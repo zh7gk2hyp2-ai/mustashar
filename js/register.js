@@ -31,7 +31,6 @@ function addCert() {
       <div class="fi"><label>الجهة المانحة</label><input class="corg" placeholder="الجهة"></div>
     </div>
     <div class="two">
-      <div class="fi"><label>الرقم المرجعي</label><input class="cnum" placeholder="رقم"></div>
       <div class="fi"><label>السنة</label><input class="cyear" type="number" placeholder="2022"></div>
     </div>
     <button onclick="this.parentElement.remove()" style="font-size:.75rem;color:var(--red);font-weight:700;cursor:pointer">✕ حذف</button>`;
