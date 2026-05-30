@@ -22,6 +22,11 @@ async function doConsultantLogin() {
   btn.textContent = 'جارٍ التحقق...';
 
   try {
+    /* clear any existing admin session first */
+    sessionStorage.removeItem('mu_auth');
+    sessionStorage.removeItem('mu_token');
+    sessionStorage.removeItem('mu_admin');
+
     /* try real backend first, fall back to localStorage check */
     let success = false;
     try {

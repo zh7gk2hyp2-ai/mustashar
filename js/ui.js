@@ -4,9 +4,13 @@
 
 /* ── Routing ──────────────────────────── */
 function go(pg, extra) {
-  /* auth guards — check BEFORE showing any page */
-  if (pg === 'dashboard' && !isLoggedIn())          { openLoginModal('admin');      return; }
-  if (pg === 'portal'    && !isConsultantLoggedIn()) { openLoginModal('consultant'); return; }
+  /* auth guards — exclusive roles, check BEFORE showing any page */
+  if (pg === 'dashboard') {
+    if (!isLoggedIn() || isConsultantLoggedIn()) { openLoginModal('admin'); return; }
+  }
+  if (pg === 'portal') {
+    if (!isConsultantLoggedIn() || isLoggedIn()) { openLoginModal('consultant'); return; }
+  }
 
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('pg-' + pg)?.classList.add('active');

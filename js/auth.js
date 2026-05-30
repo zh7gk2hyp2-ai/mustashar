@@ -73,6 +73,11 @@ function doLogin() {
   const err = document.getElementById('loginErr');
 
   if (u === ADMIN.user && p === ADMIN.pass) {
+    /* clear any existing consultant session first */
+    sessionStorage.removeItem('mu_cons');
+    sessionStorage.removeItem('mu_cons_token');
+    sessionStorage.removeItem('mu_cons_local');
+
     sessionStorage.setItem('mu_auth', '1');
     err.style.display = 'none';
     document.getElementById('loginOv').classList.remove('open');
