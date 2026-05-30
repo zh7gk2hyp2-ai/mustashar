@@ -570,11 +570,46 @@
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px" id="techCards"></div>
   </div>
 </section>
+<section style="padding:48px 0;background:var(--surf2)">
+  <div class="w">
+    <div class="sh"><div class="ey">الوثائق</div><h2>أدلة الاستخدام</h2></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;margin-top:28px">
+      <a href="docs/admin-guide.html" target="_blank" style="background:var(--surf);border:1px solid var(--bdr);border-radius:var(--rl);padding:22px;text-decoration:none;display:block;transition:all .22s"
+        onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='var(--shl)'"
+        onmouseout="this.style.transform='';this.style.boxShadow=''">
+        <div style="font-size:1.8rem;margin-bottom:8px">📋</div>
+        <h3 style="color:var(--navy);font-size:.95rem;margin-bottom:4px">دليل مدير النظام</h3>
+        <p style="font-size:.8rem;color:var(--muted)">إدارة الطلبات والمستشارين والتعاقدات</p>
+      </a>
+      <a href="docs/consultant-guide.html" target="_blank" style="background:var(--surf);border:1px solid var(--bdr);border-radius:var(--rl);padding:22px;text-decoration:none;display:block;transition:all .22s"
+        onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='var(--shl)'"
+        onmouseout="this.style.transform='';this.style.boxShadow=''">
+        <div style="font-size:1.8rem;margin-bottom:8px">👤</div>
+        <h3 style="color:var(--navy);font-size:.95rem;margin-bottom:4px">دليل المستشار</h3>
+        <p style="font-size:.8rem;color:var(--muted)">التسجيل وإدارة ملفك الاحترافي</p>
+      </a>
+      <a href="docs/entity-guide.html" target="_blank" style="background:var(--surf);border:1px solid var(--bdr);border-radius:var(--rl);padding:22px;text-decoration:none;display:block;transition:all .22s"
+        onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='var(--shl)'"
+        onmouseout="this.style.transform='';this.style.boxShadow=''">
+        <div style="font-size:1.8rem;margin-bottom:8px">🏢</div>
+        <h3 style="color:var(--navy);font-size:.95rem;margin-bottom:4px">دليل الجهات الشريكة</h3>
+        <p style="font-size:.8rem;color:var(--muted)">البحث عن مستشار وتقديم طلب تعاقد</p>
+      </a>
+      <a href="docs/deployment-guide.html" target="_blank" style="background:var(--surf);border:1px solid var(--bdr);border-radius:var(--rl);padding:22px;text-decoration:none;display:block;transition:all .22s"
+        onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='var(--shl)'"
+        onmouseout="this.style.transform='';this.style.boxShadow=''">
+        <div style="font-size:1.8rem;margin-bottom:8px">🚀</div>
+        <h3 style="color:var(--navy);font-size:.95rem;margin-bottom:4px">دليل النشر التقني</h3>
+        <p style="font-size:.8rem;color:var(--muted)">تثبيت المنصة على خوادم الجامعة</p>
+      </a>
+    </div>
+  </div>
+</section>
 <footer class="footer"><div class="w">
   <div class="fg">
     <div class="fc"><div class="logo" style="margin-bottom:12px;cursor:pointer" onclick="go('home')"><div class="logo-m">م</div><div><div class="logo-t" style="color:#fff">مُستشار</div><div class="logo-s">جامعة الطائف</div></div></div><p>منصة رقمية معتمدة من مركز البحوث والاستشارات.</p></div>
     <div class="fc"><h4>المنصة</h4><a onclick="go('search')">البحث</a><a onclick="go('register')">تسجيل</a><a onclick="go('about')">عن المنصة</a></div>
-    <div class="fc"><h4>للجهات</h4><a onclick="go('search')">استعراض الخبراء</a><a onclick="go('search')">طلب تعاقد</a></div>
+    <div class="fc"><h4>للجهات</h4><a onclick="go('search')">استعراض الخبراء</a><a onclick="go('search')">طلب تعاقد</a><a href="docs/entity-guide.html" target="_blank">دليل الاستخدام</a></div>
     <div class="fc"><h4>تواصل معنا</h4><p>📞 0127270020<br>📧 research@tu.edu.sa</p></div>
   </div>
   <div class="fb"><span>© 2025 جامعة الطائف</span><span>🇸🇦 رؤية 2030</span></div>
@@ -627,6 +662,7 @@
 </div>
 
 <!-- ════════ Scripts ════════ -->
+<script src="js/api.js"></script>
 <script src="js/data.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/ui.js"></script>

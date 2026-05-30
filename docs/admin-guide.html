@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>دليل مدير النظام – منصة مستشار</title>
+<style>
+  :root{--g:#006633;--g2:#002b16;--gold:#c8941f;--bg:#f2f7f4;--surf:#fff;--bdr:#ccddd5;--txt:#1a2b22;--txt2:#3d5a47;--muted:#6b8f7a}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:var(--bg);color:var(--txt);line-height:1.7}
+  .header{background:var(--g2);color:#fff;padding:24px 40px;display:flex;align-items:center;gap:16px}
+  .header h1{font-size:1.4rem}
+  .header .sub{font-size:.85rem;opacity:.75;margin-top:3px}
+  .container{max-width:960px;margin:0 auto;padding:32px 24px}
+  .toc{background:var(--surf);border:1px solid var(--bdr);border-radius:10px;padding:20px 28px;margin-bottom:32px}
+  .toc h2{color:var(--g);font-size:1rem;margin-bottom:12px}
+  .toc ol{padding-right:20px;color:var(--txt2);font-size:.9rem;line-height:2}
+  .toc a{color:var(--g);text-decoration:none}
+  .toc a:hover{text-decoration:underline}
+  section{background:var(--surf);border:1px solid var(--bdr);border-radius:10px;padding:28px 32px;margin-bottom:24px}
+  section h2{color:var(--g2);font-size:1.1rem;padding-bottom:10px;border-bottom:2px solid var(--bdr);margin-bottom:18px;display:flex;align-items:center;gap:8px}
+  section h3{color:var(--g);font-size:.95rem;margin:18px 0 8px}
+  p,li{font-size:.88rem;color:var(--txt2);margin-bottom:6px}
+  ul,ol{padding-right:22px;margin-bottom:10px}
+  .note{background:#fff8e1;border-right:4px solid var(--gold);padding:10px 14px;border-radius:6px;font-size:.83rem;color:#5a4000;margin:12px 0}
+  .warn{background:#fdf2f2;border-right:4px solid #c0392b;padding:10px 14px;border-radius:6px;font-size:.83rem;color:#7b1a1a;margin:12px 0}
+  .step{background:var(--bg);border-radius:8px;padding:12px 16px;margin:8px 0;font-size:.86rem;counter-increment:steps;display:flex;gap:10px;align-items:flex-start}
+  .step::before{content:counter(steps);background:var(--g);color:#fff;border-radius:50%;width:22px;height:22px;min-width:22px;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;margin-top:1px}
+  .steps{counter-reset:steps}
+  table{width:100%;border-collapse:collapse;font-size:.83rem;margin:12px 0}
+  th{background:var(--g);color:#fff;padding:8px 12px;text-align:right}
+  td{padding:8px 12px;border-bottom:1px solid var(--bdr);color:var(--txt2)}
+  tr:hover td{background:var(--bg)}
+  .badge{display:inline-block;padding:2px 8px;border-radius:12px;font-size:.75rem;font-weight:700}
+  .b-g{background:#e6f4ec;color:#155724}
+  .b-r{background:#fdecea;color:#7b1a1a}
+  .b-gold{background:#fff3cd;color:#5a4000}
+  footer{text-align:center;padding:24px;font-size:.78rem;color:var(--muted);border-top:1px solid var(--bdr);margin-top:16px}
+</style>
+</head>
+<body>
+<div class="header">
+  <div>
+    <h1>📋 دليل مدير النظام</h1>
+    <div class="sub">منصة مستشار – جامعة الطائف | الإصدار 1.0</div>
+  </div>
+</div>
+
+<div class="container">
+
+<div class="toc">
+  <h2>📑 فهرس المحتويات</h2>
+  <ol>
+    <li><a href="#login">تسجيل الدخول وإدارة الجلسة</a></li>
+    <li><a href="#dashboard">لوحة التحكم والإحصاءات</a></li>
+    <li><a href="#registrations">مراجعة طلبات التسجيل</a></li>
+    <li><a href="#consultants">إدارة المستشارين المعتمدين</a></li>
+    <li><a href="#contracts">متابعة طلبات التعاقد</a></li>
+    <li><a href="#kpis">مؤشرات الأداء الرئيسية</a></li>
+    <li><a href="#settings">إعدادات النظام والأمان</a></li>
+    <li><a href="#roles">صلاحيات الأدوار</a></li>
+  </ol>
+</div>
+
+<section id="login">
+  <h2>🔐 تسجيل الدخول وإدارة الجلسة</h2>
+  <div class="steps">
+    <div class="step">انتقل إلى الموقع وانقر على "لوحة التحكم" في شريط التنقل العلوي.</div>
+    <div class="step">أدخل اسم المستخدم وكلمة المرور في نافذة تسجيل الدخول.</div>
+    <div class="step">انقر "دخول" — ستُحوَّل تلقائياً إلى لوحة التحكم.</div>
+    <div class="step">لتسجيل الخروج انقر "خروج" في الزاوية العلوية اليمنى.</div>
+  </div>
+  <div class="note">⚡ الجلسة تنتهي تلقائياً بعد 8 ساعات من عدم النشاط. احرص على الحفظ قبل الخروج.</div>
+  <div class="warn">⚠️ لا تشارك بيانات دخولك مع أي شخص. في حال الاشتباه بأي اختراق، غيّر كلمة المرور فوراً.</div>
+
+  <h3>تغيير كلمة المرور</h3>
+  <p>من قائمة "الإعدادات" اختر "تغيير كلمة المرور"، أدخل كلمة المرور الحالية ثم الجديدة (8 أحرف على الأقل).</p>
+</section>
+
+<section id="dashboard">
+  <h2>📊 لوحة التحكم والإحصاءات</h2>
+  <p>تعرض الصفحة الرئيسية للوحة التحكم ملخصاً فورياً يشمل:</p>
+  <table>
+    <tr><th>المؤشر</th><th>الوصف</th></tr>
+    <tr><td>إجمالي المسجلين</td><td>عدد جميع طلبات التسجيل المُستلمة</td></tr>
+    <tr><td>طلبات قيد المراجعة</td><td>الطلبات التي تحتاج إجراء من المراجع</td></tr>
+    <tr><td>طلبات التعاقد</td><td>إجمالي طلبات التعاقد من الجهات الخارجية</td></tr>
+    <tr><td>الملفات المعتمدة</td><td>عدد المستشارين النشطين في الدليل</td></tr>
+  </table>
+  <p>في أسفل الصفحة: آخر 5 تسجيلات وآخر 5 طلبات تعاقد للاطلاع السريع.</p>
+</section>
+
+<section id="registrations">
+  <h2>📝 مراجعة طلبات التسجيل</h2>
+  <p>انقر على "طلبات التسجيل" في القائمة الجانبية لعرض جميع الطلبات الجديدة.</p>
+
+  <h3>خطوات مراجعة الطلب</h3>
+  <div class="steps">
+    <div class="step">راجع البيانات الأساسية: الاسم، رقم الهوية الوظيفية، الكلية، نوع العمل.</div>
+    <div class="step">تحقق من حقل "تضارب المصالح" — إذا كان "يراجع" تأكد من تفاصيل التضارب.</div>
+    <div class="step">اطّلع على السيرة الذاتية والشهادات المرفقة إن وجدت.</div>
+    <div class="step">انقر "قبول" لاعتماد الطلب وإنشاء ملف المستشار تلقائياً، أو "رفض" مع ذكر سبب الرفض.</div>
+  </div>
+
+  <h3>حالات الطلب</h3>
+  <table>
+    <tr><th>الحالة</th><th>المعنى</th><th>الإجراء المطلوب</th></tr>
+    <tr><td><span class="badge b-gold">قيد المراجعة</span></td><td>طلب جديد لم يُراجع بعد</td><td>مراجعة وقبول/رفض</td></tr>
+    <tr><td><span class="badge b-g">معتمد</span></td><td>تم القبول وإنشاء ملف المستشار</td><td>لا يلزم</td></tr>
+    <tr><td><span class="badge b-r">مرفوض</span></td><td>تم الرفض مع إشعار المتقدم</td><td>يمكن إعادة المراجعة</td></tr>
+  </table>
+
+  <div class="note">📧 عند القبول أو الرفض يُرسَل إشعار تلقائي إلى بريد المتقدم (إذا كان SMTP مُفعَّلاً).</div>
+</section>
+
+<section id="consultants">
+  <h2>👤 إدارة المستشارين المعتمدين</h2>
+  <p>من لوح "المستشارون" يمكنك:</p>
+  <ul>
+    <li>البحث والتصفية حسب الكلية أو التخصص.</li>
+    <li>عرض الملف الكامل لأي مستشار.</li>
+    <li>تعديل بيانات المستشار (المسمى، التخصص، السعر، التوفر).</li>
+    <li>تغيير حالة التوفر (متاح / مشغول).</li>
+    <li>إيقاف الملف مؤقتاً أو إلغاء الاعتماد.</li>
+  </ul>
+
+  <h3>تعديل الملخص الاحترافي (AI)</h3>
+  <p>يُنشأ الملخص تلقائياً من البيانات المُدخلة. يمكن للمراجع تعديله يدوياً من زر "تعديل الملخص" في صفحة الملف.</p>
+  <div class="note">💡 الملخص الذي وافق عليه المستشار (<strong>consent_ai = نعم</strong>) يظهر عاماً للزوار.</div>
+</section>
+
+<section id="contracts">
+  <h2>📄 متابعة طلبات التعاقد</h2>
+  <p>تصل طلبات التعاقد من نموذج الموقع وتظهر فوراً في لوح "التعاقدات".</p>
+
+  <h3>دورة حياة العقد</h3>
+  <table>
+    <tr><th>المرحلة</th><th>الإجراء</th></tr>
+    <tr><td><span class="badge b-gold">قيد الدراسة</span></td><td>مراجعة الطلب والتواصل مع الطرفين</td></tr>
+    <tr><td><span class="badge b-g">مقبول</span></td><td>تأكيد الموافقة وإشعار المستشار والجهة</td></tr>
+    <tr><td><span class="badge b-r">مرفوض</span></td><td>ذكر سبب الرفض</td></tr>
+    <tr><td><span class="badge" style="background:#e8f4fb;color:#0c4a6e">تحت التنفيذ</span></td><td>العمل جارٍ – لا إجراء فوري</td></tr>
+    <tr><td><span class="badge b-g">مكتمل</span></td><td>إغلاق العقد، يُطلب تقييم الجهة</td></tr>
+  </table>
+
+  <h3>التوزيع المالي</h3>
+  <p>عند إدخال القيمة التقديرية يحسب النظام تلقائياً:</p>
+  <ul>
+    <li><strong>70%</strong> → حصة المستشار</li>
+    <li><strong>30%</strong> → حصة الجامعة (مركز البحوث)</li>
+  </ul>
+</section>
+
+<section id="kpis">
+  <h2>📈 مؤشرات الأداء الرئيسية (KPI)</h2>
+  <table>
+    <tr><th>المؤشر</th><th>الهدف</th><th>طريقة القياس</th></tr>
+    <tr><td>المنسوبون المسجلون</td><td>200 منسوب</td><td>إجمالي سجلات الاستمارة</td></tr>
+    <tr><td>الملفات المعتمدة</td><td>150 ملف</td><td>سجلات consultants المعتمدة</td></tr>
+    <tr><td>طلبات التعاقد الشهرية</td><td>50 طلب</td><td>سجلات contracts هذا الشهر</td></tr>
+    <tr><td>متوسط التقييم</td><td>4.5 من 5</td><td>متوسط جدول reviews</td></tr>
+    <tr><td>وقت الاستجابة</td><td>≤ 48 ساعة</td><td>الوقت بين استلام الطلب والرد</td></tr>
+    <tr><td>الجهات الشريكة</td><td>30 جهة</td><td>org_name المتميز في contracts</td></tr>
+  </table>
+</section>
+
+<section id="settings">
+  <h2>⚙️ إعدادات النظام والأمان</h2>
+  <h3>متغيرات البيئة الحرجة</h3>
+  <table>
+    <tr><th>المتغير</th><th>الوصف</th></tr>
+    <tr><td>JWT_SECRET</td><td>مفتاح تشفير الجلسات – يجب أن يكون عشوائياً وطويلاً (64+ حرف)</td></tr>
+    <tr><td>DB_PASS</td><td>كلمة مرور قاعدة البيانات</td></tr>
+    <tr><td>SMTP_PASS</td><td>كلمة مرور خادم البريد</td></tr>
+    <tr><td>LDAP_BIND_PASS</td><td>كلمة مرور حساب LDAP الخدمي</td></tr>
+  </table>
+  <div class="warn">⚠️ لا ترفع ملف <code>.env</code> أبداً إلى أي مستودع Git أو نظام نسخ احتياطي غير مشفر.</div>
+
+  <h3>النسخ الاحتياطي</h3>
+  <p>جدوِل مهمة cron يومية لتصدير قاعدة البيانات:</p>
+  <pre style="background:#1e1e1e;color:#d4d4d4;padding:12px;border-radius:6px;font-size:.8rem;overflow:auto;direction:ltr">0 2 * * * mysqldump -u mustashar_user -p mustashar_db | gzip > /backups/mustashar_$(date +%F).sql.gz</pre>
+</section>
+
+<section id="roles">
+  <h2>👥 صلاحيات الأدوار</h2>
+  <table>
+    <tr><th>الدور</th><th>الصلاحيات</th></tr>
+    <tr><td><strong>super_admin</strong></td><td>كامل الصلاحيات: إدارة المديرين، الإعدادات، الحذف</td></tr>
+    <tr><td><strong>admin</strong></td><td>مراجعة الطلبات، إدارة المستشارين والتعاقدات، الإحصاءات</td></tr>
+    <tr><td><strong>reviewer</strong></td><td>مراجعة الطلبات فقط (قبول/رفض)، قراءة الإحصاءات</td></tr>
+  </table>
+</section>
+
+</div>
+<footer>منصة مستشار – جامعة الطائف &nbsp;|&nbsp; مركز البحوث والدراسات &nbsp;|&nbsp; الإصدار 1.0 – 2025</footer>
+</body>
+</html>

@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>دليل النشر على خوادم جامعة الطائف – منصة مستشار</title>
+<style>
+  :root{--g:#006633;--g2:#002b16;--gold:#c8941f;--bg:#f2f7f4;--surf:#fff;--bdr:#ccddd5;--txt:#1a2b22;--txt2:#3d5a47;--muted:#6b8f7a}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:var(--bg);color:var(--txt);line-height:1.7}
+  .header{background:var(--g2);color:#fff;padding:24px 40px}
+  .header h1{font-size:1.4rem}
+  .header .sub{font-size:.85rem;opacity:.75;margin-top:3px}
+  .container{max-width:960px;margin:0 auto;padding:32px 24px}
+  section{background:var(--surf);border:1px solid var(--bdr);border-radius:10px;padding:28px 32px;margin-bottom:24px}
+  section h2{color:var(--g2);font-size:1.1rem;padding-bottom:10px;border-bottom:2px solid var(--bdr);margin-bottom:18px}
+  section h3{color:var(--g);font-size:.95rem;margin:18px 0 8px}
+  p,li{font-size:.88rem;color:var(--txt2);margin-bottom:6px}
+  ul,ol{padding-right:22px;margin-bottom:10px}
+  .note{background:#fff8e1;border-right:4px solid var(--gold);padding:10px 14px;border-radius:6px;font-size:.83rem;color:#5a4000;margin:12px 0}
+  .warn{background:#fdf2f2;border-right:4px solid #c0392b;padding:10px 14px;border-radius:6px;font-size:.83rem;color:#7b1a1a;margin:12px 0}
+  pre{background:#1e1e1e;color:#d4d4d4;padding:14px 16px;border-radius:8px;font-size:.8rem;overflow:auto;margin:10px 0;direction:ltr;text-align:left}
+  code{background:#eaf2ee;color:var(--g2);padding:1px 5px;border-radius:3px;font-size:.82rem}
+  .step{background:var(--bg);border-radius:8px;padding:12px 16px;margin:8px 0;font-size:.86rem;counter-increment:steps;display:flex;gap:10px;align-items:flex-start}
+  .step::before{content:counter(steps);background:var(--g);color:#fff;border-radius:50%;width:22px;height:22px;min-width:22px;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;margin-top:1px}
+  .steps{counter-reset:steps}
+  table{width:100%;border-collapse:collapse;font-size:.83rem;margin:12px 0}
+  th{background:var(--g);color:#fff;padding:8px 12px;text-align:right}
+  td{padding:8px 12px;border-bottom:1px solid var(--bdr);color:var(--txt2);vertical-align:top}
+  footer{text-align:center;padding:24px;font-size:.78rem;color:var(--muted);border-top:1px solid var(--bdr);margin-top:16px}
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>🚀 دليل النشر على خوادم جامعة الطائف</h1>
+  <div class="sub">منصة مستشار | الإصدار 1.0 – متطلبات البنية التحتية والتكامل</div>
+</div>
+
+<div class="container">
+
+<section>
+  <h2>📋 متطلبات الخادم</h2>
+  <table>
+    <tr><th>المكوّن</th><th>الحد الأدنى</th><th>الموصى به</th></tr>
+    <tr><td>نظام التشغيل</td><td>Ubuntu 22.04 LTS / RHEL 8</td><td>Ubuntu 22.04 LTS</td></tr>
+    <tr><td>المعالج</td><td>2 vCPU</td><td>4 vCPU</td></tr>
+    <tr><td>الذاكرة</td><td>4 GB RAM</td><td>8 GB RAM</td></tr>
+    <tr><td>التخزين</td><td>50 GB SSD</td><td>100 GB SSD</td></tr>
+    <tr><td>Node.js</td><td>18 LTS</td><td>20 LTS</td></tr>
+    <tr><td>MySQL</td><td>8.0</td><td>8.0 + (أو MariaDB 10.6+)</td></tr>
+    <tr><td>خادم الويب</td><td>Nginx 1.24</td><td>Nginx 1.24</td></tr>
+  </table>
+</section>
+
+<section>
+  <h2>1️⃣ تثبيت البيئة</h2>
+  <h3>Node.js 20 LTS</h3>
+  <pre>curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt-get install -y nodejs</pre>
+
+  <h3>MySQL 8.0</h3>
+  <pre>sudo apt-get install -y mysql-server
+sudo mysql_secure_installation</pre>
+
+  <h3>Nginx</h3>
+  <pre>sudo apt-get install -y nginx</pre>
+
+  <h3>PM2 (لإدارة العملية)</h3>
+  <pre>sudo npm install -g pm2</pre>
+</section>
+
+<section>
+  <h2>2️⃣ إعداد قاعدة البيانات</h2>
+  <div class="steps">
+    <div class="step">سجّل دخول MySQL وأنشئ قاعدة البيانات والمستخدم:
+<pre>sudo mysql -u root -p
+
+CREATE DATABASE mustashar_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER 'mustashar_user'@'localhost' IDENTIFIED BY 'STRONG_PASSWORD_HERE';
+GRANT ALL PRIVILEGES ON mustashar_db.* TO 'mustashar_user'@'localhost';
+FLUSH PRIVILEGES;
+EXIT;</pre></div>
+    <div class="step">طبّق المخطط والبيانات الأولية:
+<pre>mysql -u mustashar_user -p mustashar_db &lt; server/db/schema.sql
+mysql -u mustashar_user -p mustashar_db &lt; server/db/seed.sql</pre></div>
+  </div>
+  <div class="warn">⚠️ استبدل <code>STRONG_PASSWORD_HERE</code> بكلمة مرور قوية (20+ حرف عشوائي) وحفظها في <code>.env</code>.</div>
+</section>
+
+<section>
+  <h2>3️⃣ رفع الكود وتثبيت الحزم</h2>
+  <div class="steps">
+    <div class="step">انسخ المشروع إلى الخادم:
+<pre>git clone https://github.com/zh7gk2hyp2-ai/mustashar.git /var/www/mustashar
+cd /var/www/mustashar/server</pre></div>
+    <div class="step">أنشئ ملف <code>.env</code> من النموذج وعدّل القيم:
+<pre>cp .env.example .env
+nano .env</pre></div>
+    <div class="step">ثبّت الاعتماديات:
+<pre>npm install --production</pre></div>
+  </div>
+</section>
+
+<section>
+  <h2>4️⃣ ضبط متغيرات البيئة (.env)</h2>
+  <p>القيم الحرجة التي <strong>يجب</strong> تغييرها:</p>
+  <table>
+    <tr><th>المتغير</th><th>القيمة المطلوبة</th></tr>
+    <tr><td>DB_PASS</td><td>كلمة مرور MySQL (قوية وعشوائية)</td></tr>
+    <tr><td>JWT_SECRET</td><td>سلسلة عشوائية 64 حرفاً على الأقل<br><code>node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"</code></td></tr>
+    <tr><td>ADMIN_PASSWORD</td><td>كلمة مرور المدير الافتراضي (ستُستخدم مرة واحدة)</td></tr>
+    <tr><td>ALLOWED_ORIGINS</td><td>https://mustashar.tu.edu.sa</td></tr>
+    <tr><td>SMTP_PASS</td><td>كلمة مرور حساب البريد noreply@tu.edu.sa</td></tr>
+  </table>
+  <div class="note">💡 بعد تعيين ADMIN_PASSWORD شغّل: <code>node -e "require('./db/init-admin')"</code> لتحديث الهاش في قاعدة البيانات (اختياري إذا استخدمت seed.sql مباشرةً).</div>
+</section>
+
+<section>
+  <h2>5️⃣ تشغيل التطبيق مع PM2</h2>
+  <pre>cd /var/www/mustashar/server
+pm2 start server.js --name mustashar --max-memory-restart 512M
+pm2 save
+pm2 startup systemd</pre>
+  <p>للتحقق من الحالة:</p>
+  <pre>pm2 status
+pm2 logs mustashar</pre>
+</section>
+
+<section>
+  <h2>6️⃣ ضبط Nginx كـ Reverse Proxy</h2>
+  <pre>sudo nano /etc/nginx/sites-available/mustashar</pre>
+  <pre>server {
+    listen 80;
+    server_name mustashar.tu.edu.sa;
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    server_name mustashar.tu.edu.sa;
+
+    ssl_certificate     /etc/ssl/certs/tu-edu-sa.crt;
+    ssl_certificate_key /etc/ssl/private/tu-edu-sa.key;
+    ssl_protocols       TLSv1.2 TLSv1.3;
+
+    client_max_body_size 15M;
+
+    location /api/ {
+        proxy_pass         http://127.0.0.1:3000;
+        proxy_http_version 1.1;
+        proxy_set_header   Upgrade $http_upgrade;
+        proxy_set_header   Connection 'upgrade';
+        proxy_set_header   Host $host;
+        proxy_set_header   X-Real-IP $remote_addr;
+        proxy_cache_bypass $http_upgrade;
+    }
+
+    location /uploads/ {
+        alias /var/www/mustashar/uploads/;
+        expires 30d;
+    }
+
+    location / {
+        root  /var/www/mustashar;
+        try_files $uri $uri/ /index.html;
+    }
+}</pre>
+  <pre>sudo ln -s /etc/nginx/sites-available/mustashar /etc/nginx/sites-enabled/
+sudo nginx -t && sudo systemctl reload nginx</pre>
+</section>
+
+<section>
+  <h2>7️⃣ تكامل LDAP / Active Directory</h2>
+  <p>في <code>.env</code> فعّل LDAP وعدّل الإعدادات:</p>
+  <pre>LDAP_ENABLED=true
+LDAP_URL=ldap://ad.tu.edu.sa:389
+LDAP_BASE_DN=DC=tu,DC=edu,DC=sa
+LDAP_BIND_DN=CN=svc-mustashar,OU=ServiceAccounts,DC=tu,DC=edu,DC=sa
+LDAP_BIND_PASS=SERVICE_ACCOUNT_PASSWORD</pre>
+  <p>يتطلب هذا التكامل:</p>
+  <ul>
+    <li>إنشاء حساب خدمة <code>svc-mustashar</code> في Active Directory بصلاحية قراءة فقط.</li>
+    <li>فتح المنفذ 389 (أو 636 لـ LDAPS) من خادم التطبيق إلى خادم AD.</li>
+    <li>تفعيل كود LDAP في <code>server/routes/auth.js</code> (معطّل افتراضياً للتوافق).</li>
+  </ul>
+  <div class="note">📞 تواصل مع إدارة تقنية المعلومات في الجامعة للحصول على بيانات الحساب الخدمي وفتح المنافذ اللازمة.</div>
+</section>
+
+<section>
+  <h2>8️⃣ تكامل Banner (Ellucian)</h2>
+  <pre>BANNER_ENABLED=true
+BANNER_API_URL=https://banner.tu.edu.sa/api
+BANNER_API_KEY=YOUR_API_KEY</pre>
+  <p>يُستخدم للتحقق من رقم المنسوب تلقائياً عند التسجيل. يتطلب:</p>
+  <ul>
+    <li>مفتاح API من إدارة Banner في جامعة الطائف.</li>
+    <li>فتح الاتصال من خادم التطبيق إلى <code>banner.tu.edu.sa</code>.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>9️⃣ الأمان والصيانة</h2>
+  <h3>جدار الحماية</h3>
+  <pre>sudo ufw allow 22/tcp   # SSH
+sudo ufw allow 80/tcp   # HTTP
+sudo ufw allow 443/tcp  # HTTPS
+sudo ufw enable</pre>
+
+  <h3>النسخ الاحتياطي اليومي</h3>
+  <pre># أضف إلى crontab -e
+0 2 * * * mysqldump -u mustashar_user -pPASSWORD mustashar_db | gzip > /backups/mustashar_$(date +\%F).sql.gz
+# احتفظ بآخر 30 نسخة
+find /backups -name "mustashar_*.sql.gz" -mtime +30 -delete</pre>
+
+  <h3>تحديث التطبيق</h3>
+  <pre>cd /var/www/mustashar
+git pull origin main
+cd server && npm install --production
+pm2 restart mustashar</pre>
+  <div class="warn">⚠️ اختبر دائماً في بيئة تجريبية قبل النشر على الإنتاج.</div>
+</section>
+
+<section>
+  <h2>✅ قائمة مراجعة ما قبل الإطلاق</h2>
+  <ul style="list-style:none;padding:0">
+    <li>☐ تغيير كلمة المرور الافتراضية <code>admin/tu2025</code></li>
+    <li>☐ ضبط JWT_SECRET بقيمة عشوائية قوية</li>
+    <li>☐ تفعيل HTTPS بشهادة SSL صادرة من جهة موثوقة</li>
+    <li>☐ التحقق من عمل SMTP وإرسال بريد اختباري</li>
+    <li>☐ اختبار LDAP مع حساب جامعي حقيقي (إن كان مُفعَّلاً)</li>
+    <li>☐ اختبار رفع ملف PDF والتحقق من حفظه</li>
+    <li>☐ اختبار تقديم طلب تسجيل من نهاية لنهاية</li>
+    <li>☐ التحقق من عمل لوحة التحكم وإحصاءاتها</li>
+    <li>☐ تجريب النسخ الاحتياطي واستعادة قاعدة البيانات</li>
+    <li>☐ تحديد ALLOWED_ORIGINS بنطاق الجامعة فقط</li>
+  </ul>
+</section>
+
+</div>
+<footer>منصة مستشار – جامعة الطائف &nbsp;|&nbsp; مركز البحوث والدراسات &nbsp;|&nbsp; الإصدار 1.0 – 2025</footer>
+</body>
+</html>
