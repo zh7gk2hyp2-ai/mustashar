@@ -33,9 +33,9 @@ function updateNav() {
     btn.onclick = consultantLogout;
     if (mobLogin) { mobLogin.textContent = '🚪 خروج'; mobLogin.onclick = consultantLogout; }
   } else {
-    btn.textContent = 'دخول';
+    btn.textContent = 'تسجيل الدخول';
     btn.onclick = () => openLoginModal();
-    if (mobLogin) { mobLogin.textContent = 'دخول'; mobLogin.onclick = () => openLoginModal(); }
+    if (mobLogin) { mobLogin.textContent = 'تسجيل الدخول'; mobLogin.onclick = () => openLoginModal(); }
   }
 }
 
