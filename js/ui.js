@@ -183,6 +183,8 @@ function renderProfile(id) {
       <div class="inforow"><span class="l">التعاقدات</span><span class="v">${c.contracts}</span></div>
       <div class="inforow"><span class="l">الحالة</span><span class="v">${c.available ? '🟢 متاح' : '🔴 مشغول'}</span></div>
       <div class="inforow"><span class="l">اللغات</span><span class="v">${c.lang.join(' • ')}</span></div>
+      ${c.rate ? `<div class="inforow"><span class="l">💰 السعر</span><span class="v" style="color:var(--blue)">${c.rate} ريال/${c.rateType}</span></div>` : ''}
+      <div class="inforow" style="border-bottom:none"><span class="l" style="font-size:.7rem;color:var(--muted)">التوزيع</span><span class="v" style="font-size:.72rem"><span style="color:var(--blue)">70% منسوب</span> / <span style="color:var(--gold)">30% جامعة</span></span></div>
     </div>
     <div class="sc" style="text-align:center">
       <button class="btn btn-p" style="width:100%;margin-bottom:10px" onclick="document.getElementById('contractOv').classList.add('open')">📄 طلب تعاقد الآن</button>

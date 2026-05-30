@@ -354,6 +354,35 @@
             <span class="chip" data-v="الفرنسية">الفرنسية</span>
           </div>
         </div>
+        <!-- التسعير -->
+        <div style="background:var(--surf2);border-radius:var(--r);padding:16px;margin-bottom:16px;border:1px solid var(--bdr)">
+          <div style="font-size:.82rem;font-weight:800;color:var(--navy);margin-bottom:12px">💰 التسعير التقديري <span style="font-weight:400;color:var(--muted)">(يحدّده مركز البحوث نهائياً)</span></div>
+          <div class="two">
+            <div class="fi" style="margin-bottom:0">
+              <label>السعر المقترح (ريال) <span class="rq">*</span></label>
+              <input id="r_rate" type="number" placeholder="500" min="100">
+            </div>
+            <div class="fi" style="margin-bottom:0">
+              <label>نوع السعر <span class="rq">*</span></label>
+              <select id="r_rate_type">
+                <option value="">اختر</option>
+                <option value="ساعة">بالساعة</option>
+                <option value="يوم">باليوم</option>
+                <option value="مشروع">بالمشروع</option>
+              </select>
+            </div>
+          </div>
+          <div style="font-size:.74rem;color:var(--muted);margin-top:8px">
+            💡 التوزيع المالي: <strong style="color:var(--blue)">70% للمنسوب</strong> / <strong style="color:var(--gold)">30% للجامعة</strong>
+          </div>
+        </div>
+        <!-- موافقة النشر -->
+        <div style="background:rgba(0,102,51,.05);border:1.5px solid rgba(0,102,51,.18);border-radius:var(--r);padding:14px;margin-bottom:16px">
+          <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:.82rem;color:var(--txt2)">
+            <input type="checkbox" id="r_consent_publish" style="margin-top:3px;accent-color:var(--blue)" required>
+            <span>أوافق على نشر ملفي التعريفي للجهات الخارجية عبر منصة مستشار، ويحق لي طلب إيقاف النشر في أي وقت بمراسلة مركز البحوث</span>
+          </label>
+        </div>
         <div class="snav2"><div></div><button class="btn btn-p" onclick="rNext(1)">التالي ←</button></div>
       </div>
 
@@ -379,6 +408,22 @@
             <span class="chip" data-v="التعليم">التعليم</span>
           </div>
           <input id="rSkillCustom" placeholder="أضف مهارة أخرى واضغط Enter..." style="margin-top:8px;width:100%;padding:8px 12px;border-radius:9px;border:1.5px solid var(--bdr);font-size:.83rem;font-family:inherit;outline:none" onkeydown="if(event.key==='Enter'){addSkill();event.preventDefault()}">
+        </div>
+        <!-- إعلان تضارب المصالح -->
+        <div style="background:rgba(200,148,31,.06);border:1.5px solid rgba(200,148,31,.3);border-radius:var(--r);padding:16px;margin-bottom:16px">
+          <div style="font-size:.84rem;font-weight:800;color:var(--navy);margin-bottom:10px">⚖️ إعلان تضارب المصالح <span class="rq">*</span></div>
+          <div class="fi" style="margin-bottom:10px">
+            <label>هل لديك ارتباط بجهة خارجية قد تطلب خدماتك؟</label>
+            <select id="r_conflict">
+              <option value="">اختر</option>
+              <option value="no">لا يوجد تضارب مصالح</option>
+              <option value="yes">نعم، لدي ارتباط (يرجى التوضيح)</option>
+            </select>
+          </div>
+          <div class="fi" id="conflictDetailBox" style="display:none;margin-bottom:0">
+            <label>تفاصيل الارتباط</label>
+            <textarea id="r_conflict_detail" placeholder="اذكر اسم الجهة وطبيعة الارتباط..."></textarea>
+          </div>
         </div>
         <div class="snav2"><button class="btn btn-g" onclick="rPrev(2)">← رجوع</button><button class="btn btn-p" onclick="rNext(2)">التالي ←</button></div>
       </div>
@@ -420,10 +465,16 @@
         <div class="sp-title">مراجعة البيانات</div>
         <div class="sp-desc">تحقق من بياناتك قبل الإرسال</div>
         <div id="reviewBox" style="background:var(--surf);border:1px solid var(--bdr);border-radius:var(--rl);padding:20px;margin-bottom:18px;font-size:.84rem;line-height:2"></div>
-        <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:.82rem;color:var(--txt2);margin-bottom:20px">
-          <input type="checkbox" id="consent" style="margin-top:3px;accent-color:var(--blue)">
-          أوافق على سياسة الخصوصية وأتعهد بصحة جميع المعلومات وفق نظام حماية البيانات السعودي
-        </label>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px">
+          <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:.82rem;color:var(--txt2)">
+            <input type="checkbox" id="consent" style="margin-top:3px;accent-color:var(--blue)">
+            أتعهد بصحة جميع المعلومات المُدخلة وأوافق على سياسة الخصوصية وفق نظام حماية البيانات الشخصية السعودي (نظام PDPL)
+          </label>
+          <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:.82rem;color:var(--txt2)">
+            <input type="checkbox" id="consent2" style="margin-top:3px;accent-color:var(--blue)">
+            أُقرّ بأن الملخص الذي سيولّده الذكاء الاصطناعي من بياناتي سيخضع لمراجعتي قبل النشر النهائي، وأحق في طلب تعديله
+          </label>
+        </div>
         <div class="snav2"><button class="btn btn-g" onclick="rPrev(5)">← رجوع</button><button class="btn btn-gold btn-lg" onclick="submitReg()">✅ إرسال للمراجعة</button></div>
       </div>
 
@@ -468,6 +519,7 @@
       <a onclick="showPanel('consultants')" id="dp-consultants">👤 المنسوبون</a>
       <a onclick="showPanel('contracts')"   id="dp-contracts">📄 طلبات التعاقد</a>
       <a onclick="showPanel('analytics')"   id="dp-analytics">📈 التقارير</a>
+      <a onclick="showPanel('kpis')"        id="dp-kpis">🎯 مؤشرات الأداء</a>
     </div>
   </div>
   <div>
@@ -507,6 +559,30 @@
       <h3 style="color:var(--navy);margin-bottom:18px">إدارة طلبات التعاقد</h3>
       <div id="dashContractsList"></div>
     </div>
+    <!-- KPIs -->
+    <div class="dpanel" id="pan-kpis">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+        <h3 style="color:var(--navy)">🎯 مؤشرات الأداء – السنة الأولى</h3>
+        <span class="tag tag-gold">مرحلة الإطلاق – الربع الأول</span>
+      </div>
+      <div id="kpiCards"></div>
+      <!-- التوزيع المالي -->
+      <div style="background:var(--surf);border:1px solid var(--bdr);border-radius:var(--rl);padding:22px;margin-top:18px">
+        <h4 style="font-size:.88rem;color:var(--navy);margin-bottom:16px">💰 نموذج التوزيع المالي</h4>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+          <div style="background:rgba(0,102,51,.07);border-radius:var(--r);padding:18px;text-align:center;border:1.5px solid rgba(0,102,51,.2)">
+            <div style="font-size:2rem;font-weight:900;color:var(--blue)">70%</div>
+            <div style="font-size:.8rem;color:var(--txt2);margin-top:4px">عائد المنسوب</div>
+          </div>
+          <div style="background:rgba(200,148,31,.07);border-radius:var(--r);padding:18px;text-align:center;border:1.5px solid rgba(200,148,31,.25)">
+            <div style="font-size:2rem;font-weight:900;color:var(--gold)">30%</div>
+            <div style="font-size:.8rem;color:var(--txt2);margin-top:4px">عائد الجامعة (مركز البحوث)</div>
+          </div>
+        </div>
+        <p style="font-size:.75rem;color:var(--muted);margin-top:12px">النسب قابلة للمراجعة وفق طبيعة كل عقد ونوع الخدمة، ويُحدَّد التسعير النهائي من قِبل مركز البحوث والاستشارات.</p>
+      </div>
+    </div>
+
     <!-- Analytics -->
     <div class="dpanel" id="pan-analytics">
       <h3 style="color:var(--navy);margin-bottom:18px">📈 التقارير والتحليلات</h3>

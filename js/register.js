@@ -54,6 +54,14 @@ function rmFile(key, name, el) {
   el.remove();
 }
 
+/* إظهار حقل التفاصيل عند اختيار وجود تضارب */
+document.addEventListener('change', e => {
+  if (e.target.id === 'r_conflict') {
+    document.getElementById('conflictDetailBox').style.display =
+      e.target.value === 'yes' ? 'block' : 'none';
+  }
+});
+
 function rNext(cur) {
   if (cur === 1) {
     const req = ['r1','r2','r3','r4','r5','r6','r7'];
@@ -63,6 +71,20 @@ function rNext(cur) {
     }
     if (!/^05\d{8}$/.test(document.getElementById('r4').value)) {
       toast('رقم الجوال غير صحيح', 't-err');
+      return;
+    }
+    if (!document.getElementById('r_rate').value || !document.getElementById('r_rate_type').value) {
+      toast('يرجى إدخال السعر التقديري ونوعه', 't-err');
+      return;
+    }
+    if (!document.getElementById('r_consent_publish').checked) {
+      toast('يرجى الموافقة على نشر الملف', 't-err');
+      return;
+    }
+  }
+  if (cur === 2) {
+    if (!document.getElementById('r_conflict').value) {
+      toast('يرجى تعبئة إعلان تضارب المصالح', 't-err');
       return;
     }
   }
@@ -93,8 +115,11 @@ function goRStep(n) {
 }
 
 function buildReview() {
-  const skills = [...document.querySelectorAll('#skillG .chip.on')].map(c => c.dataset.v || c.textContent);
-  const langs  = [...document.querySelectorAll('#langG .chip.on')].map(c => c.dataset.v || c.textContent);
+  const skills   = [...document.querySelectorAll('#skillG .chip.on')].map(c => c.dataset.v || c.textContent);
+  const langs    = [...document.querySelectorAll('#langG .chip.on')].map(c => c.dataset.v || c.textContent);
+  const rate     = document.getElementById('r_rate').value;
+  const rateType = document.getElementById('r_rate_type').value;
+  const conflict = document.getElementById('r_conflict').value === 'yes' ? '⚠️ نعم – يراجع المركز' : '✅ لا يوجد';
   document.getElementById('reviewBox').innerHTML = `
     <div><strong>الاسم:</strong> ${document.getElementById('r1').value} ${document.getElementById('r2').value}</div>
     <div><strong>رقم المنسوب:</strong> ${document.getElementById('r3').value}</div>
@@ -103,12 +128,15 @@ function buildReview() {
     <div><strong>طبيعة العمل:</strong> ${document.getElementById('r7').value === 'academic' ? 'أكاديمي' : 'إداري'}</div>
     <div><strong>المهارات:</strong> ${skills.join('، ') || '—'}</div>
     <div><strong>اللغات:</strong> ${langs.join('، ')}</div>
+    <div><strong>السعر التقديري:</strong> ${rate} ريال / ${rateType} <span style="color:var(--muted);font-size:.75rem">(70% للمنسوب)</span></div>
+    <div><strong>تضارب المصالح:</strong> ${conflict}</div>
+    <div><strong>الموافقة على النشر:</strong> ✅ موافق</div>
     <div><strong>السيرة الذاتية:</strong> ${rFiles.cv.length ? '✅ مرفوعة' : '❌ مطلوبة'}</div>`;
 }
 
 function submitReg() {
-  if (!document.getElementById('consent').checked) {
-    toast('يرجى الموافقة على سياسة الخصوصية', 't-err');
+  if (!document.getElementById('consent').checked || !document.getElementById('consent2').checked) {
+    toast('يرجى الموافقة على جميع الإقرارات', 't-err');
     return;
   }
 
@@ -116,25 +144,29 @@ function submitReg() {
   const skills = [...document.querySelectorAll('#skillG .chip.on')].map(c => c.dataset.v || c.textContent);
   const langs  = [...document.querySelectorAll('#langG .chip.on')].map(c => c.dataset.v || c.textContent);
 
-  /* حفظ بيانات التسجيل في localStorage */
   const regs = getRegs();
   regs.push({
-    id:        reqId,
-    firstName: document.getElementById('r1').value.trim(),
-    lastName:  document.getElementById('r2').value.trim(),
-    empId:     document.getElementById('r3').value.trim(),
-    phone:     document.getElementById('r4').value.trim(),
-    email:     document.getElementById('r5').value.trim(),
-    college:   document.getElementById('r6').value,
-    type:      document.getElementById('r7').value === 'academic' ? 'أكاديمي' : 'إداري',
+    id:             reqId,
+    firstName:      document.getElementById('r1').value.trim(),
+    lastName:       document.getElementById('r2').value.trim(),
+    empId:          document.getElementById('r3').value.trim(),
+    phone:          document.getElementById('r4').value.trim(),
+    email:          document.getElementById('r5').value.trim(),
+    college:        document.getElementById('r6').value,
+    type:           document.getElementById('r7').value === 'academic' ? 'أكاديمي' : 'إداري',
+    rate:           document.getElementById('r_rate').value,
+    rateType:       document.getElementById('r_rate_type').value,
+    conflict:       document.getElementById('r_conflict').value === 'yes',
+    conflictDetail: document.getElementById('r_conflict_detail')?.value.trim() || '',
+    consentPublish: true,
     skills,
     langs,
-    adminExp:  document.getElementById('r_admin').value.trim(),
-    trainExp:  document.getElementById('r_train').value.trim(),
-    resExp:    document.getElementById('r_res').value.trim(),
-    status:    'قيد المراجعة',
-    date:      new Date().toLocaleDateString('ar-SA'),
-    timestamp: Date.now()
+    adminExp:       document.getElementById('r_admin').value.trim(),
+    trainExp:       document.getElementById('r_train').value.trim(),
+    resExp:         document.getElementById('r_res').value.trim(),
+    status:         'قيد المراجعة',
+    date:           new Date().toLocaleDateString('ar-SA'),
+    timestamp:      Date.now()
   });
   saveRegs(regs);
 

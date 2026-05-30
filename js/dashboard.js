@@ -6,6 +6,100 @@ function showPanel(id) {
   document.getElementById('pan-' + id).classList.add('act');
   document.querySelectorAll('.dsec a').forEach(a => a.classList.remove('on'));
   document.getElementById('dp-' + id).classList.add('on');
+  if (id === 'kpis') renderKPIs();
+}
+
+/* ── مؤشرات الأداء KPIs ── */
+function renderKPIs() {
+  const regs      = getRegs();
+  const approved  = regs.filter(r => r.status === 'معتمد').length + DATA.length;
+  const totalRegs = DATA.length + regs.length;
+  const contracts = STATE.contracts.length;
+  const avgRating = DATA.reduce((s, c) => s + c.rating, 0) / DATA.length;
+
+  const kpis = [
+    {
+      label:   'المنسوبون المسجلون',
+      icon:    '👤',
+      current: totalRegs,
+      target:  KPI_TARGETS.registeredConsultants,
+      unit:    'منسوب',
+      color:   'var(--blue)',
+    },
+    {
+      label:   'الملفات المعتمدة',
+      icon:    '✅',
+      current: approved,
+      target:  KPI_TARGETS.approvedProfiles,
+      unit:    'ملف',
+      color:   'var(--green)',
+    },
+    {
+      label:   'طلبات التعاقد (الكلي)',
+      icon:    '📄',
+      current: contracts,
+      target:  KPI_TARGETS.monthlyContracts,
+      unit:    'طلب',
+      color:   'var(--gold)',
+    },
+    {
+      label:   'متوسط التقييم',
+      icon:    '⭐',
+      current: +avgRating.toFixed(1),
+      target:  KPI_TARGETS.avgRating,
+      unit:    'من 5',
+      color:   '#f59e0b',
+      decimal: true,
+    },
+    {
+      label:   'هدف الجهات الشريكة',
+      icon:    '🏢',
+      current: Math.min(STATE.contracts.map(c => c.org).filter((v,i,a)=>a.indexOf(v)===i).length, KPI_TARGETS.partnerEntities),
+      target:  KPI_TARGETS.partnerEntities,
+      unit:    'جهة',
+      color:   'var(--teal)',
+    },
+    {
+      label:   'وقت الاستجابة المستهدف',
+      icon:    '⏱️',
+      current: 24,
+      target:  KPI_TARGETS.responseHours,
+      unit:    'ساعة',
+      color:   'var(--mid)',
+      inverse: true,
+    },
+  ];
+
+  document.getElementById('kpiCards').innerHTML =
+    `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px">` +
+    kpis.map(k => {
+      const pct   = k.inverse
+        ? Math.min(100, Math.round((k.target / Math.max(k.current, 1)) * 100))
+        : Math.min(100, Math.round((k.current / k.target) * 100));
+      const val   = k.decimal ? k.current.toFixed(1) : k.current;
+      const tgt   = k.decimal ? k.target.toFixed(1)  : k.target;
+      const badge = pct >= 100 ? '<span class="tag tag-g" style="margin-right:8px">✓ تحقق</span>'
+                  : pct >= 60  ? '<span class="tag tag-gold" style="margin-right:8px">جارٍ</span>'
+                  :              '<span class="tag tag-r" style="margin-right:8px">دون الهدف</span>';
+      return `
+        <div style="background:var(--surf);border:1px solid var(--bdr);border-radius:var(--rl);padding:20px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="font-size:1.4rem">${k.icon}</span>
+              <span style="font-size:.82rem;font-weight:700;color:var(--txt2)">${k.label}</span>
+            </div>
+            ${badge}
+          </div>
+          <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:10px">
+            <span style="font-size:1.9rem;font-weight:900;color:${k.color}">${val}</span>
+            <span style="font-size:.78rem;color:var(--muted)">/ ${tgt} ${k.unit}</span>
+          </div>
+          <div style="background:var(--surf2);border-radius:6px;overflow:hidden;height:8px">
+            <div style="width:${pct}%;height:100%;background:${k.color};border-radius:6px;transition:width .6s"></div>
+          </div>
+          <div style="font-size:.72rem;color:var(--muted);margin-top:5px;text-align:left">${pct}%</div>
+        </div>`;
+    }).join('') + '</div>';
 }
 
 function renderDash() {
@@ -66,16 +160,18 @@ function renderPendingTable() {
   const el = document.getElementById('pendingTable');
   if (!el) return;
   el.innerHTML =
-    `<tr><th>الاسم</th><th>رقم المنسوب</th><th>الكلية</th><th>النوع</th><th>الحالة</th><th>التاريخ</th><th>إجراء</th></tr>` +
+    `<tr><th>الاسم</th><th>الكلية</th><th>النوع</th><th>السعر</th><th>تضارب</th><th>الحالة</th><th>التاريخ</th><th>إجراء</th></tr>` +
     (regs.length
       ? regs.slice().reverse().map(r =>
           `<tr>
-            <td><strong>${r.firstName} ${r.lastName}</strong>
-              <div style="font-size:.73rem;color:var(--muted)">${r.email}</div>
+            <td>
+              <strong>${r.firstName} ${r.lastName}</strong>
+              <div style="font-size:.72rem;color:var(--muted)">${r.email || ''} ${r.empId ? '| ' + r.empId : ''}</div>
             </td>
-            <td style="font-size:.78rem">${r.empId}</td>
             <td style="font-size:.78rem;color:var(--muted)">${r.college}</td>
             <td>${r.type}</td>
+            <td style="font-size:.78rem;color:var(--blue);font-weight:700">${r.rate ? r.rate + ' ر/' + r.rateType : '—'}</td>
+            <td>${r.conflict ? '<span class="tag tag-r">⚠️ يراجع</span>' : '<span class="tag tag-g">✓ لا يوجد</span>'}</td>
             <td><span class="tag ${statusClass(r.status)}" id="rs-${r.id}">${r.status}</span></td>
             <td>${r.date}</td>
             <td>
@@ -85,7 +181,7 @@ function renderPendingTable() {
               </div>
             </td>
           </tr>`).join('')
-      : '<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:24px">لا توجد طلبات تسجيل بعد</td></tr>');
+      : '<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:24px">لا توجد طلبات تسجيل بعد</td></tr>');
 }
 
 function approveReg(id) {
