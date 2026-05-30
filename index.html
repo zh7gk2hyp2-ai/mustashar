@@ -6,534 +6,7 @@
 <title>مُستشار — منصة خبرات جامعة الطائف</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
-<style>
-/* ════════════════════════════════════════════
-   DESIGN TOKENS
-════════════════════════════════════════════ */
-:root {
-  --navy:   #0b1f3a;
-  --blue:   #163d75;
-  --mid:    #1e56a0;
-  --sky:    #3b82c4;
-  --gold:   #c8941f;
-  --gold2:  #e8b44a;
-  --teal:   #0b7a8a;
-  --green:  #0a7c5c;
-  --red:    #c0392b;
-  --bg:     #f4f7fb;
-  --surf:   #ffffff;
-  --surf2:  #eef2f8;
-  --bdr:    #d8e2f0;
-  --txt:    #0d1f36;
-  --txt2:   #3a5070;
-  --muted:  #6b82a0;
-  --r:      14px;
-  --rl:     20px;
-  --sh:     0 4px 20px rgba(11,31,58,.08);
-  --shl:    0 12px 48px rgba(11,31,58,.14);
-}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth;font-size:16px}
-body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--txt);direction:rtl;overflow-x:hidden;line-height:1.65}
-a{text-decoration:none;color:inherit}
-button{cursor:pointer;font-family:inherit;border:none;background:none}
-img{max-width:100%;display:block}
-input,select,textarea{font-family:inherit}
-
-/* ── Layout ───────────────────────────────── */
-.w{max-width:1180px;margin:0 auto;padding:0 24px}
-.page{display:none;min-height:100vh}
-.page.active{display:block}
-
-/* ── Buttons ──────────────────────────────── */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;
-  padding:10px 22px;border-radius:var(--r);font-size:.87rem;font-weight:700;
-  transition:all .22s;white-space:nowrap;cursor:pointer}
-.btn-p{background:linear-gradient(135deg,var(--blue),var(--mid));color:#fff;
-  box-shadow:0 4px 18px rgba(22,61,117,.28)}
-.btn-p:hover{box-shadow:0 8px 32px rgba(22,61,117,.4);transform:translateY(-1px)}
-.btn-g{color:var(--blue);border:1.5px solid var(--bdr);background:var(--surf)}
-.btn-g:hover{border-color:var(--blue);background:var(--surf2)}
-.btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#fff;
-  box-shadow:0 4px 18px rgba(200,148,31,.3)}
-.btn-gold:hover{box-shadow:0 8px 32px rgba(200,148,31,.45);transform:translateY(-1px)}
-.btn-sm{padding:7px 16px;font-size:.8rem;border-radius:10px}
-.btn-lg{padding:14px 32px;font-size:1rem;border-radius:var(--rl)}
-
-/* ── Nav ──────────────────────────────────── */
-.nav{position:fixed;top:0;inset-inline:0;z-index:200;height:64px;
-  background:rgba(255,255,255,.94);backdrop-filter:blur(16px);
-  border-bottom:1px solid var(--bdr);transition:box-shadow .3s}
-.nav.up{box-shadow:var(--shl)}
-.nav-in{display:flex;align-items:center;gap:20px;height:100%;
-  max-width:1180px;margin:0 auto;padding:0 24px}
-.logo{display:flex;align-items:center;gap:10px;font-weight:900;color:var(--navy);flex-shrink:0}
-.logo-m{width:38px;height:38px;border-radius:10px;flex-shrink:0;
-  background:linear-gradient(135deg,var(--navy),var(--blue));
-  color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:900}
-.logo-t{font-size:1.1rem}
-.logo-s{font-size:.66rem;font-weight:400;color:var(--muted);display:block;margin-top:-2px}
-.nav-links{display:flex;align-items:center;gap:2px;flex:1}
-.nav-links a{padding:6px 13px;border-radius:10px;font-size:.84rem;font-weight:600;
-  color:var(--txt2);transition:all .18s}
-.nav-links a:hover,.nav-links a.on{color:var(--navy);background:var(--surf2)}
-.nav-end{display:flex;gap:10px;align-items:center}
-.ham{display:none;width:38px;height:38px;border-radius:10px;border:1.5px solid var(--bdr);
-  align-items:center;justify-content:center;font-size:1.1rem;color:var(--navy);margin-right:auto}
-.mob{display:none;flex-direction:column;gap:2px;padding:10px 20px 14px;
-  background:var(--surf);border-top:1px solid var(--bdr)}
-.mob a{padding:9px 12px;border-radius:10px;font-size:.88rem;font-weight:600;color:var(--txt2)}
-.mob.open{display:flex}
-
-/* ── Section header ───────────────────────── */
-.sh{text-align:center;margin-bottom:48px}
-.sh .ey{display:inline-block;padding:4px 14px;border-radius:20px;
-  background:rgba(22,61,117,.08);color:var(--blue);
-  font-size:.75rem;font-weight:800;letter-spacing:.6px;margin-bottom:10px}
-.sh h2{color:var(--navy);font-size:clamp(1.4rem,3vw,2rem);font-weight:900}
-.sh p{color:var(--txt2);font-size:.9rem;max-width:500px;margin:8px auto 0}
-
-/* ── Cards ────────────────────────────────── */
-.cc{background:var(--surf);border-radius:var(--rl);border:1px solid var(--bdr);
-  overflow:hidden;transition:all .24s;cursor:default}
-.cc:hover{transform:translateY(-4px);box-shadow:var(--shl);border-color:rgba(22,61,117,.2)}
-.cc-top{display:flex;gap:12px;align-items:flex-start;padding:18px 18px 12px}
-.cc-av{width:50px;height:50px;border-radius:12px;flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:900;color:#fff}
-.cc-name{font-weight:800;font-size:.92rem;color:var(--navy)}
-.cc-role{font-size:.74rem;color:var(--muted);margin-top:1px}
-.cc-coll{font-size:.72rem;color:var(--mid);margin-top:1px}
-.cc-tr{margin-right:auto;display:flex;flex-direction:column;align-items:flex-end;gap:5px}
-.cc-sum{font-size:.77rem;color:var(--txt2);line-height:1.6;padding:0 18px 12px}
-.cc-tags{display:flex;flex-wrap:wrap;gap:5px;padding:0 18px 14px}
-.cc-ft{padding:12px 18px;border-top:1px solid var(--bdr);
-  display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
-.cc-rat{font-size:.74rem;color:var(--muted)}
-.stars{color:#f59e0b;font-size:.84rem;letter-spacing:1px}
-
-/* ── Tags ─────────────────────────────────── */
-.tag{display:inline-block;padding:3px 10px;border-radius:6px;font-size:.72rem;font-weight:700;
-  background:var(--surf2);color:var(--txt2)}
-.tag-g{background:rgba(10,124,92,.09);color:var(--green)}
-.tag-b{background:rgba(22,61,117,.09);color:var(--blue)}
-.tag-gold{background:rgba(200,148,31,.12);color:var(--gold)}
-.tag-r{background:rgba(192,57,43,.08);color:var(--red)}
-
-/* ── Chip ─────────────────────────────────── */
-.chip{padding:6px 14px;border-radius:9px;font-size:.78rem;font-weight:700;
-  border:1.5px solid var(--bdr);color:var(--txt2);cursor:pointer;
-  transition:all .18s;background:var(--surf)}
-.chip:hover{border-color:var(--blue)}
-.chip.on{background:rgba(22,61,117,.08);border-color:var(--blue);color:var(--blue)}
-
-/* ── Animations ───────────────────────────── */
-@keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
-@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(1.3)}}
-@keyframes spin{to{transform:rotate(360deg)}}
-.au{opacity:0;animation:fadeUp .55s ease forwards;animation-delay:var(--d,0s)}
-
-/* ── Toast ────────────────────────────────── */
-#toasts{position:fixed;bottom:24px;left:24px;z-index:9999;
-  display:flex;flex-direction:column;gap:8px;pointer-events:none}
-.toast{display:flex;align-items:center;gap:10px;padding:12px 18px;
-  border-radius:var(--r);font-size:.85rem;font-weight:700;color:#fff;
-  box-shadow:var(--shl);animation:fadeUp .3s ease;pointer-events:all;max-width:320px}
-.t-ok{background:var(--green)}.t-err{background:var(--red)}.t-inf{background:var(--blue)}
-
-/* ── Modal ────────────────────────────────── */
-.ov{position:fixed;inset:0;z-index:500;background:rgba(11,31,58,.55);
-  backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;
-  opacity:0;pointer-events:none;transition:opacity .25s}
-.ov.open{opacity:1;pointer-events:all}
-.modal{background:var(--surf);border-radius:var(--rl);padding:32px;
-  width:min(520px,92vw);max-height:88vh;overflow-y:auto;
-  transform:translateY(14px);transition:transform .25s;box-shadow:var(--shl)}
-.ov.open .modal{transform:translateY(0)}
-.m-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
-.m-close{width:32px;height:32px;border-radius:8px;background:var(--surf2);
-  display:flex;align-items:center;justify-content:center;font-size:1.1rem;color:var(--muted);transition:all .18s}
-.m-close:hover{background:var(--red);color:#fff}
-
-/* ── Form ─────────────────────────────────── */
-.fi{margin-bottom:16px}
-.fi label{display:block;font-size:.82rem;font-weight:700;color:var(--txt);margin-bottom:6px}
-.fi label .rq{color:var(--red);margin-right:2px}
-.fi input,.fi select,.fi textarea{width:100%;padding:10px 14px;border-radius:var(--r);
-  border:1.5px solid var(--bdr);background:var(--surf);font-size:.87rem;color:var(--txt);
-  outline:none;transition:border-color .2s,box-shadow .2s}
-.fi input:focus,.fi select:focus,.fi textarea:focus{border-color:var(--blue);
-  box-shadow:0 0 0 3px rgba(22,61,117,.1)}
-.fi textarea{resize:vertical;min-height:88px}
-.fi .hint{font-size:.73rem;color:var(--muted);margin-top:4px}
-.fi .err{font-size:.73rem;color:var(--red);margin-top:4px;display:none}
-.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-
-/* ── Footer ───────────────────────────────── */
-.footer{background:var(--navy);color:rgba(255,255,255,.7);padding:56px 0 0}
-.fg{display:grid;grid-template-columns:1.8fr 1fr 1fr 1fr;gap:36px;
-  padding-bottom:44px;border-bottom:1px solid rgba(255,255,255,.08)}
-.fc h4{font-size:.84rem;font-weight:800;color:#fff;margin-bottom:14px}
-.fc a{display:block;font-size:.81rem;margin-bottom:9px;transition:color .18s}
-.fc a:hover{color:#fff}
-.fc p{font-size:.8rem;line-height:1.8}
-.fb{display:flex;align-items:center;justify-content:space-between;
-  padding:18px 0;font-size:.76rem}
-
-/* ══════════════════════════════════════════
-   PAGE: HOME
-══════════════════════════════════════════ */
-/* Hero */
-.hero{min-height:100vh;padding-top:64px;position:relative;overflow:hidden;
-  background:linear-gradient(155deg,var(--navy) 0%,#112d60 55%,var(--blue) 100%);
-  display:flex;align-items:center}
-.hero-dots{position:absolute;inset:0;pointer-events:none;
-  background-image:radial-gradient(circle,rgba(255,255,255,.055) 1px,transparent 1px);
-  background-size:34px 34px}
-.hero-g1{position:absolute;width:700px;height:700px;border-radius:50%;pointer-events:none;
-  background:radial-gradient(circle,rgba(59,130,196,.2) 0%,transparent 68%);top:-150px;left:-100px}
-.hero-g2{position:absolute;width:450px;height:450px;border-radius:50%;pointer-events:none;
-  background:radial-gradient(circle,rgba(200,148,31,.15) 0%,transparent 68%);bottom:0;right:8%}
-.hero-in{position:relative;z-index:2;display:grid;grid-template-columns:1fr 460px;
-  gap:60px;align-items:center;padding:80px 24px;max-width:1180px;margin:0 auto;width:100%}
-.hbadge{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;
-  border-radius:20px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16);
-  color:rgba(255,255,255,.88);font-size:.77rem;font-weight:700;margin-bottom:20px}
-.hbadge .dot{width:7px;height:7px;border-radius:50%;background:#4ade80;animation:pulse 2s infinite}
-.h1{font-size:clamp(2rem,5vw,3.4rem);font-weight:900;color:#fff;line-height:1.18;margin-bottom:18px}
-.h1 em{font-style:normal;color:var(--gold2)}
-.hdesc{font-size:.97rem;color:rgba(255,255,255,.72);line-height:1.8;max-width:500px;margin-bottom:32px}
-.hbtns{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:44px}
-.hbtn1{display:inline-flex;align-items:center;gap:10px;padding:14px 28px;
-  border-radius:var(--rl);font-size:.95rem;font-weight:800;
-  background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--navy);
-  box-shadow:0 8px 32px rgba(200,148,31,.42);transition:all .25s}
-.hbtn1:hover{transform:translateY(-2px);box-shadow:0 14px 44px rgba(200,148,31,.55)}
-.hbtn2{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;
-  border-radius:var(--rl);font-size:.95rem;font-weight:700;color:#fff;
-  background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.22);transition:all .25s}
-.hbtn2:hover{background:rgba(255,255,255,.18)}
-.hstats{display:flex;gap:28px;flex-wrap:wrap}
-.hstat strong{display:block;font-size:1.6rem;font-weight:900;color:#fff}
-.hstat span{font-size:.76rem;color:rgba(255,255,255,.58)}
-.hsdiv{width:1px;background:rgba(255,255,255,.14)}
-
-/* hero visual */
-.hvis{position:relative}
-.hcard{background:rgba(255,255,255,.09);backdrop-filter:blur(14px);
-  border:1px solid rgba(255,255,255,.16);border-radius:18px;
-  padding:15px 18px;display:flex;align-items:center;gap:14px;
-  margin-bottom:12px;transition:transform .3s}
-.hcard:nth-child(2){margin-right:24px;transform:translateY(6px)}
-.hcard:hover{transform:translateY(-3px)!important}
-.hav{width:46px;height:46px;border-radius:12px;flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:900;color:#fff}
-.hn{font-size:.87rem;font-weight:700;color:#fff}
-.hr2{font-size:.72rem;color:rgba(255,255,255,.62)}
-.hs{color:#f59e0b;font-size:.74rem}
-.hvbadge{margin-right:auto;font-size:.67rem;font-weight:700;padding:2px 8px;
-  border-radius:6px;background:rgba(74,222,128,.16);color:#4ade80}
-.hfloat{position:absolute;border-radius:12px;background:rgba(255,255,255,.1);
-  border:1px solid rgba(255,255,255,.2);backdrop-filter:blur(10px);
-  color:#fff;font-size:.74rem;font-weight:700;padding:8px 14px;
-  display:flex;align-items:center;gap:6px;animation:float 3s ease-in-out infinite}
-
-/* How section */
-.how{padding:88px 0;background:var(--surf)}
-.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:0;position:relative}
-.steps::before{content:'';position:absolute;top:36px;right:16.67%;width:66.66%;height:2px;
-  background:linear-gradient(90deg,var(--blue),var(--sky),var(--teal))}
-.sti{text-align:center;padding:0 24px}
-.sti-ring{width:72px;height:72px;border-radius:50%;margin:0 auto 16px;
-  background:var(--surf);border:2px solid var(--bdr);
-  display:flex;align-items:center;justify-content:center;font-size:1.6rem;
-  position:relative;z-index:1;transition:all .3s;box-shadow:var(--sh)}
-.sti:hover .sti-ring{border-color:var(--blue);box-shadow:0 0 0 7px rgba(22,61,117,.07)}
-.sti-n{position:absolute;top:-8px;right:-8px;width:24px;height:24px;border-radius:50%;
-  background:var(--blue);color:#fff;font-size:.68rem;font-weight:800;
-  display:flex;align-items:center;justify-content:center}
-.sti h3{margin-bottom:8px;color:var(--navy)}
-.sti p{font-size:.83rem;color:var(--txt2)}
-
-/* quick search */
-.qsec{padding:64px 0}
-.qbox{background:var(--surf);border-radius:var(--rl);padding:28px 32px;
-  box-shadow:var(--shl);border:1px solid var(--bdr)}
-.qrow{display:flex;gap:10px;margin-bottom:14px}
-.qinp{flex:1;position:relative}
-.qinp svg{position:absolute;right:13px;top:50%;transform:translateY(-50%);
-  width:17px;height:17px;color:var(--muted);pointer-events:none}
-.qinp input{width:100%;padding:12px 40px 12px 14px;border-radius:10px;
-  border:1.5px solid var(--bdr);font-size:.9rem;outline:none;transition:border-color .2s}
-.qinp input:focus{border-color:var(--blue)}
-.qchips{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
-
-/* featured */
-.feat{padding:80px 0}
-.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px}
-
-/* categories */
-.cats{padding:80px 0;background:var(--surf)}
-.catgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
-.catcard{background:var(--bg);border:1.5px solid var(--bdr);border-radius:var(--r);
-  padding:22px 16px;text-align:center;transition:all .22s;display:block;cursor:pointer}
-.catcard:hover{border-color:var(--blue);background:#fff;transform:translateY(-3px);box-shadow:var(--sh)}
-.caticon{font-size:1.8rem;display:block;margin-bottom:10px}
-.catname{font-weight:700;font-size:.88rem;color:var(--navy);display:block;margin-bottom:4px}
-.catcount{font-size:.73rem;color:var(--muted)}
-
-/* testimonials */
-.testi{padding:80px 0}
-.tgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
-.tc{background:var(--surf);border:1px solid var(--bdr);border-radius:var(--rl);padding:24px}
-.tc-q{font-size:.87rem;line-height:1.8;color:var(--txt2);margin-bottom:16px;font-family:'Amiri',serif;font-size:.96rem}
-.tc-a{display:flex;align-items:center;gap:10px}
-.tc-av{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;
-  justify-content:center;color:#fff;font-weight:700;font-size:.87rem;flex-shrink:0}
-.tc-name{font-weight:700;font-size:.82rem;color:var(--navy)}
-.tc-org{font-size:.72rem;color:var(--muted)}
-
-/* CTA */
-.cta{padding:80px 0;background:linear-gradient(135deg,var(--navy),var(--blue));
-  text-align:center;position:relative;overflow:hidden}
-.cta::before{content:'';position:absolute;inset:0;pointer-events:none;
-  background-image:radial-gradient(circle,rgba(255,255,255,.05) 1px,transparent 1px);
-  background-size:28px 28px}
-.cta h2{color:#fff;position:relative}
-.cta p{color:rgba(255,255,255,.72);margin:10px 0 28px;position:relative}
-.cta-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;position:relative}
-
-/* ══════════════════════════════════════════
-   PAGE: SEARCH
-══════════════════════════════════════════ */
-.spage-head{background:linear-gradient(135deg,var(--navy),var(--blue));
-  padding:88px 0 44px;margin-top:64px}
-.spage-head h1{color:#fff;margin-bottom:6px}
-.spage-head p{color:rgba(255,255,255,.7)}
-.sbox{background:var(--surf);border-radius:var(--rl);padding:24px;
-  box-shadow:var(--shl);margin-top:-28px;position:relative;z-index:10;border:1px solid var(--bdr)}
-.srow{display:flex;gap:10px;margin-bottom:14px}
-.sinp{flex:1;position:relative}
-.sinp svg{position:absolute;right:13px;top:50%;transform:translateY(-50%);
-  width:17px;color:var(--muted);pointer-events:none}
-.sinp input{width:100%;padding:12px 40px 12px 14px;border-radius:10px;
-  border:1.5px solid var(--bdr);font-size:.9rem;outline:none;transition:border-color .2s}
-.sinp input:focus{border-color:var(--blue)}
-.frow{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-.fsel{padding:7px 12px;border-radius:9px;border:1.5px solid var(--bdr);
-  font-size:.82rem;color:var(--txt);outline:none;transition:border-color .2s;font-family:inherit}
-.fsel:focus{border-color:var(--blue)}
-.rbar{display:flex;align-items:center;justify-content:space-between;
-  margin:22px 0 16px;flex-wrap:wrap;gap:10px}
-.rcount{font-size:.87rem;color:var(--muted)}
-.rcount strong{color:var(--navy)}
-.slayout{display:grid;grid-template-columns:250px 1fr;gap:22px;align-items:start}
-.sidebar{background:var(--surf);border:1px solid var(--bdr);border-radius:var(--rl);
-  padding:20px;position:sticky;top:82px}
-.sb-title{font-size:.84rem;font-weight:800;color:var(--navy);margin-bottom:14px;
-  padding-bottom:10px;border-bottom:1px solid var(--bdr)}
-.fg{margin-bottom:18px}
-.fg h5{font-size:.77rem;font-weight:700;color:var(--txt2);margin-bottom:9px}
-.cki{display:flex;align-items:center;gap:8px;margin-bottom:7px;cursor:pointer;font-size:.82rem;color:var(--txt2)}
-.cki input{accent-color:var(--blue);width:15px;height:15px}
-.nores{text-align:center;padding:60px 20px;color:var(--muted)}
-.nores .ni{font-size:3rem;margin-bottom:12px}
-.nores h3{color:var(--navy);margin-bottom:8px}
-.slpanel{position:fixed;bottom:24px;right:24px;z-index:300;
-  background:var(--navy);color:#fff;border-radius:var(--rl);
-  padding:14px 20px;display:flex;align-items:center;gap:14px;
-  box-shadow:var(--shl);transform:translateY(100px);opacity:0;
-  transition:all .3s;pointer-events:none}
-.slpanel.show{transform:translateY(0);opacity:1;pointer-events:all}
-
-/* ══════════════════════════════════════════
-   PAGE: PROFILE
-══════════════════════════════════════════ */
-.phead{padding:100px 0 56px;position:relative;overflow:hidden;
-  background:linear-gradient(135deg,var(--navy),var(--blue));margin-top:64px}
-.phead::before{content:'';position:absolute;inset:0;pointer-events:none;
-  background-image:radial-gradient(circle,rgba(255,255,255,.05) 1px,transparent 1px);
-  background-size:28px 28px}
-.phead-in{display:flex;gap:28px;align-items:flex-start;position:relative;z-index:2}
-.p-av{width:100px;height:100px;border-radius:20px;flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;
-  font-size:2.8rem;font-weight:900;color:#fff;border:3px solid rgba(255,255,255,.25)}
-.p-name{font-size:1.55rem;font-weight:900;color:#fff;margin-bottom:5px}
-.p-role{color:rgba(255,255,255,.75);font-size:.93rem;margin-bottom:10px}
-.p-tags{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px}
-.ptag{padding:4px 12px;border-radius:8px;background:rgba(255,255,255,.12);
-  border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.9);font-size:.74rem;font-weight:700}
-.p-meta{display:flex;gap:20px;flex-wrap:wrap}
-.pmi{display:flex;align-items:center;gap:6px;color:rgba(255,255,255,.7);font-size:.81rem}
-.p-acts{margin-right:auto;display:flex;flex-direction:column;gap:10px;align-items:flex-end}
-.playout{display:grid;grid-template-columns:1fr 330px;gap:22px;padding:32px 0 60px;align-items:start}
-.pcard{background:var(--surf);border:1px solid var(--bdr);border-radius:var(--rl);padding:24px;margin-bottom:18px}
-.pcard h3{font-size:.93rem;font-weight:800;color:var(--navy);margin-bottom:14px;
-  padding-bottom:10px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:8px}
-.ai-sum{background:linear-gradient(135deg,rgba(22,61,117,.05),rgba(11,122,138,.04));
-  border:1.5px solid rgba(22,61,117,.14);border-radius:var(--r);padding:16px;
-  font-family:'Amiri',serif;font-size:.97rem;line-height:1.85;color:var(--txt)}
-.ai-lbl{display:flex;align-items:center;gap:6px;font-size:.72rem;font-weight:700;
-  color:var(--blue);margin-bottom:10px;font-family:'Cairo',sans-serif}
-.exp-row{display:flex;gap:12px;margin-bottom:14px;align-items:flex-start}
-.exp-ico{width:36px;height:36px;border-radius:10px;background:var(--surf2);
-  display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
-.exp-t{font-weight:700;font-size:.87rem;color:var(--navy)}
-.exp-o{font-size:.77rem;color:var(--muted)}
-.vbadge{font-size:.67rem;font-weight:700;padding:2px 7px;border-radius:5px;
-  background:#ecfdf5;color:var(--green);margin-right:5px}
-.skcloud{display:flex;flex-wrap:wrap;gap:7px}
-.sk{padding:5px 13px;border-radius:8px;font-size:.77rem;font-weight:700;
-  background:rgba(22,61,117,.07);color:var(--blue)}
-.sc{background:var(--surf);border:1px solid var(--bdr);border-radius:var(--rl);padding:22px;margin-bottom:18px}
-.sc h4{font-size:.87rem;font-weight:800;color:var(--navy);margin-bottom:14px}
-.inforow{display:flex;justify-content:space-between;align-items:center;
-  padding:9px 0;border-bottom:1px solid var(--bdr);font-size:.82rem}
-.inforow:last-child{border-bottom:none}
-.inforow .l{color:var(--muted)}.inforow .v{font-weight:700}
-.rbig{text-align:center;padding:16px 0}
-.rbig .rn{font-size:2.5rem;font-weight:900;color:var(--navy)}
-.rbig .rs{font-size:1.2rem;color:#f59e0b;display:block;margin:4px 0}
-.rbig .rc{font-size:.77rem;color:var(--muted)}
-
-/* ══════════════════════════════════════════
-   PAGE: REGISTER
-══════════════════════════════════════════ */
-.rlayout{display:grid;grid-template-columns:320px 1fr;min-height:100vh}
-.rside{background:linear-gradient(160deg,var(--navy),var(--blue));
-  padding:48px 30px;position:sticky;top:0;height:100vh;overflow:hidden;
-  display:flex;flex-direction:column;justify-content:center}
-.rside h2{color:#fff;font-size:1.4rem;margin-bottom:12px}
-.rside p{color:rgba(255,255,255,.7);font-size:.87rem;line-height:1.75}
-.rperks{margin-top:28px;display:flex;flex-direction:column;gap:14px}
-.rp{display:flex;align-items:flex-start;gap:10px}
-.rp-ico{font-size:1.1rem;margin-top:1px}
-.rp-t{font-size:.82rem;color:rgba(255,255,255,.8)}
-.rp-t strong{color:#fff;display:block}
-.rmain{padding-top:64px;background:var(--bg)}
-.rwrap{max-width:620px;margin:0 auto;padding:36px 24px 60px}
-.snav{display:flex;align-items:center;margin-bottom:32px}
-.sni{display:flex;align-items:center;gap:7px;flex:1}
-.sni-c{width:30px;height:30px;border-radius:50%;border:2px solid var(--bdr);
-  display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:800;
-  color:var(--muted);flex-shrink:0;transition:all .3s}
-.sni.done .sni-c{background:var(--green);border-color:var(--green);color:#fff}
-.sni.act .sni-c{background:var(--blue);border-color:var(--blue);color:#fff}
-.sni-l{font-size:.74rem;font-weight:700;color:var(--muted)}
-.sni.act .sni-l{color:var(--navy)}
-.snl{flex:1;height:2px;background:var(--bdr);margin:0 5px}
-.snl.done{background:var(--green)}
-.sp{display:none}
-.sp.act{display:block}
-.sp-title{font-size:1.15rem;font-weight:900;color:var(--navy);margin-bottom:4px}
-.sp-desc{font-size:.84rem;color:var(--muted);margin-bottom:22px}
-.chip-g{display:flex;flex-wrap:wrap;gap:7px;margin-top:6px}
-.fdrop{border:2px dashed var(--bdr);border-radius:var(--r);padding:26px;
-  text-align:center;cursor:pointer;transition:all .2s;background:var(--surf)}
-.fdrop:hover{border-color:var(--blue);background:rgba(22,61,117,.03)}
-.fd-ico{font-size:2rem;margin-bottom:8px}
-.fd-txt{font-size:.84rem;color:var(--txt2)}
-.fd-hint{font-size:.73rem;color:var(--muted);margin-top:4px}
-.flist{margin-top:10px;display:flex;flex-direction:column;gap:6px}
-.fitem{display:flex;align-items:center;gap:8px;padding:8px 12px;
-  border-radius:8px;background:var(--surf2);font-size:.79rem}
-.fitem .frm{margin-right:auto;cursor:pointer;color:var(--red);font-weight:700}
-.snav2{display:flex;gap:10px;margin-top:26px;justify-content:space-between}
-.succ{text-align:center;padding:40px 20px}
-.succ-ico{font-size:4rem;margin-bottom:16px}
-.succ h2{color:var(--green);margin-bottom:8px}
-
-/* ══════════════════════════════════════════
-   PAGE: DASHBOARD
-══════════════════════════════════════════ */
-.dash-head{background:linear-gradient(135deg,var(--navy),var(--blue));
-  padding:80px 0 36px;margin-top:64px}
-.dash-head h1{color:#fff;margin-bottom:6px}
-.dash-head p{color:rgba(255,255,255,.7)}
-.dlayout{display:grid;grid-template-columns:220px 1fr;gap:22px;padding:28px 0 60px;align-items:start}
-.dside{background:var(--surf);border:1px solid var(--bdr);border-radius:var(--rl);
-  padding:16px;position:sticky;top:82px}
-.dsec{margin-bottom:6px}
-.dsec a{display:flex;align-items:center;gap:10px;padding:10px 13px;border-radius:10px;
-  font-size:.84rem;font-weight:600;color:var(--txt2);transition:all .18s;cursor:pointer}
-.dsec a:hover,.dsec a.on{background:rgba(22,61,117,.08);color:var(--navy)}
-.duser{padding:14px 12px;border-bottom:1px solid var(--bdr);margin-bottom:12px;text-align:center}
-.du-av{width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,var(--blue),var(--mid));
-  color:#fff;display:flex;align-items:center;justify-content:center;
-  font-size:1.3rem;font-weight:900;margin:0 auto 10px}
-.du-name{font-weight:800;font-size:.88rem;color:var(--navy)}
-.du-role{font-size:.73rem;color:var(--muted)}
-.dpanel{display:none}
-.dpanel.act{display:block}
-.stats4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
-.stat-c{background:var(--surf);border:1px solid var(--bdr);border-radius:var(--rl);padding:20px}
-.stat-c .sv{font-size:1.8rem;font-weight:900;color:var(--navy)}
-.stat-c .sl{font-size:.78rem;color:var(--muted);margin-top:2px}
-.stat-c .si{font-size:1.4rem;float:left}
-.tbl{width:100%;border-collapse:collapse;font-size:.82rem}
-.tbl th{text-align:right;padding:10px 14px;background:var(--surf2);
-  font-weight:700;font-size:.78rem;color:var(--txt2);border-bottom:2px solid var(--bdr)}
-.tbl td{padding:12px 14px;border-bottom:1px solid var(--bdr)}
-.tbl tr:last-child td{border-bottom:none}
-.tbl tr:hover td{background:rgba(22,61,117,.03)}
-.dc-card{background:var(--surf);border:1px solid var(--bdr);border-radius:var(--rl);padding:20px;margin-bottom:14px}
-.dc-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-.dc-title{font-weight:800;font-size:.92rem;color:var(--navy)}
-.dc-status{padding:4px 10px;border-radius:8px;font-size:.72rem;font-weight:700}
-.dc-info{font-size:.8rem;color:var(--txt2);line-height:1.7}
-
-/* ══════════════════════════════════════════
-   PAGE: ABOUT
-══════════════════════════════════════════ */
-.about-head{background:linear-gradient(135deg,var(--navy),var(--blue));
-  padding:88px 0 56px;margin-top:64px;text-align:center}
-.about-head h1{color:#fff;margin-bottom:10px}
-.about-head p{color:rgba(255,255,255,.72);max-width:560px;margin:0 auto}
-.about-sec{padding:72px 0}
-.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
-.ab-vis{background:linear-gradient(135deg,rgba(22,61,117,.06),rgba(11,122,138,.06));
-  border-radius:var(--rl);padding:32px;border:1px solid var(--bdr)}
-.kpi-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.kpi-c{background:var(--surf);border-radius:var(--r);padding:18px;text-align:center;border:1px solid var(--bdr)}
-.kpi-v{font-size:1.6rem;font-weight:900;color:var(--navy)}
-.kpi-l{font-size:.76rem;color:var(--muted);margin-top:3px}
-.team-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:40px}
-.team-c{background:var(--surf);border:1px solid var(--bdr);border-radius:var(--rl);padding:24px;text-align:center}
-.team-av{width:64px;height:64px;border-radius:16px;margin:0 auto 14px;
-  display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:900;color:#fff}
-.team-name{font-weight:800;color:var(--navy);margin-bottom:4px}
-.team-role{font-size:.78rem;color:var(--muted)}
-
-/* ══════════════════════════════════════════
-   RESPONSIVE
-══════════════════════════════════════════ */
-@media(max-width:960px){
-  .hero-in{grid-template-columns:1fr}.hvis{display:none}
-  .steps::before{display:none}.steps{grid-template-columns:1fr;gap:32px}
-  .catgrid{grid-template-columns:repeat(2,1fr)}
-  .tgrid{grid-template-columns:1fr}
-  .slayout{grid-template-columns:1fr}.sidebar{position:static;display:none}
-  .sidebar.mob-open{display:block}
-  .playout{grid-template-columns:1fr}
-  .phead-in{flex-direction:column}.p-acts{align-items:flex-start;margin-right:0;flex-direction:row}
-  .rlayout{grid-template-columns:1fr}.rside{display:none}
-  .dlayout{grid-template-columns:1fr}.dside{position:static}
-  .stats4{grid-template-columns:repeat(2,1fr)}
-  .about-grid{grid-template-columns:1fr}
-  .fg{grid-template-columns:1fr 1fr}
-  .nav-links,.nav-end{display:none}.ham{display:flex}
-}
-@media(max-width:600px){
-  .catgrid{grid-template-columns:repeat(2,1fr)}
-  .two{grid-template-columns:1fr}
-  .stats4{grid-template-columns:1fr 1fr}
-  .team-grid{grid-template-columns:1fr}
-  .kpi-row{grid-template-columns:1fr 1fr}
-  .fg{grid-template-columns:1fr}
-  .fb{flex-direction:column;gap:6px;text-align:center}
-}
-</style>
+<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 <div id="toasts"></div>
@@ -546,14 +19,14 @@ input,select,textarea{font-family:inherit}
       <div><div class="logo-t">مُستشار</div><div class="logo-s">جامعة الطائف</div></div>
     </div>
     <div class="nav-links">
-      <a onclick="go('home')"    id="nl-home">الرئيسية</a>
-      <a onclick="go('search')"  id="nl-search">البحث عن مستشار</a>
+      <a onclick="go('home')"     id="nl-home">الرئيسية</a>
+      <a onclick="go('search')"   id="nl-search">البحث عن مستشار</a>
       <a onclick="go('register')" id="nl-register">تسجيل المنسوب</a>
-      <a onclick="go('dashboard')" id="nl-dashboard">لوحة التحكم</a>
-      <a onclick="go('about')"   id="nl-about">عن المنصة</a>
+      <a onclick="navDash()"      id="nl-dashboard">لوحة التحكم</a>
+      <a onclick="go('about')"    id="nl-about">عن المنصة</a>
     </div>
     <div class="nav-end">
-      <button class="btn btn-g btn-sm" onclick="go('dashboard')">دخول</button>
+      <button class="btn btn-g btn-sm" onclick="navDash()">دخول</button>
       <button class="btn btn-p btn-sm" onclick="go('register')">ابدأ الآن</button>
     </div>
     <button class="ham" onclick="toggleMob()">☰</button>
@@ -562,7 +35,7 @@ input,select,textarea{font-family:inherit}
     <a onclick="go('home');toggleMob()">الرئيسية</a>
     <a onclick="go('search');toggleMob()">البحث</a>
     <a onclick="go('register');toggleMob()">تسجيل</a>
-    <a onclick="go('dashboard');toggleMob()">لوحة التحكم</a>
+    <a onclick="navDash();toggleMob()">لوحة التحكم</a>
     <a onclick="go('about');toggleMob()">عن المنصة</a>
   </div>
 </nav>
@@ -572,7 +45,6 @@ input,select,textarea{font-family:inherit}
 ════════════════════════════════════════ -->
 <div class="page active" id="pg-home">
 
-<!-- Hero -->
 <section class="hero">
   <div class="hero-dots"></div><div class="hero-g1"></div><div class="hero-g2"></div>
   <div class="hero-in">
@@ -599,15 +71,14 @@ input,select,textarea{font-family:inherit}
     </div>
     <div class="hvis au" style="--d:.2s">
       <div class="hfloat" style="top:8px;left:-18px;animation-delay:.5s">🤖 ملخص ذكي</div>
-      <div class="hcard"><div class="hav" style="background:#163d75">د</div><div><div class="hn">د. أحمد العتيبي</div><div class="hr2">تحليل البيانات • الذكاء الاصطناعي</div><div class="hs">★★★★★ 4.9</div></div><div class="hvbadge">✓ موثق</div></div>
-      <div class="hcard"><div class="hav" style="background:#0b7a8a">أ</div><div><div class="hn">أ.د. سارة المالكي</div><div class="hr2">الصحة العامة • الوبائيات</div><div class="hs">★★★★★ 5.0</div></div><div class="hvbadge">✓ موثق</div></div>
-      <div class="hcard"><div class="hav" style="background:#0a7c5c">ه</div><div><div class="hn">أ. هند العسيري</div><div class="hr2">التصميم التعليمي • التدريب</div><div class="hs">★★★★★ 4.9</div></div><div class="hvbadge">✓ موثق</div></div>
+      <div class="hcard"><div class="hav" style="background:#006633">د</div><div><div class="hn">د. أحمد العتيبي</div><div class="hr2">تحليل البيانات • الذكاء الاصطناعي</div><div class="hs">★★★★★ 4.9</div></div><div class="hvbadge">✓ موثق</div></div>
+      <div class="hcard"><div class="hav" style="background:#087a45">أ</div><div><div class="hn">أ.د. سارة المالكي</div><div class="hr2">الصحة العامة • الوبائيات</div><div class="hs">★★★★★ 5.0</div></div><div class="hvbadge">✓ موثق</div></div>
+      <div class="hcard"><div class="hav" style="background:#1a7340">ه</div><div><div class="hn">أ. هند العسيري</div><div class="hr2">التصميم التعليمي • التدريب</div><div class="hs">★★★★★ 4.9</div></div><div class="hvbadge">✓ موثق</div></div>
       <div class="hfloat" style="bottom:-8px;right:-16px;animation-delay:1.4s">📄 عقود فورية</div>
     </div>
   </div>
 </section>
 
-<!-- How -->
 <section class="how">
   <div class="w">
     <div class="sh au"><div class="ey">كيف تعمل المنصة</div><h2>ثلاث خطوات فقط</h2></div>
@@ -619,7 +90,6 @@ input,select,textarea{font-family:inherit}
   </div>
 </section>
 
-<!-- Quick Search -->
 <section class="qsec">
   <div class="w">
     <div class="qbox au">
@@ -643,7 +113,6 @@ input,select,textarea{font-family:inherit}
   </div>
 </section>
 
-<!-- Featured -->
 <section class="feat">
   <div class="w">
     <div class="sh au"><div class="ey">مستشارون مميزون</div><h2>نخبة خبراء جامعة الطائف</h2></div>
@@ -654,36 +123,33 @@ input,select,textarea{font-family:inherit}
   </div>
 </section>
 
-<!-- Categories -->
 <section class="cats">
   <div class="w">
     <div class="sh au"><div class="ey">التخصصات</div><h2>ابحث حسب مجال الخبرة</h2></div>
     <div class="catgrid">
       <div class="catcard au" style="--d:.05s" onclick="searchCat('إدارة')"><span class="caticon">🏛️</span><span class="catname">الإدارة والقيادة</span><span class="catcount">248 خبير</span></div>
-      <div class="catcard au" style="--d:.1s" onclick="searchCat('تحليل بيانات')"><span class="caticon">📊</span><span class="catname">تحليل البيانات</span><span class="catcount">156 خبير</span></div>
+      <div class="catcard au" style="--d:.1s"  onclick="searchCat('تحليل بيانات')"><span class="caticon">📊</span><span class="catname">تحليل البيانات</span><span class="catcount">156 خبير</span></div>
       <div class="catcard au" style="--d:.15s" onclick="searchCat('صحة')"><span class="caticon">🏥</span><span class="catname">الصحة العامة</span><span class="catcount">134 خبير</span></div>
-      <div class="catcard au" style="--d:.2s" onclick="searchCat('هندسة')"><span class="caticon">⚙️</span><span class="catname">الهندسة والتقنية</span><span class="catcount">189 خبير</span></div>
+      <div class="catcard au" style="--d:.2s"  onclick="searchCat('هندسة')"><span class="caticon">⚙️</span><span class="catname">الهندسة والتقنية</span><span class="catcount">189 خبير</span></div>
       <div class="catcard au" style="--d:.25s" onclick="searchCat('قانون')"><span class="caticon">⚖️</span><span class="catname">القانون والأنظمة</span><span class="catcount">78 خبير</span></div>
-      <div class="catcard au" style="--d:.3s" onclick="searchCat('تدريب')"><span class="caticon">🎓</span><span class="catname">التعليم والتدريب</span><span class="catcount">312 خبير</span></div>
+      <div class="catcard au" style="--d:.3s"  onclick="searchCat('تدريب')"><span class="caticon">🎓</span><span class="catname">التعليم والتدريب</span><span class="catcount">312 خبير</span></div>
       <div class="catcard au" style="--d:.35s" onclick="searchCat('مالية')"><span class="caticon">💰</span><span class="catname">المالية والاقتصاد</span><span class="catcount">92 خبير</span></div>
-      <div class="catcard au" style="--d:.4s" onclick="searchCat('بحث')"><span class="caticon">🔬</span><span class="catname">البحث العلمي</span><span class="catcount">267 خبير</span></div>
+      <div class="catcard au" style="--d:.4s"  onclick="searchCat('بحث')"><span class="caticon">🔬</span><span class="catname">البحث العلمي</span><span class="catcount">267 خبير</span></div>
     </div>
   </div>
 </section>
 
-<!-- Testimonials -->
 <section class="testi">
   <div class="w">
     <div class="sh au"><div class="ey">آراء الجهات</div><h2>ماذا يقول شركاؤنا؟</h2></div>
     <div class="tgrid">
-      <div class="tc au" style="--d:.1s"><div class="tc-q">«ساعدتنا منصة مستشار في إيجاد الخبير المناسب لمشروع تحليل البيانات خلال أيام. الملفات دقيقة وموثوقة والإجراءات سلسة»</div><div class="tc-a"><div class="tc-av" style="background:#163d75">م</div><div><div class="tc-name">م. سلطان الغامدي</div><div class="tc-org">مدير تقنية – STC</div></div></div></div>
-      <div class="tc au" style="--d:.2s"><div class="tc-q">«الدكتورة سارة قدمت برنامجاً تدريبياً استثنائياً في الصحة المهنية. مستوى الاحترافية فوق التوقعات تماماً»</div><div class="tc-a"><div class="tc-av" style="background:#0a7c5c">ن</div><div><div class="tc-name">أ. نوف السهلي</div><div class="tc-org">مدير موارد بشرية – وزارة الصحة</div></div></div></div>
+      <div class="tc au" style="--d:.1s"><div class="tc-q">«ساعدتنا منصة مستشار في إيجاد الخبير المناسب لمشروع تحليل البيانات خلال أيام. الملفات دقيقة وموثوقة والإجراءات سلسة»</div><div class="tc-a"><div class="tc-av" style="background:#006633">م</div><div><div class="tc-name">م. سلطان الغامدي</div><div class="tc-org">مدير تقنية – STC</div></div></div></div>
+      <div class="tc au" style="--d:.2s"><div class="tc-q">«الدكتورة سارة قدمت برنامجاً تدريبياً استثنائياً في الصحة المهنية. مستوى الاحترافية فوق التوقعات تماماً»</div><div class="tc-a"><div class="tc-av" style="background:#1a7340">ن</div><div><div class="tc-name">أ. نوف السهلي</div><div class="tc-org">مدير موارد بشرية – وزارة الصحة</div></div></div></div>
       <div class="tc au" style="--d:.3s"><div class="tc-q">«آلية التعاقد عبر المنصة سلّمتنا من الإجراءات المعقدة. واضحة، رسمية، سريعة. ننصح بها لأي جهة تبحث عن كفاءات»</div><div class="tc-a"><div class="tc-av" style="background:#c8941f">ع</div><div><div class="tc-name">م. عبدالرحمن الجحدلي</div><div class="tc-org">مدير المشاريع – أمانة الطائف</div></div></div></div>
     </div>
   </div>
 </section>
 
-<!-- CTA -->
 <section class="cta">
   <div class="w">
     <h2 class="au">هل أنت منسوب في جامعة الطائف؟</h2>
@@ -729,12 +195,23 @@ input,select,textarea{font-family:inherit}
     <div class="frow">
       <select class="fsel" id="fcoll" onchange="doSearch()">
         <option value="">كل الكليات</option>
-        <option>كلية الحاسب وتقنية المعلومات</option>
         <option>كلية الطب</option>
-        <option>كلية الهندسة</option>
-        <option>كلية الاقتصاد والإدارة</option>
-        <option>كلية الحقوق</option>
+        <option>كلية طب الأسنان</option>
+        <option>كلية الصيدلة</option>
+        <option>كلية العلوم الطبية التطبيقية</option>
+        <option>كلية التمريض</option>
         <option>كلية التربية</option>
+        <option>كلية الآداب</option>
+        <option>الكلية التطبيقية</option>
+        <option>كلية الشريعة والأنظمة</option>
+        <option>كلية إدارة الأعمال</option>
+        <option>كلية العلوم</option>
+        <option>كلية الهندسة</option>
+        <option>كلية الحاسبات وتقنية المعلومات</option>
+        <option>كلية التصاميم والفنون التطبيقية</option>
+        <option>الكلية الجامعية بتربة</option>
+        <option>الكلية الجامعية برنية</option>
+        <option>الكلية الجامعية بالخرمة</option>
       </select>
       <select class="fsel" id="favail" onchange="doSearch()">
         <option value="">كل الحالات</option>
@@ -754,10 +231,13 @@ input,select,textarea{font-family:inherit}
   <div class="slayout">
     <div class="sidebar" id="sidebarEl">
       <div class="sb-title">🔧 فلاتر متقدمة</div>
-      <div class="fg2"><h5 style="font-size:.77rem;font-weight:700;color:var(--txt2);margin-bottom:9px">الحد الأدنى للتقييم</h5>
+      <div class="fg2">
+        <h5>الحد الأدنى للتقييم</h5>
         <select class="fsel" id="frat" onchange="doSearch()" style="width:100%">
-          <option value="0">كل التقييمات</option><option value="4">4+ نجوم</option>
-          <option value="4.5">4.5+ نجوم</option><option value="4.8">4.8+ نجوم</option>
+          <option value="0">كل التقييمات</option>
+          <option value="4">4+ نجوم</option>
+          <option value="4.5">4.5+ نجوم</option>
+          <option value="4.8">4.8+ نجوم</option>
         </select>
       </div>
       <div style="margin-top:14px">
@@ -812,7 +292,6 @@ input,select,textarea{font-family:inherit}
   </div>
   <div class="rmain">
     <div class="rwrap">
-      <!-- Steps nav -->
       <div class="snav" id="stepsNav">
         <div class="sni act" id="sn1"><div class="sni-c">1</div><div class="sni-l">البيانات</div></div>
         <div class="snl" id="sl1"></div>
@@ -824,41 +303,90 @@ input,select,textarea{font-family:inherit}
         <div class="snl" id="sl4"></div>
         <div class="sni" id="sn5"><div class="sni-c">5</div><div class="sni-l">المراجعة</div></div>
       </div>
-      <!-- Step 1 -->
+
+      <!-- Step 1: البيانات -->
       <div class="sp act" id="rsp1">
         <div class="sp-title">البيانات الأساسية</div>
         <div class="sp-desc">معلوماتك الشخصية والوظيفية</div>
-        <div class="two"><div class="fi"><label>الاسم الأول <span class="rq">*</span></label><input id="r1" placeholder="أحمد"></div><div class="fi"><label>الاسم الأخير <span class="rq">*</span></label><input id="r2" placeholder="العتيبي"></div></div>
-        <div class="two"><div class="fi"><label>رقم المنسوب <span class="rq">*</span></label><input id="r3" placeholder="12345678" maxlength="8"></div><div class="fi"><label>رقم الجوال <span class="rq">*</span></label><input id="r4" placeholder="05XXXXXXXX"></div></div>
+        <div class="two">
+          <div class="fi"><label>الاسم الأول <span class="rq">*</span></label><input id="r1" placeholder="أحمد"></div>
+          <div class="fi"><label>الاسم الأخير <span class="rq">*</span></label><input id="r2" placeholder="العتيبي"></div>
+        </div>
+        <div class="two">
+          <div class="fi"><label>رقم المنسوب <span class="rq">*</span></label><input id="r3" placeholder="12345678" maxlength="8"></div>
+          <div class="fi"><label>رقم الجوال <span class="rq">*</span></label><input id="r4" placeholder="05XXXXXXXX"></div>
+        </div>
         <div class="fi"><label>البريد الجامعي <span class="rq">*</span></label><input id="r5" type="email" placeholder="a.name@tu.edu.sa"></div>
         <div class="two">
-          <div class="fi"><label>الكلية <span class="rq">*</span></label><select id="r6"><option value="">اختر الكلية</option><option>كلية الحاسب وتقنية المعلومات</option><option>كلية الطب</option><option>كلية الهندسة</option><option>كلية الاقتصاد والإدارة</option><option>كلية الحقوق</option><option>كلية التربية</option><option>كلية العلوم</option><option>كلية الآداب</option></select></div>
-          <div class="fi"><label>طبيعة العمل <span class="rq">*</span></label><select id="r7"><option value="">اختر</option><option value="academic">أكاديمي</option><option value="admin">إداري</option></select></div>
+          <div class="fi">
+            <label>الكلية <span class="rq">*</span></label>
+            <select id="r6">
+              <option value="">اختر الكلية</option>
+              <option>كلية الطب</option>
+              <option>كلية طب الأسنان</option>
+              <option>كلية الصيدلة</option>
+              <option>كلية العلوم الطبية التطبيقية</option>
+              <option>كلية التمريض</option>
+              <option>كلية التربية</option>
+              <option>كلية الآداب</option>
+              <option>الكلية التطبيقية</option>
+              <option>كلية الشريعة والأنظمة</option>
+              <option>كلية إدارة الأعمال</option>
+              <option>كلية العلوم</option>
+              <option>كلية الهندسة</option>
+              <option>كلية الحاسبات وتقنية المعلومات</option>
+              <option>كلية التصاميم والفنون التطبيقية</option>
+              <option>الكلية الجامعية بتربة</option>
+              <option>الكلية الجامعية برنية</option>
+              <option>الكلية الجامعية بالخرمة</option>
+            </select>
+          </div>
+          <div class="fi">
+            <label>طبيعة العمل <span class="rq">*</span></label>
+            <select id="r7"><option value="">اختر</option><option value="academic">أكاديمي</option><option value="admin">إداري</option></select>
+          </div>
         </div>
-        <div class="fi"><label>اللغات</label><div class="chip-g" id="langG"><span class="chip on" data-v="العربية">العربية</span><span class="chip" data-v="الإنجليزية">الإنجليزية</span><span class="chip" data-v="الفرنسية">الفرنسية</span></div></div>
+        <div class="fi">
+          <label>اللغات</label>
+          <div class="chip-g" id="langG">
+            <span class="chip on" data-v="العربية">العربية</span>
+            <span class="chip" data-v="الإنجليزية">الإنجليزية</span>
+            <span class="chip" data-v="الفرنسية">الفرنسية</span>
+          </div>
+        </div>
         <div class="snav2"><div></div><button class="btn btn-p" onclick="rNext(1)">التالي ←</button></div>
       </div>
-      <!-- Step 2 -->
+
+      <!-- Step 2: الخبرات -->
       <div class="sp" id="rsp2">
-        <div class="sp-title">الخبرات</div><div class="sp-desc">أدخل خبراتك في المجالات المختلفة</div>
+        <div class="sp-title">الخبرات</div>
+        <div class="sp-desc">أدخل خبراتك في المجالات المختلفة</div>
         <div class="fi"><label>الخبرات الإدارية</label><textarea id="r_admin" placeholder="مثال: رئيس قسم 2018–2022..."></textarea></div>
         <div class="fi"><label>الخبرات التدريبية</label><textarea id="r_train" placeholder="مثال: 200 ساعة تدريبية في قيادة الفرق..."></textarea></div>
         <div class="fi"><label>الخبرات البحثية والاستشارية</label><textarea id="r_res" placeholder="مثال: 15 ورقة بحثية، استشارة لوزارة الصحة..."></textarea></div>
-        <div class="fi"><label>المهارات الرئيسية</label>
+        <div class="fi">
+          <label>المهارات الرئيسية</label>
           <div class="chip-g" id="skillG">
-            <span class="chip" data-v="تحليل البيانات">تحليل البيانات</span><span class="chip" data-v="إدارة المشاريع">إدارة المشاريع</span>
-            <span class="chip" data-v="الذكاء الاصطناعي">الذكاء الاصطناعي</span><span class="chip" data-v="التدريب">التدريب</span>
-            <span class="chip" data-v="البحث العلمي">البحث العلمي</span><span class="chip" data-v="الصحة العامة">الصحة العامة</span>
-            <span class="chip" data-v="الهندسة">الهندسة</span><span class="chip" data-v="القانون">القانون</span>
-            <span class="chip" data-v="المالية">المالية</span><span class="chip" data-v="التعليم">التعليم</span>
+            <span class="chip" data-v="تحليل البيانات">تحليل البيانات</span>
+            <span class="chip" data-v="إدارة المشاريع">إدارة المشاريع</span>
+            <span class="chip" data-v="الذكاء الاصطناعي">الذكاء الاصطناعي</span>
+            <span class="chip" data-v="التدريب">التدريب</span>
+            <span class="chip" data-v="البحث العلمي">البحث العلمي</span>
+            <span class="chip" data-v="الصحة العامة">الصحة العامة</span>
+            <span class="chip" data-v="الهندسة">الهندسة</span>
+            <span class="chip" data-v="القانون">القانون</span>
+            <span class="chip" data-v="المالية">المالية</span>
+            <span class="chip" data-v="التعليم">التعليم</span>
           </div>
           <input id="rSkillCustom" placeholder="أضف مهارة أخرى واضغط Enter..." style="margin-top:8px;width:100%;padding:8px 12px;border-radius:9px;border:1.5px solid var(--bdr);font-size:.83rem;font-family:inherit;outline:none" onkeydown="if(event.key==='Enter'){addSkill();event.preventDefault()}">
         </div>
         <div class="snav2"><button class="btn btn-g" onclick="rPrev(2)">← رجوع</button><button class="btn btn-p" onclick="rNext(2)">التالي ←</button></div>
       </div>
-      <!-- Step 3 -->
+
+      <!-- Step 3: الشهادات -->
       <div class="sp" id="rsp3">
-        <div class="sp-title">الشهادات الاحترافية</div><div class="sp-desc">شهاداتك المهنية القابلة للتحقق</div>
+        <div class="sp-title">الشهادات الاحترافية</div>
+        <div class="sp-desc">شهاداتك المهنية القابلة للتحقق</div>
         <div id="certsCont">
           <div class="two"><div class="fi"><label>اسم الشهادة</label><input class="cname" placeholder="PMP – Project Management"></div><div class="fi"><label>الجهة المانحة</label><input class="corg" placeholder="PMI"></div></div>
           <div class="two"><div class="fi"><label>الرقم المرجعي</label><input class="cnum" placeholder="PMI-12345678"></div><div class="fi"><label>سنة الحصول</label><input class="cyear" type="number" placeholder="2022"></div></div>
@@ -867,22 +395,30 @@ input,select,textarea{font-family:inherit}
         <div class="fi"><label>رابط LinkedIn (اختياري)</label><input id="rli" type="url" placeholder="https://linkedin.com/in/..."></div>
         <div class="snav2"><button class="btn btn-g" onclick="rPrev(3)">← رجوع</button><button class="btn btn-p" onclick="rNext(3)">التالي ←</button></div>
       </div>
-      <!-- Step 4 -->
+
+      <!-- Step 4: المرفقات -->
       <div class="sp" id="rsp4">
-        <div class="sp-title">المرفقات</div><div class="sp-desc">المستندات الداعمة لتوثيق خبراتك</div>
-        <div class="fi"><label>السيرة الذاتية <span class="rq">*</span></label>
+        <div class="sp-title">المرفقات</div>
+        <div class="sp-desc">المستندات الداعمة لتوثيق خبراتك</div>
+        <div class="fi">
+          <label>السيرة الذاتية <span class="rq">*</span></label>
           <div class="fdrop" onclick="document.getElementById('cvI').click()"><div class="fd-ico">📄</div><div class="fd-txt">اسحب CV هنا أو انقر للاختيار</div><div class="fd-hint">PDF أو Word – حتى 10MB</div></div>
-          <input type="file" id="cvI" accept=".pdf,.doc,.docx" style="display:none" onchange="addFile(this,'cv')"><div class="flist" id="cvL"></div>
+          <input type="file" id="cvI" accept=".pdf,.doc,.docx" style="display:none" onchange="addFile(this,'cv')">
+          <div class="flist" id="cvL"></div>
         </div>
-        <div class="fi"><label>شهادات وخطابات الخبرة</label>
+        <div class="fi">
+          <label>شهادات وخطابات الخبرة</label>
           <div class="fdrop" onclick="document.getElementById('certI').click()"><div class="fd-ico">🏅</div><div class="fd-txt">ارفع الشهادات والخطابات</div><div class="fd-hint">PDF / صور – حتى 10MB</div></div>
-          <input type="file" id="certI" accept=".pdf,.jpg,.png" multiple style="display:none" onchange="addFile(this,'cert')"><div class="flist" id="certL"></div>
+          <input type="file" id="certI" accept=".pdf,.jpg,.png" multiple style="display:none" onchange="addFile(this,'cert')">
+          <div class="flist" id="certL"></div>
         </div>
         <div class="snav2"><button class="btn btn-g" onclick="rPrev(4)">← رجوع</button><button class="btn btn-p" onclick="rNext(4)">مراجعة ←</button></div>
       </div>
-      <!-- Step 5 -->
+
+      <!-- Step 5: المراجعة -->
       <div class="sp" id="rsp5">
-        <div class="sp-title">مراجعة البيانات</div><div class="sp-desc">تحقق من بياناتك قبل الإرسال</div>
+        <div class="sp-title">مراجعة البيانات</div>
+        <div class="sp-desc">تحقق من بياناتك قبل الإرسال</div>
         <div id="reviewBox" style="background:var(--surf);border:1px solid var(--bdr);border-radius:var(--rl);padding:20px;margin-bottom:18px;font-size:.84rem;line-height:2"></div>
         <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:.82rem;color:var(--txt2);margin-bottom:20px">
           <input type="checkbox" id="consent" style="margin-top:3px;accent-color:var(--blue)">
@@ -890,10 +426,12 @@ input,select,textarea{font-family:inherit}
         </label>
         <div class="snav2"><button class="btn btn-g" onclick="rPrev(5)">← رجوع</button><button class="btn btn-gold btn-lg" onclick="submitReg()">✅ إرسال للمراجعة</button></div>
       </div>
+
       <!-- Success -->
       <div class="sp" id="rspSucc">
-        <div class="succ"><div class="succ-ico">🎉</div>
-          <h2 style="color:var(--green)">تم الإرسال بنجاح!</h2>
+        <div class="succ">
+          <div class="succ-ico">🎉</div>
+          <h2>تم الإرسال بنجاح!</h2>
           <p style="margin:10px 0 24px">سيتواصل معك مركز البحوث خلال <strong>3 أيام عمل</strong> لمراجعة بياناتك واعتماد ملفك.</p>
           <div style="background:var(--surf);border:1px solid var(--bdr);border-radius:var(--rl);padding:20px;margin-bottom:24px">
             <div style="font-size:.8rem;color:var(--muted);margin-bottom:6px">رقم الطلب</div>
@@ -911,7 +449,12 @@ input,select,textarea{font-family:inherit}
      PAGE: DASHBOARD
 ════════════════════════════════════════ -->
 <div class="page" id="pg-dashboard">
-<div class="dash-head"><div class="w"><h1>لوحة التحكم</h1><p>مرحباً، مركز البحوث والاستشارات</p></div></div>
+<div class="dash-head">
+  <div class="w" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+    <div><h1>لوحة التحكم</h1><p>مرحباً، مركز البحوث والاستشارات</p></div>
+    <button class="btn btn-g btn-sm" style="color:#fff;border-color:rgba(255,255,255,.3)" onclick="logout()">🚪 تسجيل الخروج</button>
+  </div>
+</div>
 <div class="w"><div class="dlayout">
   <div class="dside">
     <div class="duser">
@@ -920,28 +463,33 @@ input,select,textarea{font-family:inherit}
       <div class="du-role">جامعة الطائف</div>
     </div>
     <div class="dsec">
-      <a onclick="showPanel('overview')" id="dp-overview" class="on">📊 نظرة عامة</a>
+      <a onclick="showPanel('overview')"    id="dp-overview"    class="on">📊 نظرة عامة</a>
+      <a onclick="showPanel('pending')"     id="dp-pending">🕐 طلبات التسجيل <span id="pendingBadge" class="tag tag-gold" style="margin-right:4px;font-size:.65rem"></span></a>
       <a onclick="showPanel('consultants')" id="dp-consultants">👤 المنسوبون</a>
-      <a onclick="showPanel('contracts')" id="dp-contracts">📄 طلبات التعاقد</a>
-      <a onclick="showPanel('analytics')" id="dp-analytics">📈 التقارير</a>
+      <a onclick="showPanel('contracts')"   id="dp-contracts">📄 طلبات التعاقد</a>
+      <a onclick="showPanel('analytics')"   id="dp-analytics">📈 التقارير</a>
     </div>
   </div>
   <div>
     <!-- Overview -->
     <div class="dpanel act" id="pan-overview">
-      <div class="stats4">
-        <div class="stat-c"><div class="si">👤</div><div class="sv">1,247</div><div class="sl">منسوب مسجل</div></div>
-        <div class="stat-c"><div class="si">✅</div><div class="sv">856</div><div class="sl">ملف معتمد</div></div>
-        <div class="stat-c"><div class="si">📄</div><div class="sv">143</div><div class="sl">طلب تعاقد</div></div>
-        <div class="stat-c"><div class="si">💰</div><div class="sv">847K</div><div class="sl">ريال – إجمالي العقود</div></div>
-      </div>
+      <div class="stats4" id="dashStats"></div>
       <div style="background:var(--surf);border:1px solid var(--bdr);border-radius:var(--rl);padding:22px;margin-bottom:18px">
+        <h3 style="font-size:.92rem;color:var(--navy);margin-bottom:16px">🕐 آخر طلبات التسجيل</h3>
+        <table class="tbl" id="dashRegs"></table>
+      </div>
+      <div style="background:var(--surf);border:1px solid var(--bdr);border-radius:var(--rl);padding:22px">
         <h3 style="font-size:.92rem;color:var(--navy);margin-bottom:16px">⏳ آخر طلبات التعاقد</h3>
         <table class="tbl" id="dashContracts"></table>
       </div>
-      <div style="background:var(--surf);border:1px solid var(--bdr);border-radius:var(--rl);padding:22px">
-        <h3 style="font-size:.92rem;color:var(--navy);margin-bottom:16px">🆕 آخر التسجيلات</h3>
-        <table class="tbl" id="dashRegs"></table>
+    </div>
+    <!-- Pending -->
+    <div class="dpanel" id="pan-pending">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px">
+        <h3 style="color:var(--navy)">طلبات التسجيل الجديدة</h3>
+      </div>
+      <div style="background:var(--surf);border:1px solid var(--bdr);border-radius:var(--rl);overflow:auto">
+        <table class="tbl" id="pendingTable"></table>
       </div>
     </div>
     <!-- Consultants -->
@@ -950,7 +498,7 @@ input,select,textarea{font-family:inherit}
         <h3 style="color:var(--navy)">إدارة ملفات المنسوبين</h3>
         <input type="text" placeholder="بحث..." id="dashSearch" oninput="filterDash()" style="padding:8px 14px;border-radius:10px;border:1.5px solid var(--bdr);font-size:.84rem;outline:none;width:200px">
       </div>
-      <div style="background:var(--surf);border:1px solid var(--bdr);border-radius:var(--rl);overflow:hidden">
+      <div style="background:var(--surf);border:1px solid var(--bdr);border-radius:var(--rl);overflow:auto">
         <table class="tbl" id="dashConsTable"></table>
       </div>
     </div>
@@ -1010,28 +558,58 @@ input,select,textarea{font-family:inherit}
   <div class="w">
     <div class="sh"><div class="ey">الفريق التقني</div><h2>من يقف وراء المنصة</h2></div>
     <div class="team-grid">
-      <div class="team-c"><div class="team-av" style="background:#163d75">م</div><div class="team-name">مركز البحوث والاستشارات</div><div class="team-role">الإشراف التنفيذي والتحكيم</div></div>
-      <div class="team-c"><div class="team-av" style="background:#0b7a8a">ت</div><div class="team-name">فريق تقنية المعلومات</div><div class="team-role">البنية التقنية والأمان</div></div>
-      <div class="team-c"><div class="team-av" style="background:#0a7c5c">ج</div><div class="team-name">الإدارة القانونية</div><div class="team-role">العقود والامتثال القانوني</div></div>
+      <div class="team-c"><div class="team-av" style="background:#006633">م</div><div class="team-name">مركز البحوث والاستشارات</div><div class="team-role">الإشراف التنفيذي والتحكيم</div></div>
+      <div class="team-c"><div class="team-av" style="background:#087a45">ت</div><div class="team-name">فريق تقنية المعلومات</div><div class="team-role">البنية التقنية والأمان</div></div>
+      <div class="team-c"><div class="team-av" style="background:#1a7340">ج</div><div class="team-name">الإدارة القانونية</div><div class="team-role">العقود والامتثال القانوني</div></div>
     </div>
   </div>
 </section>
 <section style="padding:64px 0">
   <div class="w">
     <div class="sh"><div class="ey">المحاور التقنية</div><h2>تقنيات متقدمة في خدمة الاستشارات</h2></div>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px" id="techCards">
-    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px" id="techCards"></div>
   </div>
 </section>
 <footer class="footer"><div class="w">
-  <div class="fg"><div class="fc"><div class="logo" style="margin-bottom:12px;cursor:pointer" onclick="go('home')"><div class="logo-m">م</div><div><div class="logo-t" style="color:#fff">مُستشار</div><div class="logo-s">جامعة الطائف</div></div></div><p>منصة رقمية معتمدة من مركز البحوث والاستشارات.</p></div><div class="fc"><h4>المنصة</h4><a onclick="go('search')">البحث</a><a onclick="go('register')">تسجيل</a><a onclick="go('about')">عن المنصة</a></div><div class="fc"><h4>للجهات</h4><a onclick="go('search')">استعراض الخبراء</a><a onclick="go('search')">طلب تعاقد</a></div><div class="fc"><h4>تواصل معنا</h4><p>📞 0127270020<br>📧 research@tu.edu.sa</p></div></div>
+  <div class="fg">
+    <div class="fc"><div class="logo" style="margin-bottom:12px;cursor:pointer" onclick="go('home')"><div class="logo-m">م</div><div><div class="logo-t" style="color:#fff">مُستشار</div><div class="logo-s">جامعة الطائف</div></div></div><p>منصة رقمية معتمدة من مركز البحوث والاستشارات.</p></div>
+    <div class="fc"><h4>المنصة</h4><a onclick="go('search')">البحث</a><a onclick="go('register')">تسجيل</a><a onclick="go('about')">عن المنصة</a></div>
+    <div class="fc"><h4>للجهات</h4><a onclick="go('search')">استعراض الخبراء</a><a onclick="go('search')">طلب تعاقد</a></div>
+    <div class="fc"><h4>تواصل معنا</h4><p>📞 0127270020<br>📧 research@tu.edu.sa</p></div>
+  </div>
   <div class="fb"><span>© 2025 جامعة الطائف</span><span>🇸🇦 رؤية 2030</span></div>
 </div></footer>
 </div>
 
-<!-- ════════════════════════════════════
-     CONTRACT MODAL
-════════════════════════════════════ -->
+<!-- ════════ LOGIN MODAL ════════ -->
+<div class="ov" id="loginOv" onclick="if(this===event.target)this.classList.remove('open')">
+  <div class="modal" style="max-width:420px">
+    <div class="m-head">
+      <div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+          <div class="logo-m" style="width:36px;height:36px;font-size:1rem">م</div>
+          <h3>دخول لوحة التحكم</h3>
+        </div>
+        <p style="font-size:.8rem;color:var(--muted)">مركز البحوث والاستشارات – جامعة الطائف</p>
+      </div>
+      <button class="m-close" onclick="document.getElementById('loginOv').classList.remove('open')">✕</button>
+    </div>
+    <div class="fi">
+      <label>اسم المستخدم <span class="rq">*</span></label>
+      <input id="loginUser" placeholder="admin" autocomplete="username">
+    </div>
+    <div class="fi" style="position:relative">
+      <label>كلمة المرور <span class="rq">*</span></label>
+      <input id="loginPass" type="password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+      <button onclick="togglePassVis()" style="position:absolute;left:12px;top:34px;background:none;border:none;cursor:pointer;color:var(--muted);font-size:.85rem" title="إظهار/إخفاء">👁</button>
+    </div>
+    <div id="loginErr" style="color:var(--red);font-size:.8rem;margin-bottom:12px;display:none;padding:8px 12px;background:rgba(192,57,43,.07);border-radius:8px">⚠️ اسم المستخدم أو كلمة المرور غير صحيحة</div>
+    <button class="btn btn-p" style="width:100%" onclick="doLogin()">دخول ←</button>
+    <div style="text-align:center;margin-top:14px;font-size:.75rem;color:var(--muted)">للدعم التقني: research@tu.edu.sa</div>
+  </div>
+</div>
+
+<!-- ════════ CONTRACT MODAL ════════ -->
 <div class="ov" id="contractOv" onclick="if(this===event.target)this.classList.remove('open')">
   <div class="modal">
     <div class="m-head"><h3>📄 طلب تعاقد</h3><button class="m-close" onclick="document.getElementById('contractOv').classList.remove('open')">✕</button></div>
@@ -1048,436 +626,13 @@ input,select,textarea{font-family:inherit}
   </div>
 </div>
 
-<script>
-/* ══════════════════════════════════════
-   DATA
-══════════════════════════════════════ */
-const DATA = [
-  {id:1,name:"د. أحمد سعد العتيبي",title:"أستاذ مشارك – علوم الحاسب",college:"كلية الحاسب وتقنية المعلومات",dept:"قسم علوم الحاسب",type:"أكاديمي",exp_years:14,
-   skills:["تحليل البيانات","الذكاء الاصطناعي","إدارة المشاريع","Python","تعلم الآلة"],
-   certs:["PMP","AWS Certified","Python Institute"],admin_exp:"رئيس قسم – 4 سنوات",training_exp:"120+ ساعة تدريبية",
-   research:["18 ورقة بحثية","3 براءات اختراع"],
-   summary:"خبير في علوم البيانات والذكاء الاصطناعي بخبرة 14 عاماً في تصميم الحلول التقنية وتحليل البيانات الضخمة. نفّذ أكثر من 40 مشروع استشاري لجهات حكومية وخاصة.",
-   rating:4.9,reviews:23,contracts:18,color:"#163d75",verified:true,available:true,lang:["العربية","الإنجليزية"]},
-  {id:2,name:"أ.د. سارة خالد المالكي",title:"أستاذ – الصحة العامة",college:"كلية الطب",dept:"قسم الصحة العامة",type:"أكاديمي",exp_years:19,
-   skills:["الصحة العامة","الوبائيات","التدريب الصحي","SPSS","البحث الوبائي"],
-   certs:["Board Certified Epidemiologist","ISO 9001 Lead Auditor"],admin_exp:"عميدة مشاركة للشؤون الأكاديمية",training_exp:"250+ ساعة تدريبية",
-   research:["35 ورقة بحثية","رئاسة 7 مؤتمرات"],
-   summary:"قيادية أكاديمية في الصحة العامة والوبائيات، قدّمت استشارات لمنظمة الصحة العالمية ووزارة الصحة السعودية. متخصصة في إعداد البرامج الوقائية.",
-   rating:5.0,reviews:31,contracts:27,color:"#0b7a8a",verified:true,available:true,lang:["العربية","الإنجليزية","الفرنسية"]},
-  {id:3,name:"م. فيصل عبدالله الزهراني",title:"مهندس أول – الهندسة المدنية",college:"كلية الهندسة",dept:"قسم الهندسة المدنية",type:"أكاديمي",exp_years:11,
-   skills:["الهندسة الإنشائية","إدارة المشاريع","AutoCAD","تقييم المباني","BIM"],
-   certs:["PE – Professional Engineer","PMP","LEED"],admin_exp:"مدير مشاريع البنية التحتية",training_exp:"60 ساعة تدريبية",
-   research:["12 ورقة بحثية"],
-   summary:"مهندس مدني متخصص في التصميم الإنشائي وإدارة مشاريع البنية التحتية. قدّم خدمات استشارية لأكثر من 30 مشروع عمراني في منطقة مكة والطائف.",
-   rating:4.7,reviews:15,contracts:12,color:"#0a7c5c",verified:true,available:false,lang:["العربية","الإنجليزية"]},
-  {id:4,name:"د. نورة علي القحطاني",title:"أستاذ مساعد – المالية",college:"كلية الاقتصاد والإدارة",dept:"قسم المالية",type:"أكاديمي",exp_years:9,
-   skills:["التمويل الإسلامي","التحليل المالي","تقييم الأصول","Excel المتقدم","نمذجة مالية"],
-   certs:["CFA Level II","CIPA","SOCPA"],admin_exp:"رئيسة وحدة الجودة",training_exp:"90 ساعة تدريبية",
-   research:["9 أوراق بحثية"],
-   summary:"متخصصة في التمويل الإسلامي والتحليل المالي مع خبرة في تقييم المشاريع الاستثمارية. قدّمت استشارات مالية لمؤسسات حكومية وصناديق استثمارية.",
-   rating:4.8,reviews:19,contracts:14,color:"#7c3aed",verified:true,available:true,lang:["العربية","الإنجليزية"]},
-  {id:5,name:"د. محمد راشد الثقفي",title:"أستاذ مشارك – القانون",college:"كلية الحقوق",dept:"قسم القانون الخاص",type:"أكاديمي",exp_years:16,
-   skills:["العقود التجارية","النزاعات القانونية","أنظمة العمل","الملكية الفكرية","التحكيم"],
-   certs:["محامٍ مُرخَّص","شهادة التحكيم الدولي"],admin_exp:"وكيل كلية للتطوير",training_exp:"150 ساعة تدريبية",
-   research:["22 ورقة قانونية","3 كتب مؤلَّفة"],
-   summary:"مستشار قانوني متخصص في قانون الأعمال والعقود التجارية والملكية الفكرية. خبرة واسعة في فض النزاعات والتحكيم التجاري.",
-   rating:4.6,reviews:28,contracts:22,color:"#c8941f",verified:true,available:true,lang:["العربية","الإنجليزية"]},
-  {id:6,name:"أ. هند سلطان العسيري",title:"محاضر أول – التربية",college:"كلية التربية",dept:"قسم المناهج",type:"أكاديمي",exp_years:8,
-   skills:["التصميم التعليمي","التدريب على التدريس","مهارات القيادة","ADDIE","التعليم الإلكتروني"],
-   certs:["Instructional Designer","TOT"],admin_exp:"منسقة برامج التدريب",training_exp:"200+ ساعة تدريبية",
-   research:["6 أوراق بحثية"],
-   summary:"متخصصة في تصميم البرامج التدريبية وتطوير المناهج. نفّذت برامج تطوير مهني لأكثر من 1000 معلم ومعلمة.",
-   rating:4.9,reviews:41,contracts:35,color:"#db2777",verified:true,available:true,lang:["العربية"]},
-];
-
-const STATE = {
-  shortlist: JSON.parse(localStorage.getItem('mu_sl')||'[]'),
-  contracts: JSON.parse(localStorage.getItem('mu_ct')||'[]'),
-  currentProfile: null,
-  save(){ localStorage.setItem('mu_sl',JSON.stringify(this.shortlist)); localStorage.setItem('mu_ct',JSON.stringify(this.contracts)); },
-  toggleSL(id){ const i=this.shortlist.indexOf(id); if(i>-1)this.shortlist.splice(i,1); else this.shortlist.push(id); this.save(); return i===-1; },
-  isSL(id){ return this.shortlist.includes(id); }
-};
-
-/* ══ Routing ════════════════════════════ */
-function go(pg, extra){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.getElementById('pg-'+pg)?.classList.add('active');
-  document.querySelectorAll('.nav-links a').forEach(a=>a.classList.remove('on'));
-  document.getElementById('nl-'+pg)?.classList.add('on');
-  window.scrollTo(0,0);
-  if(pg==='search') doSearch();
-  if(pg==='profile'&&extra) renderProfile(extra);
-  if(pg==='dashboard') renderDash();
-  if(pg==='about') renderAbout();
-  if(pg==='home') renderHome();
-}
-function toggleMob(){ document.getElementById('mobMenu').classList.toggle('open'); }
-
-/* ══ Card builder ════════════════════════ */
-function star(n){ return '★'.repeat(Math.round(n))+'☆'.repeat(5-Math.round(n)); }
-function card(c){
-  const sl=STATE.isSL(c.id);
-  return `<div class="cc">
-    <div class="cc-top">
-      <div class="cc-av" style="background:${c.color}">${c.name[3]}</div>
-      <div><div class="cc-name">${c.name}</div><div class="cc-role">${c.title}</div><div class="cc-coll">${c.college}</div></div>
-      <div class="cc-tr">
-        ${c.verified?'<span class="tag tag-g">✓ موثق</span>':''}
-        <button style="font-size:1.1rem;background:none;border:none;cursor:pointer;transition:transform .2s" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform=''" onclick="handleSL(${c.id},this)">${sl?'❤️':'🤍'}</button>
-      </div>
-    </div>
-    <div class="cc-tags">${c.skills.slice(0,4).map(s=>`<span class="tag">${s}</span>`).join('')}${c.skills.length>4?`<span class="tag tag-b">+${c.skills.length-4}</span>`:''}</div>
-    <div class="cc-ft">
-      <div><span class="stars">${star(c.rating)}</span><span class="cc-rat"> ${c.rating} (${c.reviews})</span></div>
-      <div style="display:flex;gap:6px;align-items:center">
-        <span class="${c.available?'tag tag-g':'tag tag-r'}">${c.available?'متاح':'مشغول'}</span>
-        <button class="btn btn-p btn-sm" onclick="go('profile',${c.id})">الملف</button>
-      </div>
-    </div>
-  </div>`;
-}
-
-function handleSL(id, btn){
-  const added=STATE.toggleSL(id);
-  btn.textContent=added?'❤️':'🤍';
-  toast(added?'أُضيف للقائمة':'حُذف من القائمة', added?'t-ok':'t-inf');
-  updateSLPanel();
-}
-
-/* ══ HOME ═══════════════════════════════ */
-function renderHome(){
-  const g=document.getElementById('homeGrid');
-  if(g) g.innerHTML=DATA.slice(0,6).map(c=>card(c)).join('');
-}
-function goSearch(){ const q=document.getElementById('homeQ')?.value.trim(); if(q){window._sq=q;} go('search'); }
-function quickF(q){ window._sq=q; go('search'); }
-function searchCat(q){ window._sq=q; go('search'); }
-
-/* ══ SEARCH ═════════════════════════════ */
-let searchQ='';
-function doSearch(){
-  const q=(document.getElementById('sq')?.value||window._sq||'').toLowerCase();
-  window._sq='';
-  if(document.getElementById('sq')&&q&&!document.getElementById('sq').value) document.getElementById('sq').value='';
-  const coll=document.getElementById('fcoll')?.value||'';
-  const avail=document.getElementById('favail')?.value||'';
-  const minR=parseFloat(document.getElementById('frat')?.value||'0')||0;
-  const fVer=document.getElementById('fver')?.checked;
-  const fAva=document.getElementById('fava')?.checked;
-  const fAr=document.getElementById('far')?.checked;
-  const fEn=document.getElementById('fen')?.checked;
-  const fFr=document.getElementById('ffr')?.checked;
-  const sort=document.getElementById('fsort')?.value||'rating';
-  let res=DATA.filter(c=>{
-    const hay=[c.name,c.title,c.college,c.dept,...c.skills,...c.certs,c.summary].join(' ').toLowerCase();
-    if(q&&!hay.includes(q)) return false;
-    if(coll&&c.college!==coll) return false;
-    if(avail==='1'&&!c.available) return false;
-    if(avail==='0'&&c.available) return false;
-    if(c.rating<minR) return false;
-    if(fVer&&!c.verified) return false;
-    if(fAva&&!c.available) return false;
-    if(fAr&&!c.lang.includes('العربية')) return false;
-    if(fEn&&!c.lang.includes('الإنجليزية')) return false;
-    if(fFr&&!c.lang.includes('الفرنسية')) return false;
-    return true;
-  });
-  res.sort((a,b)=>sort==='rating'?b.rating-a.rating:sort==='exp'?b.exp_years-a.exp_years:b.contracts-a.contracts);
-  document.getElementById('rcnt').textContent=res.length;
-  const g=document.getElementById('sgrid');
-  const n=document.getElementById('nores');
-  if(!res.length){g.innerHTML='';n.style.display='block';}
-  else{n.style.display='none';g.innerHTML=res.map(c=>card(c)).join('');}
-  updateSLPanel();
-}
-function clearF(){
-  ['sq','fcoll','favail','frat','fsort'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=el.tagName==='SELECT'?el.options[0].value:'';});
-  ['fver','fava','far','fen','ffr'].forEach(id=>{const el=document.getElementById(id);if(el)el.checked=false;});
-  doSearch();
-}
-function updateSLPanel(){
-  const n=STATE.shortlist.length;
-  document.getElementById('slnum').textContent=n;
-  document.getElementById('slpanel').classList.toggle('show',n>0);
-}
-function viewSL(){
-  const items=DATA.filter(c=>STATE.isSL(c.id));
-  alert('قائمة المرشحين ('+items.length+'):\n'+items.map(c=>c.name+' | '+c.rating+'★').join('\n'));
-}
-function exportSL(){
-  const items=DATA.filter(c=>STATE.isSL(c.id));
-  const txt=items.map(c=>`${c.name} | ${c.title} | ${c.college} | ${c.rating}★`).join('\n');
-  const a=Object.assign(document.createElement('a'),{href:'data:text/plain;charset=utf-8,'+encodeURIComponent(txt),download:'shortlist.txt'});
-  a.click(); toast('تم التصدير بنجاح','t-ok');
-}
-
-/* ══ PROFILE ════════════════════════════ */
-function renderProfile(id){
-  const c=DATA.find(x=>x.id===id)||DATA[0];
-  STATE.currentProfile=c;
-  const sl=STATE.isSL(c.id);
-  document.getElementById('profileContent').innerHTML=`
-<div class="phead">
-  <div class="w"><div class="phead-in">
-    <div class="p-av" style="background:${c.color}">${c.name[3]}</div>
-    <div>
-      <div class="p-name">${c.name}</div>
-      <div class="p-role">${c.title} | ${c.dept}</div>
-      <div class="p-tags">
-        ${c.verified?'<span class="ptag">✓ موثق</span>':''}
-        <span class="ptag">${c.college}</span>
-        <span class="ptag">${c.exp_years} سنة خبرة</span>
-        <span class="ptag">${c.available?'🟢 متاح':'🔴 مشغول'}</span>
-        ${c.lang.map(l=>`<span class="ptag">${l}</span>`).join('')}
-      </div>
-      <div class="p-meta">
-        <span class="pmi">⭐ ${c.rating} (${c.reviews} تقييم)</span>
-        <span class="pmi">📄 ${c.contracts} تعاقد</span>
-      </div>
-    </div>
-    <div class="p-acts">
-      <button class="btn btn-gold" onclick="document.getElementById('contractOv').classList.add('open')">📄 طلب تعاقد</button>
-      <button id="slBtn" class="btn btn-g" style="border-color:rgba(255,255,255,.3);color:#fff" onclick="togglePSL(${c.id})">${sl?'❤️ في قائمتي':'🤍 أضف للقائمة'}</button>
-      <button class="btn btn-g" style="border-color:rgba(255,255,255,.3);color:#fff" onclick="go('search')">← رجوع</button>
-    </div>
-  </div></div>
-</div>
-<div class="w"><div class="playout">
-  <div>
-    <div class="pcard"><h3>🤖 الملخص الاحترافي</h3>
-      <div class="ai-lbl">✨ مُنشأ بالذكاء الاصطناعي – معتمد من مركز البحوث</div>
-      <div class="ai-sum">${c.summary}</div>
-      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:12px">${c.skills.map(s=>`<span class="tag tag-b">${s}</span>`).join('')}</div>
-    </div>
-    <div class="pcard"><h3>🏛️ الخبرات الإدارية</h3>
-      <div class="exp-row"><div class="exp-ico">🏛️</div><div><div class="exp-t">${c.admin_exp} <span class="vbadge">✓ موثق</span></div><div class="exp-o">${c.college}</div></div></div>
-    </div>
-    <div class="pcard"><h3>🎓 الخبرات التدريبية</h3>
-      <div class="exp-row"><div class="exp-ico">🎓</div><div><div class="exp-t">${c.training_exp} <span class="vbadge">✓ موثق</span></div></div></div>
-    </div>
-    <div class="pcard"><h3>🔬 الخبرات البحثية</h3>
-      ${c.research.map(r=>`<div class="exp-row"><div class="exp-ico">📄</div><div><div class="exp-t">${r} <span class="vbadge">✓ موثق</span></div></div></div>`).join('')}
-    </div>
-    <div class="pcard"><h3>🏅 الشهادات الاحترافية</h3>
-      <div class="skcloud">${c.certs.map(s=>`<span class="tag tag-gold">🏅 ${s}</span>`).join('')}</div>
-    </div>
-    <div class="pcard"><h3>💡 المهارات</h3>
-      <div class="skcloud">${c.skills.map(s=>`<span class="sk">${s}</span>`).join('')}</div>
-    </div>
-  </div>
-  <div>
-    <div class="sc"><div class="rbig"><div class="rn">${c.rating}</div><span class="rs">${star(c.rating)}</span><div class="rc">بناءً على ${c.reviews} تقييم</div></div></div>
-    <div class="sc"><h4>معلومات سريعة</h4>
-      <div class="inforow"><span class="l">التخصص</span><span class="v">${c.dept}</span></div>
-      <div class="inforow"><span class="l">الكلية</span><span class="v">${c.college}</span></div>
-      <div class="inforow"><span class="l">سنوات الخبرة</span><span class="v">${c.exp_years} سنة</span></div>
-      <div class="inforow"><span class="l">التعاقدات</span><span class="v">${c.contracts}</span></div>
-      <div class="inforow"><span class="l">الحالة</span><span class="v">${c.available?'🟢 متاح':'🔴 مشغول'}</span></div>
-      <div class="inforow"><span class="l">اللغات</span><span class="v">${c.lang.join(' • ')}</span></div>
-    </div>
-    <div class="sc" style="text-align:center">
-      <button class="btn btn-p" style="width:100%;margin-bottom:10px" onclick="document.getElementById('contractOv').classList.add('open')">📄 طلب تعاقد الآن</button>
-      <button class="btn btn-g" style="width:100%" onclick="togglePSL(${c.id})">🤍 أضف لقائمة المرشحين</button>
-    </div>
-  </div>
-</div></div>`;
-}
-function togglePSL(id){
-  const added=STATE.toggleSL(id);
-  const btn=document.getElementById('slBtn');
-  if(btn) btn.textContent=added?'❤️ في قائمتي':'🤍 أضف للقائمة';
-  toast(added?'أُضيف للقائمة':'حُذف من القائمة',added?'t-ok':'t-inf');
-}
-
-/* ══ CONTRACT ═══════════════════════════ */
-function submitContract(){
-  const o1=document.getElementById('co1').value.trim();
-  const o2=document.getElementById('co2').value.trim();
-  const o3=document.getElementById('co3').value.trim();
-  const o4=document.getElementById('co4').value;
-  const o5=document.getElementById('co5').value.trim();
-  if(!o1||!o2||!o3||!o4||!o5){toast('يرجى تعبئة الحقول الإلزامية','t-err');return;}
-  STATE.contracts.push({id:Date.now(),consultant:STATE.currentProfile?.name||'—',org:o1,contact:o2,email:o3,service:o4,desc:o5,duration:document.getElementById('co6').value,mode:document.getElementById('co7').value,status:'قيد الدراسة',date:new Date().toLocaleDateString('ar-SA')});
-  STATE.save();
-  document.getElementById('contractOv').classList.remove('open');
-  ['co1','co2','co3','co5','co6'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('co4').selectedIndex=0;
-  toast('✅ تم إرسال طلبك! سيتواصل معك المركز خلال يومي عمل','t-ok',5000);
-}
-
-/* ══ REGISTER ═══════════════════════════ */
-let rStep=1;
-const rFiles={cv:[],cert:[]};
-document.querySelectorAll('.chip').forEach(ch=>{
-  ch.addEventListener('click',()=>ch.classList.toggle('on'));
-});
-function addSkill(){
-  const inp=document.getElementById('rSkillCustom');
-  const v=inp.value.trim(); if(!v)return;
-  const ch=document.createElement('span');
-  ch.className='chip on';ch.textContent=v;ch.dataset.v=v;
-  ch.addEventListener('click',()=>ch.classList.toggle('on'));
-  document.getElementById('skillG').appendChild(ch);
-  inp.value='';
-}
-function addCert(){
-  const d=document.createElement('div');
-  d.style.cssText='border-top:1px solid var(--bdr);padding-top:14px;margin-top:14px';
-  d.innerHTML=`<div class="two"><div class="fi"><label>اسم الشهادة</label><input class="cname" placeholder="اسم الشهادة"></div><div class="fi"><label>الجهة المانحة</label><input class="corg" placeholder="الجهة"></div></div><div class="two"><div class="fi"><label>الرقم المرجعي</label><input class="cnum" placeholder="رقم"></div><div class="fi"><label>السنة</label><input class="cyear" type="number" placeholder="2022"></div></div><button onclick="this.parentElement.remove()" style="font-size:.75rem;color:var(--red);font-weight:700;cursor:pointer">✕ حذف</button>`;
-  document.getElementById('certsCont').appendChild(d);
-}
-function addFile(inp,key){
-  [...inp.files].forEach(f=>{
-    if(f.size>10*1024*1024){toast('حجم الملف يتجاوز 10MB','t-err');return;}
-    rFiles[key].push(f);
-    const li=document.createElement('div');li.className='fitem';
-    li.innerHTML=`📎 ${f.name} <span class="frm" onclick="rmFile('${key}','${f.name}',this.parentElement)">✕</span>`;
-    document.getElementById(key+'L').appendChild(li);
-  });
-}
-function rmFile(key,name,el){rFiles[key]=rFiles[key].filter(f=>f.name!==name);el.remove();}
-function rNext(cur){
-  if(cur===1){
-    const req=['r1','r2','r3','r4','r5','r6','r7'];
-    if(req.some(id=>!document.getElementById(id).value.trim())){toast('يرجى تعبئة الحقول الإلزامية','t-err');return;}
-    if(!/^05\d{8}$/.test(document.getElementById('r4').value)){toast('رقم الجوال غير صحيح','t-err');return;}
-  }
-  if(cur===4&&!rFiles.cv.length){toast('يرجى رفع السيرة الذاتية','t-err');return;}
-  if(cur===4) buildReview();
-  goRStep(cur+1);
-}
-function rPrev(cur){goRStep(cur-1);}
-function goRStep(n){
-  document.querySelectorAll('.sp').forEach(p=>p.classList.remove('act'));
-  document.getElementById('rsp'+n)?.classList.add('act');
-  for(let i=1;i<=5;i++){
-    const sn=document.getElementById('sn'+i);
-    if(!sn)continue;
-    sn.classList.remove('act','done');
-    if(i<n)sn.classList.add('done');
-    else if(i===n)sn.classList.add('act');
-    const sl=document.getElementById('sl'+i);
-    if(sl)sl.classList.toggle('done',i<n);
-  }
-  rStep=n;
-  document.querySelector('.rmain')?.scrollTo(0,0);
-  window.scrollTo(0,0);
-}
-function buildReview(){
-  const skills=[...document.querySelectorAll('#skillG .chip.on')].map(c=>c.dataset.v||c.textContent);
-  const langs=[...document.querySelectorAll('#langG .chip.on')].map(c=>c.dataset.v||c.textContent);
-  document.getElementById('reviewBox').innerHTML=`
-    <div><strong>الاسم:</strong> ${document.getElementById('r1').value} ${document.getElementById('r2').value}</div>
-    <div><strong>رقم المنسوب:</strong> ${document.getElementById('r3').value}</div>
-    <div><strong>البريد:</strong> ${document.getElementById('r5').value}</div>
-    <div><strong>الكلية:</strong> ${document.getElementById('r6').value}</div>
-    <div><strong>طبيعة العمل:</strong> ${document.getElementById('r7').value==='academic'?'أكاديمي':'إداري'}</div>
-    <div><strong>المهارات:</strong> ${skills.join('، ')||'—'}</div>
-    <div><strong>اللغات:</strong> ${langs.join('، ')}</div>
-    <div><strong>السيرة الذاتية:</strong> ${rFiles.cv.length?'✅ مرفوعة':'❌ مطلوبة'}</div>`;
-}
-function submitReg(){
-  if(!document.getElementById('consent').checked){toast('يرجى الموافقة على سياسة الخصوصية','t-err');return;}
-  document.getElementById('reqN').textContent='TU-'+Date.now().toString().slice(-6);
-  document.getElementById('stepsNav').style.display='none';
-  document.querySelectorAll('.sp').forEach(p=>p.classList.remove('act'));
-  document.getElementById('rspSucc').classList.add('act');
-  toast('✅ تم الإرسال بنجاح!','t-ok',5000);
-  window.scrollTo(0,0);
-}
-
-/* ══ DASHBOARD ══════════════════════════ */
-function showPanel(id){
-  document.querySelectorAll('.dpanel').forEach(p=>p.classList.remove('act'));
-  document.getElementById('pan-'+id).classList.add('act');
-  document.querySelectorAll('.dsec a').forEach(a=>a.classList.remove('on'));
-  document.getElementById('dp-'+id).classList.add('on');
-}
-function renderDash(){
-  // contracts table
-  const ct=STATE.contracts;
-  document.getElementById('dashContracts').innerHTML=`<tr><th>المستشار</th><th>الجهة</th><th>الخدمة</th><th>الحالة</th><th>التاريخ</th></tr>`
-    +(ct.length?ct.slice(-5).reverse().map((c,i)=>`<tr><td>${c.consultant}</td><td>${c.org}</td><td>${c.service}</td><td><span class="tag tag-b">${c.status}</span></td><td>${c.date}</td></tr>`).join(''):'<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:20px">لا توجد طلبات بعد</td></tr>');
-
-  document.getElementById('dashRegs').innerHTML=`<tr><th>الاسم</th><th>الكلية</th><th>التقييم</th><th>الحالة</th></tr>`
-    +DATA.slice(0,5).map(c=>`<tr><td>${c.name}</td><td>${c.college}</td><td class="stars">${c.rating}★</td><td><span class="${c.verified?'tag tag-g':'tag'}">✓ معتمد</span></td></tr>`).join('');
-
-  // consultants panel
-  renderConsTable(DATA);
-  // contracts panel
-  document.getElementById('dashContractsList').innerHTML=ct.length
-    ?ct.slice().reverse().map(c=>`<div class="dc-card"><div class="dc-head"><div class="dc-title">📄 ${c.service} – ${c.org}</div><span class="dc-status tag tag-b">${c.status}</span></div><div class="dc-info">المستشار: ${c.consultant} | المسؤول: ${c.contact} | النمط: ${c.mode||'—'} | التاريخ: ${c.date}</div><div style="display:flex;gap:8px;margin-top:12px"><button class="btn btn-g btn-sm" onclick="updateStatus(this,'مقبول')">قبول</button><button class="btn btn-g btn-sm" onclick="updateStatus(this,'مرفوض')">رفض</button><button class="btn btn-p btn-sm" onclick="updateStatus(this,'تحت التنفيذ')">تحت التنفيذ</button><button class="btn btn-g btn-sm" onclick="updateStatus(this,'مكتمل')">مكتمل</button></div></div>`).join('')
-    :'<div class="nores"><div class="ni">📄</div><h3>لا توجد طلبات</h3><p>ستظهر طلبات التعاقد هنا</p></div>';
-
-  // bar chart
-  const cols=[['كلية الحاسب',156],['كلية الطب',134],['كلية الهندسة',189],['الاقتصاد',92],['الحقوق',78],['التربية',312]];
-  const max=Math.max(...cols.map(c=>c[1]));
-  document.getElementById('barChart').innerHTML=`<div style="display:flex;flex-direction:column;gap:12px">`
-    +cols.map(([n,v])=>`<div style="display:flex;align-items:center;gap:12px">
-      <div style="width:120px;font-size:.78rem;color:var(--txt2);text-align:right">${n}</div>
-      <div style="flex:1;background:var(--surf2);border-radius:6px;overflow:hidden">
-        <div style="width:${(v/max*100).toFixed(1)}%;height:28px;background:linear-gradient(90deg,var(--blue),var(--sky));border-radius:6px;display:flex;align-items:center;padding-right:8px;transition:width .5s">
-          <span style="font-size:.75rem;font-weight:700;color:#fff">${v}</span>
-        </div>
-      </div>
-    </div>`).join('')+'</div>';
-}
-function renderConsTable(data){
-  document.getElementById('dashConsTable').innerHTML=`<tr><th>الاسم</th><th>الكلية</th><th>التقييم</th><th>التعاقدات</th><th>الحالة</th><th>إجراء</th></tr>`
-    +data.map(c=>`<tr><td>${c.name}</td><td style="font-size:.78rem;color:var(--muted)">${c.college}</td><td class="stars">${c.rating}★</td><td>${c.contracts}</td><td><span class="tag ${c.verified?'tag-g':'tag-r'}">${c.verified?'معتمد':'قيد المراجعة'}</span></td><td><button class="btn btn-g btn-sm" onclick="go('profile',${c.id})">عرض</button></td></tr>`).join('');
-}
-function filterDash(){
-  const q=document.getElementById('dashSearch').value.toLowerCase();
-  renderConsTable(DATA.filter(c=>[c.name,c.college,c.dept].join(' ').toLowerCase().includes(q)));
-}
-function updateStatus(btn,status){
-  btn.closest('.dc-card').querySelector('.dc-status').textContent=status;
-  toast('تم تحديث الحالة إلى: '+status,'t-ok');
-}
-
-/* ══ ABOUT ══════════════════════════════ */
-function renderAbout(){
-  const techs=[
-    {icon:'🤖',title:'الذكاء الاصطناعي',desc:'توليد ملفات تعريفية احترافية تلقائياً وخوارزمية بحث دلالية وزنية'},
-    {icon:'🔐',title:'الأمان والخصوصية',desc:'تكامل SSO + HTTPS + امتثال كامل لنظام حماية البيانات السعودي'},
-    {icon:'📊',title:'لوحة التقارير',desc:'55 مؤشر أداء KPI مع تقارير تفاعلية وتصدير Excel/PDF'},
-    {icon:'✅',title:'التحقق الثلاثي',desc:'تحقق آلي + وثائقي + متقاطع لضمان دقة جميع الخبرات'},
-    {icon:'📄',title:'عقود جاهزة',desc:'3 قوالب عقود معتمدة مع توقيع ثلاثي الأطراف وتتبع الحالة'},
-    {icon:'⚖️',title:'حوكمة المصالح',desc:'نظام متكامل لكشف وإدارة تضارب المصالح قبل كل تعاقد'},
-  ];
-  document.getElementById('techCards').innerHTML=techs.map(t=>`
-    <div style="background:var(--surf);border:1px solid var(--bdr);border-radius:var(--rl);padding:22px;transition:all .22s" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='var(--shl)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
-      <div style="font-size:1.8rem;margin-bottom:10px">${t.icon}</div>
-      <h3 style="color:var(--navy);margin-bottom:7px">${t.title}</h3>
-      <p style="font-size:.82rem">${t.desc}</p>
-    </div>`).join('');
-}
-
-/* ══ Toast ══════════════════════════════ */
-function toast(msg, type='t-inf', dur=3000){
-  const w=document.getElementById('toasts');
-  const t=document.createElement('div');
-  t.className=`toast ${type}`;t.textContent=msg;
-  w.appendChild(t);setTimeout(()=>t.remove(),dur);
-}
-
-/* ══ Nav scroll shadow ══════════════════ */
-window.addEventListener('scroll',()=>{
-  document.getElementById('mainNav')?.classList.toggle('up',window.scrollY>20);
-});
-
-/* ══ Scroll animations ══════════════════ */
-const io=new IntersectionObserver(entries=>{
-  entries.forEach(e=>{if(e.isIntersecting){e.target.style.animationPlayState='running';}});
-},{threshold:.12});
-document.querySelectorAll('.au').forEach(el=>{
-  el.style.animationPlayState='paused';io.observe(el);
-});
-
-/* ══ Init ═══════════════════════════════ */
-renderHome();
-</script>
+<!-- ════════ Scripts ════════ -->
+<script src="js/data.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/search.js"></script>
+<script src="js/register.js"></script>
+<script src="js/dashboard.js"></script>
+<script src="js/app.js"></script>
 </body>
 </html>
