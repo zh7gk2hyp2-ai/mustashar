@@ -6,7 +6,8 @@ function showPanel(id) {
   document.getElementById('pan-' + id).classList.add('act');
   document.querySelectorAll('.dsec a').forEach(a => a.classList.remove('on'));
   document.getElementById('dp-' + id).classList.add('on');
-  if (id === 'kpis') renderKPIs();
+  if (id === 'kpis')      renderKPIs();
+  if (id === 'analytics') renderCharts();
 }
 
 /* ── مؤشرات الأداء KPIs ── */
@@ -264,22 +265,83 @@ function updateContractStatus(btn, status) {
   toast('تم تحديث الحالة إلى: ' + status, 't-ok');
 }
 
-/* ── الرسم البياني ── */
-function renderBarChart() {
-  const cols = [
-    ['كلية التربية',312], ['كلية الهندسة',189], ['كلية الحاسبات',156],
-    ['كلية الطب',134], ['إدارة الأعمال',92], ['الشريعة والأنظمة',78]
-  ];
-  const max = Math.max(...cols.map(c => c[1]));
-  document.getElementById('barChart').innerHTML =
-    `<div style="display:flex;flex-direction:column;gap:12px">` +
-    cols.map(([n, v]) =>
-      `<div style="display:flex;align-items:center;gap:12px">
-        <div style="width:130px;font-size:.78rem;color:var(--txt2);text-align:right">${n}</div>
-        <div style="flex:1;background:var(--surf2);border-radius:6px;overflow:hidden">
-          <div style="width:${(v / max * 100).toFixed(1)}%;height:28px;background:linear-gradient(90deg,var(--blue),var(--sky));border-radius:6px;display:flex;align-items:center;padding-right:8px;transition:width .5s">
-            <span style="font-size:.75rem;font-weight:700;color:#fff">${v}</span>
-          </div>
-        </div>
-      </div>`).join('') + '</div>';
+/* ── الرسوم البيانية Chart.js ── */
+const _charts = {};
+
+function destroyChart(id) {
+  if (_charts[id]) { _charts[id].destroy(); delete _charts[id]; }
+}
+
+function renderBarChart() { /* legacy — now handled by renderCharts */ }
+
+function renderCharts() {
+  const regs      = getRegs();
+  const ct        = STATE.contracts;
+
+  /* 1. توزيع المنسوبين حسب الكلية */
+  const colMap = {};
+  DATA.forEach(c => { colMap[c.college] = (colMap[c.college] || 0) + 1; });
+  const colLabels = Object.keys(colMap).slice(0, 8);
+  const colVals   = colLabels.map(l => colMap[l]);
+
+  destroyChart('chartColleges');
+  const ctxC = document.getElementById('chartColleges');
+  if (ctxC) {
+    _charts.chartColleges = new Chart(ctxC, {
+      type: 'bar',
+      data: {
+        labels: colLabels,
+        datasets: [{ label: 'عدد المنسوبين', data: colVals,
+          backgroundColor: 'rgba(0,102,51,.75)', borderRadius: 6,
+          borderSkipped: false }]
+      },
+      options: {
+        indexAxis: 'y',
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { color: 'rgba(0,0,0,.05)' } },
+          y: { ticks: { font: { family: 'Cairo', size: 11 } } }
+        }
+      }
+    });
+  }
+
+  /* 2. حالات طلبات التعاقد */
+  const statuses = ['قيد الدراسة','مقبول','تحت التنفيذ','مكتمل','مرفوض'];
+  const stColors = ['#f59e0b','#006633','#087a45','#15803d','#c0392b'];
+  const stCounts = statuses.map(s => ct.filter(c => c.status === s).length);
+
+  destroyChart('chartContracts');
+  const ctxK = document.getElementById('chartContracts');
+  if (ctxK) {
+    _charts.chartContracts = new Chart(ctxK, {
+      type: 'doughnut',
+      data: { labels: statuses, datasets: [{ data: stCounts, backgroundColor: stColors, borderWidth: 2 }] },
+      options: {
+        plugins: { legend: { position: 'bottom', labels: { font: { family: 'Cairo', size: 11 }, padding: 12 } } },
+        cutout: '62%'
+      }
+    });
+  }
+
+  /* 3. التسجيلات حسب الحالة */
+  const rStatuses = ['قيد المراجعة','معتمد','مرفوض'];
+  const rColors   = ['#f59e0b','#006633','#c0392b'];
+  const rCounts   = rStatuses.map(s => regs.filter(r => r.status === s).length);
+
+  destroyChart('chartRegs');
+  const ctxR = document.getElementById('chartRegs');
+  if (ctxR) {
+    _charts.chartRegs = new Chart(ctxR, {
+      type: 'bar',
+      data: {
+        labels: rStatuses,
+        datasets: [{ label: 'الطلبات', data: rCounts, backgroundColor: rColors, borderRadius: 8, borderSkipped: false }]
+      },
+      options: {
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+      }
+    });
+  }
 }

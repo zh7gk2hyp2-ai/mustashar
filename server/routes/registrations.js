@@ -5,6 +5,7 @@ const fs      = require('fs');
 const db      = require('../db/pool');
 const authMW  = require('../middleware/auth');
 const { generateConsultantSummary } = require('../services/ai');
+const { sendApprovalEmail, sendRejectionEmail } = require('../services/email');
 
 /* ── File upload config ────────────────────────────── */
 const uploadDir = path.join(__dirname, '..', '..', process.env.UPLOAD_DIR || 'uploads');
@@ -167,6 +168,9 @@ router.patch('/:id/approve', authMW, async (req, res) => {
     await conn.commit();
     res.json({ message: 'تم قبول الطلب وإنشاء ملف المستشار' });
 
+    /* send approval email — non-blocking */
+    sendApprovalEmail(reg).catch(err => console.error('[Email approve]', err.message));
+
     /* generate AI summary after responding — non-blocking */
     if (consultantId && reg.consent_ai) {
       const collegeRow = await db.query(
@@ -202,6 +206,11 @@ router.patch('/:id/reject', authMW, async (req, res) => {
     );
     if (!result.affectedRows) return res.status(404).json({ error: 'الطلب غير موجود' });
     res.json({ message: 'تم رفض الطلب' });
+
+    /* send rejection email — non-blocking */
+    db.query('SELECT * FROM registrations WHERE id = ?', [req.params.id])
+      .then(([rows]) => { if (rows[0]) sendRejectionEmail(rows[0], rejection_note); })
+      .catch(err => console.error('[Email reject]', err.message));
   } catch (e) {
     res.status(500).json({ error: 'خطأ في الخادم' });
   }

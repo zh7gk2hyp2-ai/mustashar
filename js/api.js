@@ -108,5 +108,49 @@ const API = {
   /* ── Stats ────────────────────────────────── */
   async getDashboardStats() {
     return apiFetch('/stats/dashboard');
+  },
+
+  /* ── Consultant Portal ────────────────────── */
+  async consultantLogin(emp_id, email) {
+    const data = await apiFetch('/consultant/login', {
+      method: 'POST',
+      body: JSON.stringify({ emp_id, email })
+    });
+    sessionStorage.setItem('mu_cons_token', data.token);
+    sessionStorage.setItem('mu_cons', JSON.stringify(data.consultant));
+    return data;
+  },
+
+  consultantLogout() {
+    sessionStorage.removeItem('mu_cons_token');
+    sessionStorage.removeItem('mu_cons');
+  },
+
+  getConsultantToken() { return sessionStorage.getItem('mu_cons_token') || ''; },
+
+  async getMyProfile() {
+    return this._consApiFetch('/consultant/me');
+  },
+
+  async updateMyProfile(data) {
+    return this._consApiFetch('/consultant/profile', { method: 'PATCH', body: JSON.stringify(data) });
+  },
+
+  async getMyContracts() {
+    return this._consApiFetch('/consultant/contracts');
+  },
+
+  async getMyStats() {
+    return this._consApiFetch('/consultant/stats');
+  },
+
+  async _consApiFetch(path, options = {}) {
+    const headers = { 'Content-Type': 'application/json', ...options.headers };
+    const token = this.getConsultantToken();
+    if (token) headers['Authorization'] = 'Bearer ' + token;
+    const res = await fetch(API_BASE + path, { ...options, headers });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || 'خطأ في الخادم');
+    return data;
   }
 };

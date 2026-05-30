@@ -22,11 +22,12 @@
       <a onclick="go('home')"     id="nl-home">الرئيسية</a>
       <a onclick="go('search')"   id="nl-search">البحث عن مستشار</a>
       <a onclick="go('register')" id="nl-register">تسجيل المنسوب</a>
+      <a onclick="navPortal()"    id="nl-portal">بوابة المنسوب</a>
       <a onclick="navDash()"      id="nl-dashboard">لوحة التحكم</a>
       <a onclick="go('about')"    id="nl-about">عن المنصة</a>
     </div>
     <div class="nav-end">
-      <button class="btn btn-g btn-sm" onclick="navDash()">دخول</button>
+      <button class="btn btn-g btn-sm" onclick="navDash()">دخول المشرف</button>
       <button class="btn btn-p btn-sm" onclick="go('register')">ابدأ الآن</button>
     </div>
     <button class="ham" onclick="toggleMob()">☰</button>
@@ -35,6 +36,7 @@
     <a onclick="go('home');toggleMob()">الرئيسية</a>
     <a onclick="go('search');toggleMob()">البحث</a>
     <a onclick="go('register');toggleMob()">تسجيل</a>
+    <a onclick="navPortal();toggleMob()">بوابة المنسوب</a>
     <a onclick="navDash();toggleMob()">لوحة التحكم</a>
     <a onclick="go('about');toggleMob()">عن المنصة</a>
   </div>
@@ -586,14 +588,24 @@
     <!-- Analytics -->
     <div class="dpanel" id="pan-analytics">
       <h3 style="color:var(--navy);margin-bottom:18px">📈 التقارير والتحليلات</h3>
-      <div class="stats4">
+      <div class="stats4" id="analyticsStats">
         <div class="stat-c" style="grid-column:span 2"><div class="sv" style="color:var(--blue)">55</div><div class="sl">إجمالي مؤشرات الأداء (KPIs) المُتتبَّعة</div></div>
         <div class="stat-c"><div class="sv">4.8</div><div class="sl">متوسط تقييم المستشارين</div></div>
         <div class="stat-c"><div class="sv">92%</div><div class="sl">نسبة التعاقدات المكتملة</div></div>
       </div>
-      <div style="background:var(--surf);border:1px solid var(--bdr);border-radius:var(--rl);padding:22px">
-        <h4 style="font-size:.88rem;color:var(--navy);margin-bottom:14px">📊 توزيع المنسوبين حسب الكلية</h4>
-        <div id="barChart"></div>
+      <div class="charts-grid">
+        <div class="chart-box">
+          <h4>📊 توزيع المنسوبين حسب الكلية</h4>
+          <canvas id="chartColleges"></canvas>
+        </div>
+        <div class="chart-box">
+          <h4>📋 حالات طلبات التعاقد</h4>
+          <canvas id="chartContracts"></canvas>
+        </div>
+      </div>
+      <div class="chart-box" style="margin-bottom:0">
+        <h4>📅 التسجيلات حسب الحالة</h4>
+        <canvas id="chartRegs" style="max-height:180px"></canvas>
       </div>
     </div>
   </div>
@@ -692,31 +704,131 @@
 </div></footer>
 </div>
 
+<!-- ════════════════════════════════════════
+     PAGE: PORTAL — بوابة المنسوب
+════════════════════════════════════════ -->
+<div class="page" id="pg-portal">
+<div class="portal-head">
+  <div class="w" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+    <div>
+      <p style="font-size:.8rem;color:rgba(255,255,255,.6);margin-bottom:4px">مرحباً،</p>
+      <h1 id="portalName" style="font-size:1.4rem;margin-bottom:2px">المنسوب</h1>
+      <p style="color:rgba(255,255,255,.6);font-size:.82rem">رقم المنسوب: <span id="portalEmpId"></span></p>
+    </div>
+    <button class="btn btn-g btn-sm" style="color:#fff;border-color:rgba(255,255,255,.3)" onclick="consultantLogout()">🚪 خروج</button>
+  </div>
+</div>
+<div class="w"><div class="portal-layout">
+  <div class="pside">
+    <div class="puser">
+      <div class="pu-av">م</div>
+      <div class="pu-name" id="portalNameSide">المنسوب</div>
+      <div class="pu-id" id="portalIdSide"></div>
+    </div>
+    <div class="psec">
+      <a onclick="showPortalPanel('overview')" id="pnav-overview" class="on">📊 نظرة عامة</a>
+      <a onclick="showPortalPanel('edit')"     id="pnav-edit">✏️ تعديل ملفي</a>
+      <a onclick="go('search')"               id="pnav-search">🔍 استعراض المستشارين</a>
+    </div>
+  </div>
+  <div>
+    <!-- Overview -->
+    <div class="ppanel act" id="pp-overview">
+      <div class="stats4" id="pp-stats"></div>
+      <div class="pp-card">
+        <h3>📄 عقودي</h3>
+        <div style="overflow:auto">
+          <table class="tbl" id="pp-contracts-tbl"></table>
+        </div>
+      </div>
+      <div class="pp-card" style="text-align:center">
+        <div style="font-size:2.5rem;margin-bottom:10px">💡</div>
+        <h3 style="border:none;font-size:1rem;color:var(--navy)">ملفك الاحترافي</h3>
+        <p style="font-size:.84rem;color:var(--txt2);margin:10px 0 16px">حدّث بياناتك وسعرك وحالة توفرك لتحصل على مزيد من العقود</p>
+        <button class="btn btn-p" onclick="showPortalPanel('edit')">تعديل الملف ←</button>
+      </div>
+    </div>
+    <!-- Edit Profile -->
+    <div class="ppanel" id="pp-edit">
+      <div class="pp-card">
+        <h3>✏️ تعديل ملفي الشخصي</h3>
+        <p style="font-size:.8rem;color:var(--muted);margin-bottom:16px">يمكنك تعديل بيانات التواصل والسعر وحالة التوفر. التعديلات تنعكس فوراً على ملفك العام.</p>
+        <div class="edit-row">
+          <div class="fi"><label>العنوان الوظيفي</label><input id="ep-title" placeholder="أستاذ مساعد | استشاري أول"></div>
+          <div class="fi"><label>رقم الجوال</label><input id="ep-phone" placeholder="05XXXXXXXX"></div>
+        </div>
+        <div class="edit-row">
+          <div class="fi"><label>السعر التقديري (ر.س)</label><input id="ep-rate" type="number" placeholder="1500"></div>
+          <div class="fi"><label>نوع السعر</label>
+            <select id="ep-ratetype"><option value="">اختر</option><option value="ساعة">ساعة</option><option value="يوم">يوم</option><option value="مشروع">مشروع</option></select>
+          </div>
+        </div>
+        <div class="edit-row">
+          <div class="fi"><label>رابط LinkedIn</label><input id="ep-linkedin" type="url" placeholder="https://linkedin.com/in/..."></div>
+          <div class="fi"><label>حالة التوفر</label>
+            <select id="ep-available"><option value="1">🟢 متاح للعقود</option><option value="0">🔴 غير متاح حالياً</option></select>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:6px">
+          <button id="saveProfileBtn" class="btn btn-p" onclick="saveProfile()">حفظ التعديلات ←</button>
+          <button class="btn btn-g" onclick="showPortalPanel('overview')">إلغاء</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div></div>
+</div>
+
 <!-- ════════ LOGIN MODAL ════════ -->
 <div class="ov" id="loginOv" onclick="if(this===event.target)this.classList.remove('open')">
-  <div class="modal" style="max-width:420px">
+  <div class="modal" style="max-width:440px">
     <div class="m-head">
-      <div>
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
-          <div class="logo-m" style="width:36px;height:36px;font-size:1rem">م</div>
-          <h3>دخول لوحة التحكم</h3>
-        </div>
-        <p style="font-size:.8rem;color:var(--muted)">مركز البحوث والاستشارات – جامعة الطائف</p>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="logo-m" style="width:36px;height:36px;font-size:1rem">م</div>
+        <div><div style="font-weight:800;color:var(--navy)">منصة مستشار</div>
+        <div style="font-size:.75rem;color:var(--muted)">جامعة الطائف</div></div>
       </div>
       <button class="m-close" onclick="document.getElementById('loginOv').classList.remove('open')">✕</button>
     </div>
-    <div class="fi">
-      <label>اسم المستخدم <span class="rq">*</span></label>
-      <input id="loginUser" placeholder="admin" autocomplete="username">
+    <!-- Tabs -->
+    <div class="tab-row">
+      <button class="tab-btn on" id="tab-admin" onclick="switchLoginTab('admin')">🏛️ دخول المشرف</button>
+      <button class="tab-btn" id="tab-consultant" onclick="switchLoginTab('consultant')">👤 بوابة المنسوب</button>
     </div>
-    <div class="fi" style="position:relative">
-      <label>كلمة المرور <span class="rq">*</span></label>
-      <input id="loginPass" type="password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
-      <button onclick="togglePassVis()" style="position:absolute;left:12px;top:34px;background:none;border:none;cursor:pointer;color:var(--muted);font-size:.85rem" title="إظهار/إخفاء">👁</button>
+    <!-- Admin tab -->
+    <div class="tab-pane on" id="tabp-admin">
+      <div class="fi">
+        <label>اسم المستخدم <span class="rq">*</span></label>
+        <input id="loginUser" placeholder="admin" autocomplete="username">
+      </div>
+      <div class="fi" style="position:relative">
+        <label>كلمة المرور <span class="rq">*</span></label>
+        <input id="loginPass" type="password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+        <button onclick="togglePassVis()" style="position:absolute;left:12px;top:34px;background:none;border:none;cursor:pointer;color:var(--muted);font-size:.85rem" title="إظهار/إخفاء">👁</button>
+      </div>
+      <div id="loginErr" style="color:var(--red);font-size:.8rem;margin-bottom:12px;display:none;padding:8px 12px;background:rgba(192,57,43,.07);border-radius:8px"></div>
+      <button class="btn btn-p" style="width:100%" onclick="doLogin()">دخول ←</button>
+      <div style="text-align:center;margin-top:14px;font-size:.75rem;color:var(--muted)">للدعم: research@tu.edu.sa</div>
     </div>
-    <div id="loginErr" style="color:var(--red);font-size:.8rem;margin-bottom:12px;display:none;padding:8px 12px;background:rgba(192,57,43,.07);border-radius:8px">⚠️ اسم المستخدم أو كلمة المرور غير صحيحة</div>
-    <button class="btn btn-p" style="width:100%" onclick="doLogin()">دخول ←</button>
-    <div style="text-align:center;margin-top:14px;font-size:.75rem;color:var(--muted)">للدعم التقني: research@tu.edu.sa</div>
+    <!-- Consultant tab -->
+    <div class="tab-pane" id="tabp-consultant">
+      <p style="font-size:.82rem;color:var(--txt2);margin-bottom:16px;padding:10px 14px;background:var(--surf2);border-radius:10px">
+        ادخل بيانات حسابك المسجل في المنصة (رقم المنسوب + البريد الإلكتروني)
+      </p>
+      <div class="fi">
+        <label>رقم المنسوب <span class="rq">*</span></label>
+        <input id="loginConsEmpId" placeholder="12345678" autocomplete="off">
+      </div>
+      <div class="fi">
+        <label>البريد الإلكتروني <span class="rq">*</span></label>
+        <input id="loginConsEmail" type="email" placeholder="name@tu.edu.sa" onkeydown="if(event.key==='Enter')doConsultantLogin()">
+      </div>
+      <div id="loginConsErr" style="color:var(--red);font-size:.8rem;margin-bottom:12px;display:none;padding:8px 12px;background:rgba(192,57,43,.07);border-radius:8px"></div>
+      <button id="consLoginBtn" class="btn btn-p" style="width:100%" onclick="doConsultantLogin()">دخول ←</button>
+      <div style="text-align:center;margin-top:12px;font-size:.78rem;color:var(--muted)">
+        لم تسجّل بعد؟ <a onclick="document.getElementById('loginOv').classList.remove('open');go('register')" style="color:var(--blue);cursor:pointer;font-weight:700">سجّل الآن</a>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -738,9 +850,11 @@
 </div>
 
 <!-- ════════ Scripts ════════ -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="js/api.js"></script>
 <script src="js/data.js"></script>
 <script src="js/auth.js"></script>
+<script src="js/portal.js"></script>
 <script src="js/ui.js"></script>
 <script src="js/search.js"></script>
 <script src="js/register.js"></script>

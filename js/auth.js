@@ -1,6 +1,6 @@
 /* ══════════════════════════════════════
-   AUTH — تسجيل الدخول للوحة التحكم
-   بيانات الدخول: admin / tu2025
+   AUTH — تسجيل دخول المشرف والمنسوب
+   admin / tu2025
 ══════════════════════════════════════ */
 const ADMIN = { user: 'admin', pass: 'tu2025' };
 
@@ -8,10 +8,19 @@ function isLoggedIn() {
   return sessionStorage.getItem('mu_auth') === '1';
 }
 
+/* ── Tab switcher ──────────────────────── */
+function switchLoginTab(tab) {
+  ['admin','consultant'].forEach(t => {
+    document.getElementById('tab-' + t)?.classList.toggle('on', t === tab);
+    document.getElementById('tabp-' + t)?.classList.toggle('on', t === tab);
+  });
+}
+
 function navDash() {
   if (isLoggedIn()) {
     go('dashboard');
   } else {
+    switchLoginTab('admin');
     document.getElementById('loginUser').value = '';
     document.getElementById('loginPass').value = '';
     document.getElementById('loginErr').style.display = 'none';
@@ -31,6 +40,7 @@ function doLogin() {
     go('dashboard');
     toast('مرحباً بك في لوحة التحكم', 't-ok');
   } else {
+    err.textContent = '⚠️ اسم المستخدم أو كلمة المرور غير صحيحة';
     err.style.display = 'block';
     document.getElementById('loginPass').value = '';
     document.getElementById('loginPass').focus();

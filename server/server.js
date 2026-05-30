@@ -46,6 +46,7 @@ app.use('/api/consultants',   require('./routes/consultants'));
 app.use('/api/registrations', require('./routes/registrations'));
 app.use('/api/contracts',     require('./routes/contracts'));
 app.use('/api/stats',         require('./routes/stats'));
+app.use('/api/consultant',    require('./routes/consultant-portal').router);
 
 /* ── SPA fallback ───────────────────────────────────────── */
 app.get('*', (req, res) => {

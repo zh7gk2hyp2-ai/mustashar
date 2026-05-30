@@ -16,6 +16,10 @@ function go(pg, extra) {
     if (!isLoggedIn()) { navDash(); return; }
     renderDash();
   }
+  if (pg === 'portal') {
+    if (!isConsultantLoggedIn()) { navPortal(); return; }
+    renderPortal();
+  }
   if (pg === 'about')     renderAbout();
   if (pg === 'home')      renderHome();
 }
