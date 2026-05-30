@@ -4,6 +4,7 @@ const path    = require('path');
 const fs      = require('fs');
 const db      = require('../db/pool');
 const authMW  = require('../middleware/auth');
+const { generateConsultantSummary } = require('../services/ai');
 
 /* ── File upload config ────────────────────────────── */
 const uploadDir = path.join(__dirname, '..', '..', process.env.UPLOAD_DIR || 'uploads');
@@ -151,6 +152,12 @@ router.patch('/:id/approve', authMW, async (req, res) => {
        reg.admin_exp, reg.training_exp, reg.research_exp, reg.ai_summary]
     );
 
+    /* get new consultant id then generate AI summary asynchronously */
+    const [consRows] = await conn.query(
+      'SELECT id FROM consultants WHERE registration_id = ?', [reg.id]
+    );
+    const consultantId = consRows[0]?.id;
+
     /* audit log */
     await conn.query(
       'INSERT INTO audit_log (admin_id, action, entity, entity_id, ip_address) VALUES (?,?,?,?,?)',
@@ -159,6 +166,23 @@ router.patch('/:id/approve', authMW, async (req, res) => {
 
     await conn.commit();
     res.json({ message: 'تم قبول الطلب وإنشاء ملف المستشار' });
+
+    /* generate AI summary after responding — non-blocking */
+    if (consultantId && reg.consent_ai) {
+      const collegeRow = await db.query(
+        'SELECT name FROM colleges WHERE id = ?', [reg.college_id]
+      ).then(([r]) => r[0]);
+      generateConsultantSummary({ ...reg, college_name: collegeRow?.name })
+        .then(summary => {
+          if (summary) {
+            return db.query(
+              'UPDATE consultants SET ai_summary = ? WHERE id = ?',
+              [summary, consultantId]
+            );
+          }
+        })
+        .catch(err => console.error('[AI] فشل تحديث الملخص:', err.message));
+    }
   } catch (e) {
     await conn.rollback();
     console.error(e);
