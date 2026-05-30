@@ -22,12 +22,12 @@
       <a onclick="go('home')"     id="nl-home">الرئيسية</a>
       <a onclick="go('search')"   id="nl-search">البحث عن مستشار</a>
       <a onclick="go('register')" id="nl-register">تسجيل المنسوب</a>
-      <a onclick="navPortal()"    id="nl-portal">بوابة المنسوب</a>
-      <a onclick="navDash()"      id="nl-dashboard">لوحة التحكم</a>
       <a onclick="go('about')"    id="nl-about">عن المنصة</a>
+      <a onclick="go('dashboard')" id="nl-dashboard" style="display:none">لوحة التحكم</a>
+      <a onclick="go('portal')"   id="nl-portal"    style="display:none">بوابة المنسوب</a>
     </div>
     <div class="nav-end">
-      <button class="btn btn-g btn-sm" onclick="navDash()">دخول المشرف</button>
+      <button class="btn btn-g btn-sm" id="navLoginBtn" onclick="openLoginModal()">دخول</button>
       <button class="btn btn-p btn-sm" onclick="go('register')">ابدأ الآن</button>
     </div>
     <button class="ham" onclick="toggleMob()">☰</button>
@@ -36,9 +36,10 @@
     <a onclick="go('home');toggleMob()">الرئيسية</a>
     <a onclick="go('search');toggleMob()">البحث</a>
     <a onclick="go('register');toggleMob()">تسجيل</a>
-    <a onclick="navPortal();toggleMob()">بوابة المنسوب</a>
-    <a onclick="navDash();toggleMob()">لوحة التحكم</a>
     <a onclick="go('about');toggleMob()">عن المنصة</a>
+    <a onclick="go('dashboard');toggleMob()" id="mob-dashboard" style="display:none">لوحة التحكم</a>
+    <a onclick="go('portal');toggleMob()"    id="mob-portal"    style="display:none">بوابة المنسوب</a>
+    <a onclick="openLoginModal();toggleMob()" id="mob-login">دخول</a>
   </div>
 </nav>
 

@@ -10,17 +10,6 @@ function getConsultantSession() {
   try { return JSON.parse(sessionStorage.getItem('mu_cons') || 'null'); } catch { return null; }
 }
 
-function navPortal() {
-  if (isConsultantLoggedIn()) {
-    go('portal');
-  } else {
-    switchLoginTab('consultant');
-    document.getElementById('loginUser').value = '';
-    document.getElementById('loginConsEmail').value = '';
-    document.getElementById('loginConsErr').style.display = 'none';
-    document.getElementById('loginOv').classList.add('open');
-  }
-}
 
 async function doConsultantLogin() {
   const empId = document.getElementById('loginConsEmpId').value.trim();
@@ -62,9 +51,10 @@ async function doConsultantLogin() {
 
     err.style.display = 'none';
     document.getElementById('loginOv').classList.remove('open');
+    updateNav();
     go('portal');
     toast('مرحباً بك في بوابة المنسوب', 't-ok');
-    renderPortal();
+    return;
   } catch (e) {
     err.textContent = '⚠️ ' + (e.message || 'خطأ في الاتصال');
     err.style.display = 'block';
@@ -77,6 +67,7 @@ async function doConsultantLogin() {
 function consultantLogout() {
   API.consultantLogout();
   sessionStorage.removeItem('mu_cons_local');
+  updateNav();
   go('home');
   toast('تم تسجيل الخروج', 't-inf');
 }

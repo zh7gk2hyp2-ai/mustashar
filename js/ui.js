@@ -4,24 +4,22 @@
 
 /* ── Routing ──────────────────────────── */
 function go(pg, extra) {
+  /* auth guards — check BEFORE showing any page */
+  if (pg === 'dashboard' && !isLoggedIn())          { openLoginModal('admin');      return; }
+  if (pg === 'portal'    && !isConsultantLoggedIn()) { openLoginModal('consultant'); return; }
+
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('pg-' + pg)?.classList.add('active');
   document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('on'));
   document.getElementById('nl-' + pg)?.classList.add('on');
   window.scrollTo(0, 0);
 
-  if (pg === 'search')    doSearch();
-  if (pg === 'profile' && extra) renderProfile(extra);
-  if (pg === 'dashboard') {
-    if (!isLoggedIn()) { navDash(); return; }
-    renderDash();
-  }
-  if (pg === 'portal') {
-    if (!isConsultantLoggedIn()) { navPortal(); return; }
-    renderPortal();
-  }
-  if (pg === 'about')     renderAbout();
-  if (pg === 'home')      renderHome();
+  if (pg === 'search')              doSearch();
+  if (pg === 'profile' && extra)    renderProfile(extra);
+  if (pg === 'dashboard')           renderDash();
+  if (pg === 'portal')              renderPortal();
+  if (pg === 'about')               renderAbout();
+  if (pg === 'home')                renderHome();
 }
 
 function toggleMob() {
