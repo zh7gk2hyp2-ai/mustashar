@@ -11,62 +11,171 @@ function getConsultantSession() {
 }
 
 
+/* ── Consultant password helpers ─────────── */
+function _getConsPwd(empId) {
+  try { return JSON.parse(localStorage.getItem('mu_cons_pwd') || '{}')[empId] || null; } catch { return null; }
+}
+function _saveConsPwd(empId, pass) {
+  const store = JSON.parse(localStorage.getItem('mu_cons_pwd') || '{}');
+  store[empId] = pass;
+  localStorage.setItem('mu_cons_pwd', JSON.stringify(store));
+}
+
+/* temp state during login flow */
+let _consOtp  = null;
+let _consReg  = null; // the matched registration record
+
+/* ── Step helper ──────────────────────────── */
+function showConsStep(name) {
+  ['creds','otp','chpass'].forEach(s => {
+    const el = document.getElementById('cons-step-' + s);
+    if (el) el.style.display = s === name ? '' : 'none';
+  });
+}
+
+function toggleConsPassVis() {
+  const inp = document.getElementById('loginConsPass');
+  if (inp) inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+
+/* ── Step 1: check credentials ────────────── */
 async function doConsultantLogin() {
-  const empId = document.getElementById('loginConsEmpId').value.trim();
-  const email = document.getElementById('loginConsEmail').value.trim();
+  const email = (document.getElementById('loginConsEmail')?.value || '').trim();
+  const pass  = (document.getElementById('loginConsPass')?.value  || '');
   const err   = document.getElementById('loginConsErr');
-  if (!empId || !email) { err.textContent = '⚠️ يرجى إدخال رقم المنسوب والبريد الإلكتروني'; err.style.display = 'block'; return; }
+
+  if (!email || !pass) {
+    err.textContent = '⚠️ يرجى إدخال البريد الجامعي وكلمة المرور';
+    err.style.display = 'block';
+    return;
+  }
 
   const btn = document.getElementById('consLoginBtn');
   btn.disabled = true;
   btn.textContent = 'جارٍ التحقق...';
 
   try {
-    /* clear any existing admin session first */
+    /* clear any existing admin session */
     sessionStorage.removeItem('mu_auth');
     sessionStorage.removeItem('mu_token');
     sessionStorage.removeItem('mu_admin');
 
-    /* try real backend first, fall back to localStorage check */
-    let success = false;
-    try {
-      await API.consultantLogin(empId, email);
-      success = true;
-    } catch (apiErr) {
-      /* if backend not available, check localStorage registrations */
-      const regs = getRegs ? getRegs() : [];
-      const found = regs.find(r =>
-        (r.empId || r.emp_id) === empId &&
-        (r.email || '').toLowerCase() === email.toLowerCase() &&
-        r.status === 'معتمد'
-      );
-      if (found) {
-        const cons = { id: found.empId || found.emp_id, full_name: `${found.firstName || found.first_name} ${found.lastName || found.last_name}`, emp_id: found.empId || found.emp_id };
-        sessionStorage.setItem('mu_cons', JSON.stringify(cons));
-        sessionStorage.setItem('mu_cons_local', '1');
-        success = true;
-      }
-    }
+    /* find approved registration by email */
+    const regs  = (typeof getRegs === 'function') ? getRegs() : [];
+    const found = regs.find(r =>
+      (r.email || '').toLowerCase() === email.toLowerCase() &&
+      r.status === 'معتمد'
+    );
 
-    if (!success) {
-      err.textContent = '⚠️ بيانات غير صحيحة أو الحساب غير معتمد بعد';
+    if (!found) {
+      err.textContent = '⚠️ البريد غير مسجّل أو الحساب لم يُعتمد بعد';
       err.style.display = 'block';
       return;
     }
 
+    /* check password: stored password OR default (empId) */
+    const storedPwd  = _getConsPwd(found.empId);
+    const expectedPwd = storedPwd || found.empId;
+    if (pass !== expectedPwd) {
+      err.textContent = '⚠️ كلمة المرور غير صحيحة';
+      err.style.display = 'block';
+      return;
+    }
+
+    /* credentials OK — generate OTP */
+    _consReg = found;
+    _consOtp = String(Math.floor(100000 + Math.random() * 900000));
+
+    /* simulate sending email: show code in a toast (demo mode) */
+    toast(`📧 رمز التحقق المرسل إلى ${email} هو: ${_consOtp}`, 't-inf', 20000);
+
     err.style.display = 'none';
-    document.getElementById('loginOv').classList.remove('open');
-    updateNav();
-    go('portal');
-    toast('مرحباً بك في بوابة المنسوب', 't-ok');
-    return;
+    document.getElementById('otpEmailHint').textContent =
+      `تم إرسال رمز التحقق إلى ${email}`;
+    document.getElementById('loginConsOtp').value = '';
+    document.getElementById('loginOtpErr').style.display = 'none';
+    showConsStep('otp');
+    setTimeout(() => document.getElementById('loginConsOtp')?.focus(), 100);
+
   } catch (e) {
-    err.textContent = '⚠️ ' + (e.message || 'خطأ في الاتصال');
+    err.textContent = '⚠️ ' + (e.message || 'خطأ غير متوقع');
     err.style.display = 'block';
   } finally {
     btn.disabled = false;
     btn.textContent = 'دخول ←';
   }
+}
+
+/* ── Step 2: verify OTP ───────────────────── */
+function verifyConsOtp() {
+  const entered = (document.getElementById('loginConsOtp')?.value || '').trim();
+  const err     = document.getElementById('loginOtpErr');
+  if (!entered) { err.textContent = '⚠️ يرجى إدخال رمز التحقق'; err.style.display = 'block'; return; }
+  if (entered !== _consOtp) { err.textContent = '⚠️ الرمز غير صحيح، حاول مجدداً'; err.style.display = 'block'; return; }
+
+  err.style.display = 'none';
+
+  /* first login? no stored password yet → force change */
+  if (!_getConsPwd(_consReg.empId)) {
+    document.getElementById('loginConsNewPass').value = '';
+    document.getElementById('loginConsConfPass').value = '';
+    document.getElementById('loginChPassErr').style.display = 'none';
+    showConsStep('chpass');
+    setTimeout(() => document.getElementById('loginConsNewPass')?.focus(), 100);
+  } else {
+    _completeConsLogin();
+  }
+}
+
+function resendConsOtp() {
+  if (!_consReg) return;
+  _consOtp = String(Math.floor(100000 + Math.random() * 900000));
+  toast(`📧 رمز جديد أُرسل إلى ${_consReg.email}: ${_consOtp}`, 't-inf', 20000);
+  document.getElementById('loginConsOtp').value = '';
+  document.getElementById('loginOtpErr').style.display = 'none';
+}
+
+/* ── Step 3: change default password ─────── */
+function changeConsPassword() {
+  const newPass  = document.getElementById('loginConsNewPass')?.value  || '';
+  const confPass = document.getElementById('loginConsConfPass')?.value || '';
+  const err      = document.getElementById('loginChPassErr');
+
+  if (newPass.length < 8) {
+    err.textContent = '⚠️ كلمة المرور يجب أن تكون 8 أحرف على الأقل';
+    err.style.display = 'block'; return;
+  }
+  if (newPass !== confPass) {
+    err.textContent = '⚠️ كلمتا المرور غير متطابقتين';
+    err.style.display = 'block'; return;
+  }
+  if (newPass === _consReg.empId) {
+    err.textContent = '⚠️ لا يمكن استخدام رقم المنسوب ككلمة مرور';
+    err.style.display = 'block'; return;
+  }
+
+  _saveConsPwd(_consReg.empId, newPass);
+  err.style.display = 'none';
+  _completeConsLogin();
+}
+
+/* ── Finalise login ───────────────────────── */
+function _completeConsLogin() {
+  const cons = {
+    id:        _consReg.id,
+    full_name: `${_consReg.firstName} ${_consReg.lastName}`,
+    emp_id:    _consReg.empId,
+    email:     _consReg.email
+  };
+  sessionStorage.setItem('mu_cons', JSON.stringify(cons));
+  sessionStorage.setItem('mu_cons_local', '1');
+  _consOtp = null;
+  _consReg = null;
+
+  document.getElementById('loginOv').classList.remove('open');
+  updateNav();
+  go('portal');
+  toast('مرحباً بك في بوابة المنسوب ✓', 't-ok');
 }
 
 function consultantLogout() {

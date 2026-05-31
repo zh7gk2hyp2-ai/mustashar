@@ -40,7 +40,7 @@ function card(c) {
   const sl = STATE.isSL(c.id);
   return `<div class="cc">
     <div class="cc-top">
-      <div class="cc-av" style="background:${c.color}">${c.name[3]}</div>
+      <div class="cc-av" style="background:${c.color}">${c.name.replace(/[\s.،,]/g,'')[0]||'؟'}</div>
       <div>
         <div class="cc-name">${c.name}</div>
         <div class="cc-role">${c.title}</div>
@@ -131,7 +131,7 @@ function renderProfile(id) {
   document.getElementById('profileContent').innerHTML = `
 <div class="phead">
   <div class="w"><div class="phead-in">
-    <div class="p-av" style="background:${c.color}">${c.name[3]}</div>
+    <div class="p-av" style="background:${c.color}">${c.name.replace(/[\s.،,]/g,'')[0]||'؟'}</div>
     <div>
       <div class="p-name">${c.name}</div>
       <div class="p-role">${c.title} | ${c.dept}</div>

@@ -841,7 +841,7 @@
     <div class="tab-pane on" id="tabp-admin">
       <div class="fi">
         <label>اسم المستخدم <span class="rq">*</span></label>
-        <input id="loginUser" placeholder="admin" autocomplete="username">
+        <input id="loginUser" autocomplete="username">
       </div>
       <div class="fi" style="position:relative">
         <label>كلمة المرور <span class="rq">*</span></label>
@@ -854,22 +854,71 @@
     </div>
     <!-- Consultant tab -->
     <div class="tab-pane" id="tabp-consultant">
-      <p style="font-size:.82rem;color:var(--txt2);margin-bottom:16px;padding:10px 14px;background:var(--surf2);border-radius:10px">
-        ادخل بيانات حسابك المسجل في المنصة (رقم المنسوب + البريد الإلكتروني)
-      </p>
-      <div class="fi">
-        <label>رقم المنسوب <span class="rq">*</span></label>
-        <input id="loginConsEmpId" placeholder="12345678" autocomplete="off">
+
+      <!-- Step 1: credentials -->
+      <div id="cons-step-creds">
+        <div class="fi">
+          <label>البريد الجامعي <span class="rq">*</span></label>
+          <input id="loginConsEmail" type="email" autocomplete="email"
+            onkeydown="if(event.key==='Enter')document.getElementById('loginConsPass').focus()">
+        </div>
+        <div class="fi" style="position:relative">
+          <label>كلمة المرور <span class="rq">*</span></label>
+          <input id="loginConsPass" type="password" autocomplete="current-password"
+            onkeydown="if(event.key==='Enter')doConsultantLogin()">
+          <button type="button" onclick="toggleConsPassVis()"
+            style="position:absolute;left:12px;top:34px;background:none;border:none;cursor:pointer;color:var(--muted);font-size:.85rem"
+            title="إظهار/إخفاء">👁</button>
+        </div>
+        <div style="font-size:.72rem;color:var(--muted);margin-bottom:12px;padding:8px 12px;background:var(--surf2);border-radius:8px;line-height:1.7">
+          💡 كلمة المرور الافتراضية هي <strong>رقم المنسوب</strong> — ستُطلب منك تغييرها عند أول دخول
+        </div>
+        <div id="loginConsErr" style="color:var(--red);font-size:.8rem;margin-bottom:12px;display:none;padding:8px 12px;background:rgba(192,57,43,.07);border-radius:8px"></div>
+        <button id="consLoginBtn" class="btn btn-p" style="width:100%" onclick="doConsultantLogin()">دخول ←</button>
+        <div style="text-align:center;margin-top:12px;font-size:.78rem;color:var(--muted)">
+          لم تسجّل بعد؟ <a onclick="document.getElementById('loginOv').classList.remove('open');go('register')" style="color:var(--blue);cursor:pointer;font-weight:700">سجّل الآن</a>
+        </div>
       </div>
-      <div class="fi">
-        <label>البريد الإلكتروني <span class="rq">*</span></label>
-        <input id="loginConsEmail" type="email" placeholder="name@tu.edu.sa" onkeydown="if(event.key==='Enter')doConsultantLogin()">
+
+      <!-- Step 2: OTP verification -->
+      <div id="cons-step-otp" style="display:none">
+        <div style="text-align:center;margin-bottom:20px">
+          <div style="font-size:2.2rem;margin-bottom:8px">📧</div>
+          <div style="font-weight:800;color:var(--navy);margin-bottom:6px">تحقق من بريدك الجامعي</div>
+          <div id="otpEmailHint" style="font-size:.82rem;color:var(--txt2)"></div>
+        </div>
+        <div class="fi">
+          <label style="text-align:center;display:block">رمز التحقق (6 أرقام)</label>
+          <input id="loginConsOtp" maxlength="6" placeholder="——————"
+            style="text-align:center;font-size:1.5rem;letter-spacing:.4rem;font-weight:700"
+            onkeydown="if(event.key==='Enter')verifyConsOtp()">
+        </div>
+        <div id="loginOtpErr" style="color:var(--red);font-size:.8rem;margin-bottom:12px;display:none;padding:8px 12px;background:rgba(192,57,43,.07);border-radius:8px"></div>
+        <button class="btn btn-p" style="width:100%;margin-bottom:10px" onclick="verifyConsOtp()">تأكيد الرمز ←</button>
+        <button class="btn btn-g" style="width:100%;font-size:.82rem" onclick="resendConsOtp()">🔄 إعادة إرسال الرمز</button>
+        <div style="text-align:center;margin-top:14px;font-size:.75rem">
+          <a onclick="showConsStep('creds')" style="cursor:pointer;color:var(--blue)">← رجوع</a>
+        </div>
       </div>
-      <div id="loginConsErr" style="color:var(--red);font-size:.8rem;margin-bottom:12px;display:none;padding:8px 12px;background:rgba(192,57,43,.07);border-radius:8px"></div>
-      <button id="consLoginBtn" class="btn btn-p" style="width:100%" onclick="doConsultantLogin()">دخول ←</button>
-      <div style="text-align:center;margin-top:12px;font-size:.78rem;color:var(--muted)">
-        لم تسجّل بعد؟ <a onclick="document.getElementById('loginOv').classList.remove('open');go('register')" style="color:var(--blue);cursor:pointer;font-weight:700">سجّل الآن</a>
+
+      <!-- Step 3: force password change (first login) -->
+      <div id="cons-step-chpass" style="display:none">
+        <div style="padding:12px 14px;background:rgba(240,180,0,.08);border:1px solid rgba(240,180,0,.3);border-radius:10px;margin-bottom:18px;font-size:.82rem;color:var(--navy);line-height:1.7">
+          ⚠️ <strong>أول تسجيل دخول</strong> — يجب تغيير كلمة المرور الافتراضية قبل المتابعة.
+        </div>
+        <div class="fi" style="position:relative">
+          <label>كلمة المرور الجديدة <span class="rq">*</span></label>
+          <input id="loginConsNewPass" type="password">
+        </div>
+        <div class="fi">
+          <label>تأكيد كلمة المرور <span class="rq">*</span></label>
+          <input id="loginConsConfPass" type="password" onkeydown="if(event.key==='Enter')changeConsPassword()">
+        </div>
+        <div style="font-size:.72rem;color:var(--muted);margin-bottom:12px">8 أحرف على الأقل · لا تساوي رقم المنسوب</div>
+        <div id="loginChPassErr" style="color:var(--red);font-size:.8rem;margin-bottom:12px;display:none;padding:8px 12px;background:rgba(192,57,43,.07);border-radius:8px"></div>
+        <button class="btn btn-p" style="width:100%" onclick="changeConsPassword()">حفظ وتسجيل الدخول ←</button>
       </div>
+
     </div>
   </div>
 </div>

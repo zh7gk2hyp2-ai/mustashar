@@ -80,6 +80,20 @@ function rNext(cur) {
       toast('يرجى الموافقة على نشر الملف', 't-err');
       return;
     }
+    /* duplicate check at step 1 — before proceeding */
+    const _empIdVal = document.getElementById('r3').value.trim();
+    const _emailVal = document.getElementById('r5').value.trim().toLowerCase();
+    const _regs1    = getRegs();
+    const _dupId    = _regs1.find(r => r.empId === _empIdVal);
+    if (_dupId) {
+      toast(`رقم المنسوب ${_empIdVal} مسجّل مسبقاً — رقم الطلب: ${_dupId.id}`, 't-err', 7000);
+      return;
+    }
+    const _dupEmail = _regs1.find(r => (r.email || '').toLowerCase() === _emailVal);
+    if (_dupEmail) {
+      toast(`البريد الإلكتروني مسجّل مسبقاً — رقم الطلب: ${_dupEmail.id}`, 't-err', 7000);
+      return;
+    }
   }
   if (cur === 2) {
     if (!document.getElementById('r_conflict').value) {

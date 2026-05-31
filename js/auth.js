@@ -45,12 +45,15 @@ function openLoginModal(tab) {
   document.getElementById('loginUser').value = '';
   document.getElementById('loginPass').value = '';
   document.getElementById('loginErr').style.display = 'none';
-  if (document.getElementById('loginConsEmpId'))
-    document.getElementById('loginConsEmpId').value = '';
-  if (document.getElementById('loginConsEmail'))
-    document.getElementById('loginConsEmail').value = '';
-  if (document.getElementById('loginConsErr'))
-    document.getElementById('loginConsErr').style.display = 'none';
+  ['loginConsEmail','loginConsPass','loginConsOtp','loginConsNewPass','loginConsConfPass'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  ['loginConsErr','loginOtpErr','loginChPassErr'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+  showConsStep('creds');
   document.getElementById('loginOv').classList.add('open');
 }
 
