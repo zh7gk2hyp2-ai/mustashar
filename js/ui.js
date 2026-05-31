@@ -83,7 +83,7 @@ function toast(msg, type = 't-inf', dur = 3000) {
 /* ── HOME ─────────────────────────────── */
 function renderHome() {
   const g = document.getElementById('homeGrid');
-  if (g) g.innerHTML = DATA.slice(0, 6).map(c => card(c)).join('');
+  if (g) g.innerHTML = getAllConsultants().slice(0, 6).map(c => card(c)).join('');
 }
 
 function goSearch() {
@@ -120,7 +120,8 @@ function exportSL() {
 
 /* ── PROFILE ──────────────────────────── */
 function renderProfile(id) {
-  const c = DATA.find(x => x.id === id) || DATA[0];
+  const all = getAllConsultants();
+  const c = all.find(x => x.id === id) || all[0];
   STATE.currentProfile = c;
   const sl = STATE.isSL(c.id);
   document.getElementById('profileContent').innerHTML = `

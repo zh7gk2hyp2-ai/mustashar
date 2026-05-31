@@ -8,6 +8,82 @@ function showPanel(id) {
   document.getElementById('dp-' + id).classList.add('on');
   if (id === 'kpis')      renderKPIs();
   if (id === 'analytics') renderCharts();
+  if (id === 'email')     renderEmailSettingsPanel();
+}
+
+/* ══════════════════════════════════════
+   EMAIL SETTINGS — إعدادات البريد
+══════════════════════════════════════ */
+const _EMAIL_DEFAULTS = {
+  from:   'noreply@tu.edu.sa',
+  notify: 'research@tu.edu.sa',
+  apSubj: 'تهانينا! تم قبول طلبك في منصة مستشار – جامعة الطائف',
+  apBody: `عزيزي/عزيزتي {name}،
+
+يسعدنا إعلامك بأن طلب انضمامك إلى منصة مستشار (رقم الطلب: {req_number}) قد تمت الموافقة عليه.
+
+يمكنك الآن تسجيل الدخول إلى بوابة المنسوب باستخدام:
+- رقم المنسوب: {emp_id}
+- البريد الإلكتروني: {email}
+
+مع تحياتنا،
+مركز البحوث والاستشارات – جامعة الطائف
+📞 0127270020 | research@tu.edu.sa`,
+  rjSubj: 'بشأن طلبك في منصة مستشار – جامعة الطائف',
+  rjBody: `عزيزي/عزيزتي {name}،
+
+نشكرك على اهتمامك بالانضمام إلى منصة مستشار.
+بعد مراجعة طلبك (رقم الطلب: {req_number})، نأسف لإعلامك بعدم قبوله في الوقت الحالي.
+
+{note}
+
+للاستفسار: research@tu.edu.sa | 0127270020
+
+مركز البحوث والاستشارات – جامعة الطائف`
+};
+
+function getEmailSettings() {
+  return Object.assign({}, _EMAIL_DEFAULTS,
+    JSON.parse(localStorage.getItem('mu_email_cfg') || 'null') || {});
+}
+
+function renderEmailSettingsPanel() {
+  const s = getEmailSettings();
+  document.getElementById('em-from').value    = s.from;
+  document.getElementById('em-notify').value  = s.notify;
+  document.getElementById('em-ap-subj').value = s.apSubj;
+  document.getElementById('em-ap-body').value = s.apBody;
+  document.getElementById('em-rj-subj').value = s.rjSubj;
+  document.getElementById('em-rj-body').value = s.rjBody;
+}
+
+function saveEmailSettingsUI() {
+  const s = {
+    from:   document.getElementById('em-from').value.trim(),
+    notify: document.getElementById('em-notify').value.trim(),
+    apSubj: document.getElementById('em-ap-subj').value.trim(),
+    apBody: document.getElementById('em-ap-body').value.trim(),
+    rjSubj: document.getElementById('em-rj-subj').value.trim(),
+    rjBody: document.getElementById('em-rj-body').value.trim()
+  };
+  localStorage.setItem('mu_email_cfg', JSON.stringify(s));
+  toast('✅ تم حفظ إعدادات البريد', 't-ok');
+}
+
+function resetEmailSettingsUI() {
+  localStorage.removeItem('mu_email_cfg');
+  renderEmailSettingsPanel();
+  toast('تم استعادة الإعدادات الافتراضية', 't-inf');
+}
+
+/* helper — apply template variables */
+function applyEmailTemplate(tpl, reg) {
+  return tpl
+    .replace(/{name}/g,       `${reg.firstName} ${reg.lastName}`)
+    .replace(/{req_number}/g,  reg.id)
+    .replace(/{emp_id}/g,      reg.empId || '')
+    .replace(/{email}/g,       reg.email || '')
+    .replace(/{note}/g,        reg.rejectionNote || '');
 }
 
 /* ── مؤشرات الأداء KPIs ── */
@@ -143,7 +219,7 @@ function renderDash() {
 
   /* ── باقي الألواح ── */
   renderPendingTable();
-  renderConsTable(DATA);
+  renderConsTable(getAllConsultants());
   renderContractsList();
   renderBarChart();
 
@@ -186,23 +262,43 @@ function renderPendingTable() {
 }
 
 function approveReg(id) {
+  const reg = getRegs().find(r => r.id === id);
   updateRegStatus(id, 'معتمد');
   const el = document.getElementById('rs-' + id);
   if (el) { el.textContent = 'معتمد'; el.className = 'tag tag-g'; }
-  toast('تم قبول الطلب ✓', 't-ok');
+
   const badge = document.getElementById('pendingBadge');
   if (badge) {
     const n = getRegs().filter(r => r.status === 'قيد المراجعة').length;
     badge.textContent = n > 0 ? n + ' طلب جديد' : 'لا يوجد جديد';
     badge.className = 'tag ' + (n > 0 ? 'tag-gold' : 'tag-g');
   }
+
+  /* show email preview toast */
+  if (reg) {
+    const s = getEmailSettings();
+    const subj = applyEmailTemplate(s.apSubj, reg);
+    toast(`✅ تم القبول — سيُرسل بريد إلى: ${reg.email}\nالموضوع: ${subj}`, 't-ok', 5000);
+  } else {
+    toast('تم قبول الطلب ✓', 't-ok');
+  }
 }
 
 function rejectReg(id) {
+  const note = prompt('ملاحظة الرفض (اختياري):') || '';
+  const reg  = getRegs().find(r => r.id === id);
+  if (reg) reg.rejectionNote = note;
   updateRegStatus(id, 'مرفوض');
   const el = document.getElementById('rs-' + id);
   if (el) { el.textContent = 'مرفوض'; el.className = 'tag tag-r'; }
-  toast('تم رفض الطلب', 't-inf');
+
+  if (reg) {
+    const s    = getEmailSettings();
+    const subj = applyEmailTemplate(s.rjSubj, { ...reg, rejectionNote: note });
+    toast(`❌ تم الرفض — سيُرسل بريد إلى: ${reg.email}\nالموضوع: ${subj}`, 't-inf', 5000);
+  } else {
+    toast('تم رفض الطلب', 't-inf');
+  }
 }
 
 function updateRegStatus(id, status) {
@@ -223,18 +319,22 @@ function renderConsTable(data) {
     `<tr><th>الاسم</th><th>الكلية</th><th>التقييم</th><th>التعاقدات</th><th>الحالة</th><th>إجراء</th></tr>` +
     data.map(c =>
       `<tr>
-        <td>${c.name}</td>
+        <td>
+          ${c.name}
+          ${c._fromReg ? '<span class="tag tag-b" style="font-size:.65rem;margin-right:6px">جديد</span>' : ''}
+        </td>
         <td style="font-size:.78rem;color:var(--muted)">${c.college}</td>
-        <td class="stars">${c.rating}★</td>
-        <td>${c.contracts}</td>
+        <td class="stars">${c.rating ? c.rating + '★' : '—'}</td>
+        <td>${c.contracts || 0}</td>
         <td><span class="tag ${c.verified ? 'tag-g' : 'tag-r'}">${c.verified ? 'معتمد' : 'قيد المراجعة'}</span></td>
-        <td><button class="btn btn-g btn-sm" onclick="go('profile',${c.id})">عرض</button></td>
+        <td><button class="btn btn-g btn-sm" onclick="go('profile','${c.id}')">عرض</button></td>
       </tr>`).join('');
 }
 
 function filterDash() {
   const q = document.getElementById('dashSearch').value.toLowerCase();
-  renderConsTable(DATA.filter(c => [c.name, c.college, c.dept].join(' ').toLowerCase().includes(q)));
+  renderConsTable(getAllConsultants().filter(c =>
+    [c.name, c.college, c.dept].join(' ').toLowerCase().includes(q)));
 }
 
 /* ── قائمة طلبات التعاقد ── */

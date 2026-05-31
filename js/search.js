@@ -17,7 +17,7 @@ function doSearch() {
   const fFr    = document.getElementById('ffr')?.checked;
   const sort   = document.getElementById('fsort')?.value || 'rating';
 
-  let res = DATA.filter(c => {
+  let res = getAllConsultants().filter(c => {
     const hay = [c.name, c.title, c.college, c.dept, ...c.skills, ...c.certs, c.summary]
       .join(' ').toLowerCase();
     if (q && !hay.includes(q))             return false;

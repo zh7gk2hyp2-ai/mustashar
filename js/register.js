@@ -142,13 +142,23 @@ function submitReg() {
   const reqId  = 'TU-' + Date.now().toString().slice(-6);
   const skills = [...document.querySelectorAll('#skillG .chip.on')].map(c => c.dataset.v || c.textContent);
   const langs  = [...document.querySelectorAll('#langG .chip.on')].map(c => c.dataset.v || c.textContent);
+  const empId  = document.getElementById('r3').value.trim();
 
   const regs = getRegs();
+
+  /* منع التسجيل المكرر برقم المنسوب */
+  const dup = regs.find(r => r.empId === empId);
+  if (dup) {
+    toast(`رقم المنسوب ${empId} مسجّل مسبقاً برقم طلب ${dup.id}`, 't-err', 6000);
+    goRStep(1);
+    return;
+  }
+
   regs.push({
     id:             reqId,
     firstName:      document.getElementById('r1').value.trim(),
     lastName:       document.getElementById('r2').value.trim(),
-    empId:          document.getElementById('r3').value.trim(),
+    empId:          empId,
     phone:          document.getElementById('r4').value.trim(),
     email:          document.getElementById('r5').value.trim(),
     college:        document.getElementById('r6').value,

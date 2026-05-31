@@ -90,3 +90,46 @@ function getRegs() {
 function saveRegs(regs) {
   localStorage.setItem('mu_regs', JSON.stringify(regs));
 }
+
+/* ══ Merge approved registrations into consultant list ══ */
+const _COLORS = ['#006633','#087a45','#1a7340','#33a06f','#c8941f','#002b16','#15803d','#087a45'];
+
+function regToConsultant(reg, idx) {
+  return {
+    id:           reg.id,
+    name:         `${reg.firstName} ${reg.lastName}`,
+    title:        reg.adminExp ? reg.adminExp.split(/[،,\n]/)[0].trim() : reg.type,
+    college:      reg.college || '',
+    dept:         reg.college || '',
+    type:         reg.type || 'أكاديمي',
+    exp_years:    0,
+    skills:       Array.isArray(reg.skills) ? reg.skills : [],
+    certs:        [],
+    admin_exp:    reg.adminExp || '',
+    training_exp: reg.trainExp || '',
+    research_exp: reg.resExp   || '',
+    research:     reg.resExp   ? [reg.resExp] : [],
+    summary:      [reg.adminExp, reg.trainExp, reg.resExp].filter(Boolean).join(' | ') || '',
+    rating:       0,
+    reviews:      0,
+    contracts:    0,
+    color:        _COLORS[idx % _COLORS.length],
+    verified:     true,
+    available:    true,
+    lang:         Array.isArray(reg.langs) ? reg.langs : ['العربية'],
+    rate:         reg.rate ? parseFloat(reg.rate) : null,
+    rateType:     reg.rateType || '',
+    conflict:     !!reg.conflict,
+    consentPublish: reg.consentPublish !== false,
+    email:        reg.email  || '',
+    empId:        reg.empId  || '',
+    _fromReg:     true
+  };
+}
+
+function getAllConsultants() {
+  const approved = getRegs()
+    .filter(r => r.status === 'معتمد' && r.consentPublish !== false)
+    .map((r, i) => regToConsultant(r, DATA.length + i));
+  return [...DATA, ...approved];
+}
