@@ -74,13 +74,14 @@ const STATE = {
     localStorage.setItem('mu_ct', JSON.stringify(this.contracts));
   },
   toggleSL(id) {
-    const i = this.shortlist.indexOf(id);
+    const sid = String(id);
+    const i = this.shortlist.findIndex(x => String(x) === sid);
     if (i > -1) this.shortlist.splice(i, 1);
     else this.shortlist.push(id);
     this.save();
     return i === -1;
   },
-  isSL(id) { return this.shortlist.includes(id); }
+  isSL(id) { const sid = String(id); return this.shortlist.some(x => String(x) === sid); }
 };
 
 /* ══ Registrations helpers ═══════════════ */

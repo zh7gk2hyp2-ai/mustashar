@@ -50,7 +50,7 @@ function card(c) {
         ${c.verified ? '<span class="tag tag-g">✓ موثق</span>' : ''}
         <button style="font-size:1.1rem;background:none;border:none;cursor:pointer;transition:transform .2s"
           onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform=''"
-          onclick="handleSL(${c.id},this)">${sl ? '❤️' : '🤍'}</button>
+          onclick="handleSL('${c.id}',this)">${sl ? '❤️' : '🤍'}</button>
       </div>
     </div>
     <div class="cc-tags">
@@ -61,7 +61,7 @@ function card(c) {
       <div><span class="stars">${star(c.rating)}</span><span class="cc-rat"> ${c.rating} (${c.reviews})</span></div>
       <div style="display:flex;gap:6px;align-items:center">
         <span class="${c.available ? 'tag tag-g' : 'tag tag-r'}">${c.available ? 'متاح' : 'مشغول'}</span>
-        <button class="btn btn-p btn-sm" onclick="go('profile',${c.id})">الملف</button>
+        <button class="btn btn-p btn-sm" onclick="go('profile','${c.id}')">الملف</button>
       </div>
     </div>
   </div>`;
@@ -125,7 +125,7 @@ function exportSL() {
 /* ── PROFILE ──────────────────────────── */
 function renderProfile(id) {
   const all = getAllConsultants();
-  const c = all.find(x => x.id === id) || all[0];
+  const c = all.find(x => String(x.id) === String(id)) || all[0];
   STATE.currentProfile = c;
   const sl = STATE.isSL(c.id);
   document.getElementById('profileContent').innerHTML = `
@@ -149,7 +149,7 @@ function renderProfile(id) {
     </div>
     <div class="p-acts">
       <button class="btn btn-gold" onclick="document.getElementById('contractOv').classList.add('open')">📄 طلب تعاقد</button>
-      <button id="slBtn" class="btn btn-g" style="border-color:rgba(255,255,255,.3);color:#fff" onclick="togglePSL(${c.id})">${sl ? '❤️ في قائمتي' : '🤍 أضف للقائمة'}</button>
+      <button id="slBtn" class="btn btn-g" style="border-color:rgba(255,255,255,.3);color:#fff" onclick="togglePSL('${c.id}')">${sl ? '❤️ في قائمتي' : '🤍 أضف للقائمة'}</button>
       <button class="btn btn-g" style="border-color:rgba(255,255,255,.3);color:#fff" onclick="go('search')">← رجوع</button>
     </div>
   </div></div>
@@ -195,7 +195,7 @@ function renderProfile(id) {
     </div>
     <div class="sc" style="text-align:center">
       <button class="btn btn-p" style="width:100%;margin-bottom:10px" onclick="document.getElementById('contractOv').classList.add('open')">📄 طلب تعاقد الآن</button>
-      <button class="btn btn-g" style="width:100%" onclick="togglePSL(${c.id})">🤍 أضف لقائمة المرشحين</button>
+      <button class="btn btn-g" style="width:100%" onclick="togglePSL('${c.id}')">🤍 أضف لقائمة المرشحين</button>
     </div>
   </div>
 </div></div>`;
