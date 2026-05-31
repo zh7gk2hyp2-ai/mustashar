@@ -523,6 +523,7 @@
       <a onclick="showPanel('contracts')"   id="dp-contracts">📄 طلبات التعاقد</a>
       <a onclick="showPanel('analytics')"   id="dp-analytics">📈 التقارير</a>
       <a onclick="showPanel('kpis')"        id="dp-kpis">🎯 مؤشرات الأداء</a>
+      <a onclick="showPanel('email')"       id="dp-email">📧 إعدادات البريد</a>
     </div>
   </div>
   <div>
@@ -583,6 +584,46 @@
           </div>
         </div>
         <p style="font-size:.75rem;color:var(--muted);margin-top:12px">النسب قابلة للمراجعة وفق طبيعة كل عقد ونوع الخدمة، ويُحدَّد التسعير النهائي من قِبل مركز البحوث والاستشارات.</p>
+      </div>
+    </div>
+
+    <!-- Email Settings -->
+    <div class="dpanel" id="pan-email">
+      <h3 style="color:var(--navy);margin-bottom:20px">📧 إعدادات البريد الإلكتروني</h3>
+      <div style="background:var(--surf);border:1px solid var(--bdr);border-radius:var(--rl);padding:24px;margin-bottom:18px">
+        <h4 style="margin-bottom:16px;color:var(--navy);font-size:.9rem;padding-bottom:10px;border-bottom:1px solid var(--bdr)">📮 عناوين البريد</h4>
+        <div class="two">
+          <div class="fi">
+            <label>البريد المرسَل منه (Sender)</label>
+            <input id="em-from" placeholder="noreply@tu.edu.sa">
+          </div>
+          <div class="fi">
+            <label>بريد إشعارات الإدارة</label>
+            <input id="em-notify" placeholder="research@tu.edu.sa">
+          </div>
+        </div>
+      </div>
+      <div style="background:var(--surf);border:1px solid var(--bdr);border-radius:var(--rl);padding:24px;margin-bottom:18px">
+        <h4 style="margin-bottom:16px;color:var(--navy);font-size:.9rem;padding-bottom:10px;border-bottom:1px solid var(--bdr)">✅ رسالة القبول</h4>
+        <div class="fi"><label>الموضوع</label><input id="em-ap-subj"></div>
+        <div class="fi"><label>نص الرسالة</label><textarea id="em-ap-body" rows="6" style="width:100%;resize:vertical"></textarea></div>
+      </div>
+      <div style="background:var(--surf);border:1px solid var(--bdr);border-radius:var(--rl);padding:24px;margin-bottom:18px">
+        <h4 style="margin-bottom:16px;color:var(--navy);font-size:.9rem;padding-bottom:10px;border-bottom:1px solid var(--bdr)">❌ رسالة الرفض</h4>
+        <div class="fi"><label>الموضوع</label><input id="em-rj-subj"></div>
+        <div class="fi"><label>نص الرسالة</label><textarea id="em-rj-body" rows="6" style="width:100%;resize:vertical"></textarea></div>
+      </div>
+      <div style="background:var(--surf2);border-radius:var(--r);padding:14px 18px;font-size:.78rem;color:var(--txt2);margin-bottom:18px;line-height:1.9">
+        <strong>المتغيرات المتاحة في النص:</strong>
+        <code style="background:var(--bdr);padding:2px 6px;border-radius:4px;margin:0 4px">{name}</code> الاسم الكامل
+        <code style="background:var(--bdr);padding:2px 6px;border-radius:4px;margin:0 4px">{req_number}</code> رقم الطلب
+        <code style="background:var(--bdr);padding:2px 6px;border-radius:4px;margin:0 4px">{emp_id}</code> رقم المنسوب
+        <code style="background:var(--bdr);padding:2px 6px;border-radius:4px;margin:0 4px">{email}</code> البريد الإلكتروني
+        <code style="background:var(--bdr);padding:2px 6px;border-radius:4px;margin:0 4px">{note}</code> ملاحظة الرفض
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-p" onclick="saveEmailSettingsUI()">حفظ الإعدادات ←</button>
+        <button class="btn btn-g" onclick="resetEmailSettingsUI()">استعادة الافتراضي</button>
       </div>
     </div>
 
