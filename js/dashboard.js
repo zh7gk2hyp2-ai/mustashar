@@ -16,7 +16,7 @@ function showPanel(id) {
 ══════════════════════════════════════ */
 const _EMAIL_DEFAULTS = {
   from:   'noreply@tu.edu.sa',
-  notify: 'research@tu.edu.sa',
+  notify: 'turcc@tu.edu.sa',
   apSubj: 'تهانينا! تم قبول طلبك في منصة مستشار – جامعة الطائف',
   apBody: `عزيزي/عزيزتي {name}،
 
@@ -28,7 +28,7 @@ const _EMAIL_DEFAULTS = {
 
 مع تحياتنا،
 مركز البحوث والاستشارات – جامعة الطائف
-📞 0127270020 | research@tu.edu.sa`,
+📞 0127270020 | turcc@tu.edu.sa`,
   rjSubj: 'بشأن طلبك في منصة مستشار – جامعة الطائف',
   rjBody: `عزيزي/عزيزتي {name}،
 
@@ -37,7 +37,7 @@ const _EMAIL_DEFAULTS = {
 
 {note}
 
-للاستفسار: research@tu.edu.sa | 0127270020
+للاستفسار: turcc@tu.edu.sa | 0127270020
 
 مركز البحوث والاستشارات – جامعة الطائف`
 };

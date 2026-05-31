@@ -33,7 +33,7 @@ function tplWrap(body) {
     </div>
     <div style="padding:28px 24px">${body}</div>
     <div style="background:#f5f5f5;padding:14px 24px;text-align:center;font-size:.75rem;color:#888">
-      مركز البحوث والاستشارات – جامعة الطائف | research@tu.edu.sa | 0127270020
+      مركز البحوث والاستشارات – جامعة الطائف | turcc@tu.edu.sa | 0127270020
     </div>
   </div>`;
 }
@@ -54,7 +54,7 @@ async function sendApprovalEmail(reg) {
         <li>رقم المنسوب: <strong style="color:#006633">${reg.emp_id}</strong></li>
         <li>البريد الإلكتروني: <strong style="color:#006633">${reg.email}</strong></li>
       </ul>
-      <p style="font-size:.8rem;color:#666;margin-top:16px">للاستفسار: <a href="mailto:research@tu.edu.sa" style="color:#006633">research@tu.edu.sa</a></p>`)
+      <p style="font-size:.8rem;color:#666;margin-top:16px">للاستفسار: <a href="mailto:turcc@tu.edu.sa" style="color:#006633">turcc@tu.edu.sa</a></p>`)
   });
 }
 
@@ -67,7 +67,7 @@ async function sendRejectionEmail(reg, note) {
       <p style="line-height:1.75;color:#333">نشكرك على اهتمامك بالانضمام إلى منصة مستشار. بعد مراجعة طلبك (${reg.req_number})، نأسف لإعلامك بعدم إمكانية قبوله في الوقت الراهن.</p>
       ${note ? `<div style="background:#fff8f0;border-right:4px solid #e67e22;border-radius:8px;padding:16px;margin:18px 0"><strong>ملاحظة المراجع:</strong><p style="margin:8px 0 0;color:#555">${note}</p></div>` : ''}
       <p style="line-height:1.75;color:#333">يمكنك التواصل مع مركز البحوث والاستشارات للاستفسار أو إعادة التقديم:
-        <br><a href="mailto:research@tu.edu.sa" style="color:#006633">research@tu.edu.sa</a> | 0127270020
+        <br><a href="mailto:turcc@tu.edu.sa" style="color:#006633">turcc@tu.edu.sa</a> | 0127270020
       </p>`)
   });
 }
