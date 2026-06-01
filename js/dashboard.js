@@ -9,6 +9,7 @@ function showPanel(id) {
   if (id === 'kpis')      renderKPIs();
   if (id === 'analytics') renderCharts();
   if (id === 'email')     renderEmailSettingsPanel();
+  if (id === 'orgs')      renderOrgsList();
 }
 
 /* ══════════════════════════════════════
@@ -17,14 +18,17 @@ function showPanel(id) {
 const _EMAIL_DEFAULTS = {
   from:   'noreply@tu.edu.sa',
   notify: 'turcc@tu.edu.sa',
-  apSubj: 'تهانينا! تم قبول طلبك في منصة مستشار – جامعة الطائف',
+  apSubj: 'تهانينا! تم اعتماد ملفك في منصة مستشار – جامعة الطائف',
   apBody: `عزيزي/عزيزتي {name}،
 
-يسعدنا إعلامك بأن طلب انضمامك إلى منصة مستشار (رقم الطلب: {req_number}) قد تمت الموافقة عليه.
+يسعدنا إعلامك بأن طلب انضمامك إلى منصة مستشار (رقم الطلب: {req_number}) قد تمت الموافقة عليه واعتماده.
 
-يمكنك الآن تسجيل الدخول إلى بوابة المنسوب باستخدام:
-- رقم المنسوب: {emp_id}
-- البريد الإلكتروني: {email}
+بيانات تسجيل الدخول إلى بوابة المنسوب:
+• الرابط: https://mustashar.tu.edu.sa
+• البريد الجامعي: {email}
+• كلمة المرور الافتراضية: {emp_id} (رقم منسوبك)
+
+⚠️ يُرجى تغيير كلمة المرور فور تسجيل الدخول الأول.
 
 مع تحياتنا،
 مركز البحوث والاستشارات – جامعة الطائف
@@ -525,6 +529,83 @@ function renderCharts() {
     }]},
     options: { plugins:{ legend:{position:'bottom',labels:{font:FONT,padding:10}} }, cutout:'55%' }
   });
+}
+
+/* ── إدارة الجهات ── */
+function renderOrgsList() {
+  const orgs = getOrgs();
+  const el   = document.getElementById('dashOrgsList');
+  if (!el) return;
+
+  const pending   = orgs.filter(o => o.status === 'قيد المراجعة').length;
+  const badge = document.getElementById('orgsPendingBadge');
+  if (badge) {
+    badge.textContent = pending > 0 ? pending + ' طلب جديد' : 'لا يوجد جديد';
+    badge.className   = 'tag ' + (pending > 0 ? 'tag-gold' : 'tag-g');
+  }
+
+  if (!orgs.length) {
+    el.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:24px">لا توجد جهات مسجلة بعد</td></tr>';
+    return;
+  }
+  el.innerHTML =
+    `<tr><th>اسم الجهة</th><th>النوع</th><th>البريد</th><th>المسؤول</th><th>الحالة</th><th>التاريخ</th><th>إجراء</th></tr>` +
+    orgs.slice().reverse().map(o => {
+      const cls = o.status==='نشطة'?'tag-g':o.status==='مرفوض'?'tag-r':'tag-gold';
+      const btns = o.status === 'قيد المراجعة'
+        ? `<div style="display:flex;gap:5px">
+             <button class="btn btn-g btn-sm" onclick="approveOrg('${o.id}')">قبول</button>
+             <button class="btn btn-sm" style="background:rgba(192,57,43,.08);color:var(--red);border-radius:10px;padding:7px 10px;font-size:.78rem;font-weight:700"
+               onclick="rejectOrg('${o.id}')">رفض</button>
+           </div>`
+        : `<button class="btn btn-g btn-sm" onclick="suspendOrg('${o.id}')">${o.status==='موقوف'?'تفعيل':'وقف'}</button>`;
+      return `<tr>
+        <td><strong>${esc(o.name)}</strong><div style="font-size:.72rem;color:var(--muted)">${esc(o.id)}</div></td>
+        <td style="font-size:.8rem">${esc(o.type)}</td>
+        <td style="font-size:.78rem">${esc(o.email)}</td>
+        <td style="font-size:.8rem">${esc(o.contact)}</td>
+        <td><span class="tag ${cls}">${esc(o.status)}</span></td>
+        <td style="font-size:.75rem;color:var(--muted)">${esc(o.date)}</td>
+        <td>${btns}</td>
+      </tr>`;
+    }).join('');
+}
+
+function approveOrg(id) {
+  const orgs = getOrgs();
+  const org  = orgs.find(o => o.id === id);
+  if (!org) return;
+  org.status = 'نشطة';
+  saveOrgs(orgs);
+  renderOrgsList();
+  /* show credential email preview */
+  toast(
+    `✅ تم اعتماد الجهة — سيُرسل بريد إلى: ${org.email}\n` +
+    `بيانات الدخول: البريد = ${org.email} | كلمة المرور الافتراضية = ${org.email}`,
+    't-ok', 7000
+  );
+}
+
+function rejectOrg(id) {
+  const note = prompt('ملاحظة الرفض (اختياري):') || '';
+  const orgs = getOrgs();
+  const org  = orgs.find(o => o.id === id);
+  if (!org) return;
+  org.status = 'مرفوض';
+  if (note) org.rejectionNote = note;
+  saveOrgs(orgs);
+  renderOrgsList();
+  toast(`❌ تم رفض طلب الجهة — سيُرسل بريد إلى: ${org.email}`, 't-inf', 5000);
+}
+
+function suspendOrg(id) {
+  const orgs = getOrgs();
+  const org  = orgs.find(o => o.id === id);
+  if (!org) return;
+  org.status = org.status === 'موقوف' ? 'نشطة' : 'موقوف';
+  saveOrgs(orgs);
+  renderOrgsList();
+  toast(`تم ${org.status === 'موقوف' ? 'وقف' : 'تفعيل'} الجهة`, 't-inf');
 }
 
 /* ── قوالب العقود ── */

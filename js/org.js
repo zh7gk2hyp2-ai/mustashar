@@ -23,8 +23,12 @@ function submitOrgReg() {
     err.textContent = '⚠️ يرجى تعبئة جميع الحقول المطلوبة';
     err.style.display = 'block'; return;
   }
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+  if (!validEmail(email)) {
     err.textContent = '⚠️ البريد الإلكتروني غير صحيح';
+    err.style.display = 'block'; return;
+  }
+  if (phone && !validPhone(phone)) {
+    err.textContent = '⚠️ رقم الجوال غير صحيح';
     err.style.display = 'block'; return;
   }
   const orgs = getOrgs();
@@ -34,20 +38,20 @@ function submitOrgReg() {
   }
 
   const id  = 'ORG-' + Date.now().toString(36).slice(-5).toUpperCase();
+  /* status = قيد المراجعة — requires admin approval before login */
   const org = { id, name, type, email, phone, contact,
-                status: 'نشطة', date: new Date().toLocaleDateString('ar-SA') };
+                status: 'قيد المراجعة', date: new Date().toLocaleDateString('ar-SA') };
   orgs.push(org);
   saveOrgs(orgs);
 
-  toast(`✅ تم تسجيل الجهة (${id}) | كلمة المرور الافتراضية: البريد الإلكتروني`, 't-ok', 7000);
+  toast(`📋 تم استلام طلب تسجيل الجهة (${id}) — سيُرسل إليك بريد عند الاعتماد`, 't-ok', 7000);
   err.style.display = 'none';
-  document.getElementById('loginOrgEmail').value = email;
   showOrgLoginStep('creds');
 }
 
 /* ── 3-step login flow ────────────────── */
-let _orgOtp = null;
-let _orgRec = null;
+let _orgOtpBundle = null;
+let _orgRec       = null;
 
 function showOrgLoginStep(name) {
   ['reg','creds','otp','chpass'].forEach(s => {
@@ -65,6 +69,11 @@ async function doOrgLogin() {
     err.textContent = '⚠️ يرجى إدخال البريد وكلمة المرور';
     err.style.display = 'block'; return;
   }
+
+  /* rate limit */
+  const rl = rlCheck('org_' + email);
+  if (!rl.ok) { err.textContent = rl.msg; err.style.display = 'block'; return; }
+
   const btn = document.getElementById('orgLoginBtn');
   btn.disabled = true; btn.textContent = 'جارٍ التحقق...';
 
@@ -74,20 +83,30 @@ async function doOrgLogin() {
     sessionStorage.removeItem('mu_cons_local');
 
     const orgs  = getOrgs();
-    const found = orgs.find(o => o.email.toLowerCase() === email && o.status === 'نشطة');
+    const found = orgs.find(o => o.email.toLowerCase() === email);
     if (!found) {
-      err.textContent = '⚠️ البريد غير مسجّل أو الحساب غير نشط';
+      rlFail('org_' + email);
+      err.textContent = '⚠️ البريد غير مسجّل';
       err.style.display = 'block'; return;
     }
-    const stored   = _getOrgPwd(found.id);
-    const expected = stored || found.email;
-    if (pass !== expected) {
+    if (found.status === 'قيد المراجعة') {
+      err.textContent = '⚠️ طلب التسجيل لا يزال قيد المراجعة — سيُرسل إليك بريد عند الاعتماد';
+      err.style.display = 'block'; return;
+    }
+    if (found.status !== 'نشطة') {
+      err.textContent = '⚠️ الحساب غير نشط — تواصل مع المركز';
+      err.style.display = 'block'; return;
+    }
+    const pwdOk = await checkOrgPwd(found.id, pass, found.email);
+    if (!pwdOk) {
+      rlFail('org_' + email);
       err.textContent = '⚠️ كلمة المرور غير صحيحة';
       err.style.display = 'block'; return;
     }
-    _orgRec = found;
-    _orgOtp = String(Math.floor(100000 + Math.random() * 900000));
-    toast(`📧 رمز التحقق إلى ${email}: ${_orgOtp}`, 't-inf', 5000);
+    rlClear('org_' + email);
+    _orgRec       = found;
+    _orgOtpBundle = makeOtp();
+    toast(`📧 رمز التحقق (صالح 5 دقائق) إلى ${email}: ${_orgOtpBundle.code}`, 't-inf', 5000);
     err.style.display = 'none';
     document.getElementById('orgOtpHint').textContent = `تم إرسال الرمز إلى ${email}`;
     document.getElementById('loginOrgOtp').value = '';
@@ -106,9 +125,15 @@ function verifyOrgOtp() {
   const entered = (document.getElementById('loginOrgOtp')?.value || '').trim();
   const err     = document.getElementById('loginOrgOtpErr');
   if (!entered) { err.textContent = '⚠️ يرجى إدخال الرمز'; err.style.display = 'block'; return; }
-  if (entered !== _orgOtp) { err.textContent = '⚠️ الرمز غير صحيح'; err.style.display = 'block'; return; }
+  if (otpExpired(_orgOtpBundle)) {
+    err.textContent = '⚠️ انتهت صلاحية الرمز — اضغط "إعادة إرسال"'; err.style.display = 'block'; return;
+  }
+  if (entered !== _orgOtpBundle?.code) {
+    err.textContent = '⚠️ الرمز غير صحيح'; err.style.display = 'block'; return;
+  }
   err.style.display = 'none';
-  if (!_getOrgPwd(_orgRec.id)) {
+  const hasPwd = !!(JSON.parse(localStorage.getItem('mu_org_pwd')||'{}')[_orgRec?.id]);
+  if (!hasPwd) {
     document.getElementById('loginOrgNewPass').value  = '';
     document.getElementById('loginOrgConfPass').value = '';
     document.getElementById('loginOrgChPassErr').style.display = 'none';
@@ -121,25 +146,28 @@ function verifyOrgOtp() {
 
 function resendOrgOtp() {
   if (!_orgRec) return;
-  _orgOtp = String(Math.floor(100000 + Math.random() * 900000));
-  toast(`📧 رمز جديد إلى ${_orgRec.email}: ${_orgOtp}`, 't-inf', 5000);
+  _orgOtpBundle = makeOtp();
+  toast(`📧 رمز جديد (صالح 5 دقائق) إلى ${_orgRec.email}: ${_orgOtpBundle.code}`, 't-inf', 5000);
   document.getElementById('loginOrgOtp').value = '';
   document.getElementById('loginOrgOtpErr').style.display = 'none';
 }
 
-function changeOrgPassword() {
+async function changeOrgPassword() {
   const newPass  = document.getElementById('loginOrgNewPass')?.value  || '';
   const confPass = document.getElementById('loginOrgConfPass')?.value || '';
   const err      = document.getElementById('loginOrgChPassErr');
+  const btn      = document.querySelector('#org-step-chpass .btn.btn-p');
   if (!_isStrongPwd(newPass)) {
-    err.textContent = '⚠️ كلمة المرور لا تستوفي متطلبات الأمان (8 أحرف + كبير + صغير + رقم + رمز)';
+    err.textContent = '⚠️ كلمة المرور لا تستوفي متطلبات الأمان';
     err.style.display = 'block'; return;
   }
   if (newPass !== confPass) {
     err.textContent = '⚠️ كلمتا المرور غير متطابقتين';
     err.style.display = 'block'; return;
   }
-  _saveOrgPwd(_orgRec.id, newPass);
+  if (btn) { btn.disabled = true; btn.textContent = 'جارٍ الحفظ...'; }
+  await saveOrgPwdSecure(_orgRec.id, newPass);
+  if (btn) { btn.disabled = false; btn.textContent = 'حفظ وتسجيل الدخول ←'; }
   err.style.display = 'none';
   _completeOrgLogin();
 }
@@ -147,7 +175,8 @@ function changeOrgPassword() {
 function _completeOrgLogin() {
   const org = { id: _orgRec.id, name: _orgRec.name, email: _orgRec.email, contact: _orgRec.contact };
   sessionStorage.setItem('mu_org', JSON.stringify(org));
-  _orgOtp = null; _orgRec = null;
+  touchSession();
+  _orgOtpBundle = null; _orgRec = null;
   document.getElementById('loginOv').classList.remove('open');
   updateNav();
   go('orgportal');
@@ -321,17 +350,17 @@ function submitOrgRating() {
 }
 
 /* ── Org portal password change ─────────── */
-function orgPortalChangePassword() {
+async function orgPortalChangePassword() {
   const org = getOrgSession();
   if (!org) return;
   const curPass  = document.getElementById('op-curpass')?.value  || '';
   const newPass  = document.getElementById('op-newpass')?.value  || '';
   const confPass = document.getElementById('op-confpass')?.value || '';
   const err      = document.getElementById('op-pwd-err');
+  const btn      = document.querySelector('#op-chpass .btn.btn-p');
 
-  const stored   = _getOrgPwd(org.id);
-  const expected = stored || org.email;
-  if (curPass !== expected) {
+  const curOk = await checkOrgPwd(org.id, curPass, org.email);
+  if (!curOk) {
     err.textContent = '⚠️ كلمة المرور الحالية غير صحيحة'; err.style.display = 'block'; return;
   }
   if (!_isStrongPwd(newPass)) {
@@ -341,7 +370,9 @@ function orgPortalChangePassword() {
   if (newPass !== confPass) {
     err.textContent = '⚠️ كلمتا المرور غير متطابقتين'; err.style.display = 'block'; return;
   }
-  _saveOrgPwd(org.id, newPass);
+  if (btn) { btn.disabled = true; btn.textContent = 'جارٍ الحفظ...'; }
+  await saveOrgPwdSecure(org.id, newPass);
+  if (btn) { btn.disabled = false; btn.textContent = 'حفظ كلمة المرور ←'; }
   err.style.display = 'none';
   ['op-curpass','op-newpass','op-confpass'].forEach(id => {
     const el = document.getElementById(id); if (el) el.value = '';

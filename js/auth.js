@@ -78,19 +78,26 @@ function doLogin() {
   const p   = document.getElementById('loginPass').value;
   const err = document.getElementById('loginErr');
 
+  /* rate limit admin login */
+  const rl = (typeof rlCheck === 'function') ? rlCheck('admin') : { ok: true };
+  if (!rl.ok) { err.textContent = rl.msg; err.style.display = 'block'; return; }
+
   if (u === ADMIN.user && p === ADMIN.pass) {
-    /* clear any existing consultant session first */
+    if (typeof rlClear === 'function') rlClear('admin');
     sessionStorage.removeItem('mu_cons');
     sessionStorage.removeItem('mu_cons_token');
     sessionStorage.removeItem('mu_cons_local');
+    sessionStorage.removeItem('mu_org');
 
     sessionStorage.setItem('mu_auth', '1');
+    if (typeof touchSession === 'function') touchSession();
     err.style.display = 'none';
     document.getElementById('loginOv').classList.remove('open');
     updateNav();
     go('dashboard');
     toast('مرحباً بك في لوحة التحكم', 't-ok');
   } else {
+    if (typeof rlFail === 'function') rlFail('admin');
     err.textContent = '⚠️ اسم المستخدم أو كلمة المرور غير صحيحة';
     err.style.display = 'block';
     document.getElementById('loginPass').value = '';
