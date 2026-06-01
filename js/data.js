@@ -53,12 +53,18 @@ const DATA = [
 
 /* ══ KPI targets (السنة الأولى) ═══════════ */
 const KPI_TARGETS = {
-  registeredConsultants: 200,
-  approvedProfiles:      150,
-  monthlyContracts:       50,
-  avgRating:             4.5,
-  responseHours:          48,
-  partnerEntities:        30,
+  registeredConsultants: 300,
+  approvedProfiles:      250,
+  monthlyContracts:       10,   // per quarter (K23)
+  avgRating:             3.8,
+  responseHours:          40,   // 5 days × 8h (K25)
+  partnerEntities:        20,
+  profileCompletion:      70,   // % (K4)
+  verifiedProfiles:       70,   // % (K14)
+  aiSummaryRate:          80,   // % (K17)
+  contractCompletion:     70,   // % (K26)
+  searchConversion:        5,   // % (K29)
+  annualRevenue:      200000,   // SAR (K37)
 };
 
 /* نسبة التوزيع المالي */

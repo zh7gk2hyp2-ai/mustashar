@@ -35,6 +35,14 @@ function star(n) {
   return '★'.repeat(Math.round(n)) + '☆'.repeat(5 - Math.round(n));
 }
 
+/* ── Rating badge (from governance doc §5.3) ── */
+function ratingBadge(c) {
+  if (!c.rating || c.reviews < 2) return '';
+  if (c.rating >= 4.5) return '<span class="tag tag-gold" style="font-size:.6rem;padding:2px 6px">🥇 متميز</span>';
+  if (c.rating >= 3.5) return '<span class="tag" style="background:#bdc3c7;color:#2c3e50;font-size:.6rem;padding:2px 6px">🥈 موثوق</span>';
+  return '';
+}
+
 /* ── Card builder ─────────────────────── */
 function card(c) {
   const sl = STATE.isSL(c.id);
@@ -56,6 +64,7 @@ function card(c) {
     <div class="cc-tags">
       ${c.skills.slice(0, 4).map(s => `<span class="tag">${s}</span>`).join('')}
       ${c.skills.length > 4 ? `<span class="tag tag-b">+${c.skills.length - 4}</span>` : ''}
+      ${ratingBadge(c)}
     </div>
     <div class="cc-ft">
       <div><span class="stars">${star(c.rating)}</span><span class="cc-rat"> ${c.rating} (${c.reviews})</span></div>
@@ -137,8 +146,12 @@ function renderProfile(id) {
       <div class="p-role">${c.title} | ${c.dept}</div>
       <div class="p-tags">
         ${c.verified ? '<span class="ptag">✓ موثق</span>' : ''}
+        ${c.rating >= 4.5 && c.reviews >= 2 ? '<span class="ptag" style="background:linear-gradient(135deg,#c8941f,#f59e0b);color:#fff">🥇 مستشار متميز</span>' : c.rating >= 3.5 && c.reviews >= 2 ? '<span class="ptag" style="background:#bdc3c7;color:#2c3e50">🥈 مستشار موثوق</span>' : ''}
         <span class="ptag">${c.college}</span>
         <span class="ptag">${c.exp_years} سنة خبرة</span>
+        <span class="ptag" style="background:${c.verified?'rgba(0,102,51,.12)':'rgba(200,148,31,.1)'};color:${c.verified?'var(--green)':'var(--gold)'}">
+          ${c.verified?'🔒 موثق الخبرات':'📋 قيد التوثيق'}
+        </span>
         <span class="ptag">${c.available ? '🟢 متاح' : '🔴 مشغول'}</span>
         ${c.lang.map(l => `<span class="ptag">${l}</span>`).join('')}
       </div>

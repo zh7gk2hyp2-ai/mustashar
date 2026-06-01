@@ -485,3 +485,17 @@ function renderCharts() {
     options: { plugins:{ legend:{position:'bottom',labels:{font:FONT,padding:10}} }, cutout:'55%' }
   });
 }
+
+/* ── قوالب العقود ── */
+function showCTemplate(n) {
+  [1,2,3].forEach(i => {
+    const el = document.getElementById('ct-' + i);
+    if (el) el.style.display = i === n ? '' : 'none';
+    const btn = document.getElementById('ctab-' + i);
+    if (btn) btn.className = i === n ? 'btn btn-p btn-sm' : 'btn btn-g btn-sm';
+  });
+}
+
+function printContract() {
+  window.print();
+}

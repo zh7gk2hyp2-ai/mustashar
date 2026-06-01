@@ -523,6 +523,7 @@
       <a onclick="showPanel('contracts')"   id="dp-contracts">📄 طلبات التعاقد</a>
       <a onclick="showPanel('analytics')"   id="dp-analytics">📈 التقارير</a>
       <a onclick="showPanel('kpis')"        id="dp-kpis">🎯 مؤشرات الأداء</a>
+      <a onclick="showPanel('ctemplates')"  id="dp-ctemplates">📝 قوالب العقود</a>
       <a onclick="showPanel('email')"       id="dp-email">📧 إعدادات البريد</a>
     </div>
   </div>
@@ -624,6 +625,154 @@
       <div style="display:flex;gap:10px">
         <button class="btn btn-p" onclick="saveEmailSettingsUI()">حفظ الإعدادات ←</button>
         <button class="btn btn-g" onclick="resetEmailSettingsUI()">استعادة الافتراضي</button>
+      </div>
+    </div>
+
+    <!-- Contract Templates -->
+    <div class="dpanel" id="pan-ctemplates">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+        <h3 style="color:var(--navy)">📝 قوالب العقود المعتمدة</h3>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-g btn-sm" onclick="printContract()">🖨️ طباعة</button>
+          <span class="tag tag-g">3 قوالب معتمدة</span>
+        </div>
+      </div>
+      <!-- Template selector -->
+      <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap">
+        <button class="btn btn-p btn-sm" id="ctab-1" onclick="showCTemplate(1)">📋 استشارات فردية</button>
+        <button class="btn btn-g btn-sm" id="ctab-2" onclick="showCTemplate(2)">🎓 برامج تدريبية</button>
+        <button class="btn btn-g btn-sm" id="ctab-3" onclick="showCTemplate(3)">🔬 استشارات بحثية</button>
+      </div>
+      <!-- Template 1 -->
+      <div id="ct-1" style="background:var(--surf);border:1px solid var(--bdr);border-radius:var(--rl);padding:28px">
+        <div style="text-align:center;border-bottom:2px solid var(--navy);padding-bottom:16px;margin-bottom:20px">
+          <div style="font-size:.8rem;color:var(--muted)">جامعة الطائف – مركز البحوث والاستشارات</div>
+          <h3 style="color:var(--navy);margin:6px 0;font-size:1.1rem">عقد تقديم خدمات استشارية</h3>
+          <div style="display:flex;justify-content:center;gap:20px;font-size:.8rem;color:var(--muted);margin-top:6px">
+            <span>رقم العقد: <input style="width:100px;border:none;border-bottom:1px solid var(--bdr);background:transparent;font-family:Cairo;font-size:.8rem" placeholder="_______"></span>
+            <span>التاريخ: <input style="width:100px;border:none;border-bottom:1px solid var(--bdr);background:transparent;font-family:Cairo;font-size:.8rem" placeholder="__/__/____"></span>
+          </div>
+        </div>
+        <div style="margin-bottom:18px">
+          <h4 style="color:var(--navy);font-size:.88rem;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--surf2)">أطراف العقد</h4>
+          <div style="display:grid;gap:8px;font-size:.82rem">
+            <div><strong>الطرف الأول (الجهة الطالبة):</strong> <input style="width:200px;border:none;border-bottom:1px solid var(--bdr);background:transparent;font-family:Cairo" placeholder="اسم الجهة"> – ممثلةً بـ <input style="width:120px;border:none;border-bottom:1px solid var(--bdr);background:transparent;font-family:Cairo" placeholder="اسم المسؤول"></div>
+            <div><strong>الطرف الثاني (المنسوب):</strong> <input style="width:180px;border:none;border-bottom:1px solid var(--bdr);background:transparent;font-family:Cairo" placeholder="الاسم الرباعي"> – رقم المنسوب: <input style="width:90px;border:none;border-bottom:1px solid var(--bdr);background:transparent;font-family:Cairo" placeholder="_______"></div>
+            <div><strong>الطرف الوسيط:</strong> مركز البحوث والاستشارات – جامعة الطائف (الجهة المشرفة والمنظِّمة)</div>
+          </div>
+        </div>
+        <div style="margin-bottom:18px">
+          <h4 style="color:var(--navy);font-size:.88rem;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--surf2)">نطاق الخدمة</h4>
+          <div style="display:grid;gap:8px;font-size:.82rem">
+            <div><strong>وصف الخدمة:</strong> <input style="width:100%;max-width:400px;border:none;border-bottom:1px solid var(--bdr);background:transparent;font-family:Cairo" placeholder="وصف تفصيلي للخدمة المطلوبة"></div>
+            <div><strong>المخرجات المتوقعة:</strong> <input style="width:100%;max-width:400px;border:none;border-bottom:1px solid var(--bdr);background:transparent;font-family:Cairo" placeholder="التقارير والمستندات المطلوبة"></div>
+            <div style="display:flex;gap:20px;flex-wrap:wrap">
+              <span><strong>من:</strong> <input style="width:90px;border:none;border-bottom:1px solid var(--bdr);background:transparent;font-family:Cairo" placeholder="__/__/____"></span>
+              <span><strong>إلى:</strong> <input style="width:90px;border:none;border-bottom:1px solid var(--bdr);background:transparent;font-family:Cairo" placeholder="__/__/____"></span>
+              <span><strong>النمط:</strong> <select style="border:none;border-bottom:1px solid var(--bdr);background:transparent;font-family:Cairo;font-size:.82rem"><option>حضوري</option><option>عن بُعد</option><option>مختلط</option></select></span>
+            </div>
+          </div>
+        </div>
+        <div style="margin-bottom:18px">
+          <h4 style="color:var(--navy);font-size:.88rem;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--surf2)">المقابل المالي</h4>
+          <div style="display:grid;gap:8px;font-size:.82rem">
+            <div><strong>إجمالي قيمة العقد:</strong> <input style="width:120px;border:none;border-bottom:1px solid var(--bdr);background:transparent;font-family:Cairo" placeholder="_________"> ريال سعودي (شاملاً ضريبة القيمة المضافة)</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px;background:var(--surf2);border-radius:8px;margin-top:4px">
+              <div style="text-align:center"><div style="font-size:1.5rem;font-weight:900;color:var(--blue)">70%</div><div style="font-size:.74rem;color:var(--muted)">عائد المنسوب</div></div>
+              <div style="text-align:center"><div style="font-size:1.5rem;font-weight:900;color:var(--gold)">30%</div><div style="font-size:.74rem;color:var(--muted)">مركز البحوث</div></div>
+            </div>
+            <div><strong>جدول الدفع:</strong> <select style="border:none;border-bottom:1px solid var(--bdr);background:transparent;font-family:Cairo;font-size:.82rem"><option>دفعة واحدة عند الاكتمال</option><option>دفعتان (50% مقدماً – 50% عند التسليم)</option><option>ثلاث دفعات</option></select></div>
+          </div>
+        </div>
+        <div style="margin-bottom:20px">
+          <h4 style="color:var(--navy);font-size:.88rem;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--surf2)">الالتزامات والشروط</h4>
+          <div style="font-size:.78rem;line-height:1.9;color:var(--txt2)">
+            <div>• <strong>السرية:</strong> يلتزم الطرف الثاني بعدم الإفصاح عن أي معلومات تتعلق بالجهة الطالبة دون إذن خطي.</div>
+            <div>• <strong>الملكية الفكرية:</strong> تؤول جميع المخرجات للجهة الطالبة مع ذكر اسم المنسوب.</div>
+            <div>• <strong>الجزاء:</strong> في حالة التأخر عن الموعد النهائي يُخصم <input style="width:40px;border:none;border-bottom:1px solid var(--bdr);background:transparent;font-family:Cairo;font-size:.78rem" placeholder="5">% من قيمة العقد عن كل أسبوع تأخير.</div>
+            <div>• <strong>فضّ النزاعات:</strong> يُرجع في حالة النزاع إلى لجنة مشتركة بين الأطراف ومركز البحوث والاستشارات.</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;border-top:1px solid var(--bdr);padding-top:16px;font-size:.78rem;text-align:center">
+          <div><div style="font-weight:700;color:var(--navy);margin-bottom:8px">مدير مركز البحوث</div><div style="height:50px;border-bottom:1px solid var(--bdr);margin-bottom:6px"></div><div style="color:var(--muted)">التوقيع والتاريخ</div></div>
+          <div><div style="font-weight:700;color:var(--navy);margin-bottom:8px">ممثل الجهة الطالبة</div><div style="height:50px;border-bottom:1px solid var(--bdr);margin-bottom:6px"></div><div style="color:var(--muted)">التوقيع والتاريخ</div></div>
+          <div><div style="font-weight:700;color:var(--navy);margin-bottom:8px">المنسوب (المستشار)</div><div style="height:50px;border-bottom:1px solid var(--bdr);margin-bottom:6px"></div><div style="color:var(--muted)">التوقيع والتاريخ</div></div>
+        </div>
+      </div>
+      <!-- Template 2 -->
+      <div id="ct-2" style="display:none;background:var(--surf);border:1px solid var(--bdr);border-radius:var(--rl);padding:28px">
+        <div style="text-align:center;border-bottom:2px solid var(--navy);padding-bottom:16px;margin-bottom:20px">
+          <div style="font-size:.8rem;color:var(--muted)">جامعة الطائف – مركز البحوث والاستشارات</div>
+          <h3 style="color:var(--navy);margin:6px 0;font-size:1.1rem">عقد تقديم برنامج تدريبي</h3>
+          <div style="display:flex;justify-content:center;gap:20px;font-size:.8rem;color:var(--muted);margin-top:6px">
+            <span>رقم العقد: <input style="width:100px;border:none;border-bottom:1px solid var(--bdr);background:transparent;font-family:Cairo;font-size:.8rem" placeholder="_______"></span>
+            <span>التاريخ: <input style="width:100px;border:none;border-bottom:1px solid var(--bdr);background:transparent;font-family:Cairo;font-size:.8rem" placeholder="__/__/____"></span>
+          </div>
+        </div>
+        <div style="display:grid;gap:12px;font-size:.82rem">
+          <div><strong>اسم البرنامج التدريبي:</strong> <input style="width:100%;max-width:350px;border:none;border-bottom:1px solid var(--bdr);background:transparent;font-family:Cairo" placeholder="عنوان البرنامج"></div>
+          <div style="display:flex;gap:20px;flex-wrap:wrap">
+            <span><strong>عدد الساعات:</strong> <input style="width:60px;border:none;border-bottom:1px solid var(--bdr);background:transparent;font-family:Cairo" placeholder="___"> ساعة</span>
+            <span><strong>عدد الأيام:</strong> <input style="width:60px;border:none;border-bottom:1px solid var(--bdr);background:transparent;font-family:Cairo" placeholder="___"> أيام</span>
+            <span><strong>عدد المتدربين:</strong> <input style="width:60px;border:none;border-bottom:1px solid var(--bdr);background:transparent;font-family:Cairo" placeholder="___"> متدرباً</span>
+          </div>
+          <div style="display:flex;gap:20px;flex-wrap:wrap">
+            <span><strong>مكان التنفيذ:</strong> <select style="border:none;border-bottom:1px solid var(--bdr);background:transparent;font-family:Cairo;font-size:.82rem"><option>مقر الجهة</option><option>مقر الجامعة</option><option>عن بُعد</option></select></span>
+            <span><strong>الحقيبة التدريبية:</strong> <select style="border:none;border-bottom:1px solid var(--bdr);background:transparent;font-family:Cairo;font-size:.82rem"><option>مُعدّة من قِبل المنسوب</option><option>مُعدّة من قِبل الجهة</option></select></span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;padding:12px;background:var(--surf2);border-radius:8px;margin-top:4px">
+            <div style="text-align:center"><div><strong>رسوم البرنامج</strong></div><input style="width:100%;border:none;border-bottom:1px solid var(--bdr);background:transparent;font-family:Cairo;text-align:center;font-size:.82rem" placeholder="_________ ريال"></div>
+            <div style="text-align:center"><div><font color='var(--blue)'><strong>70% للمنسوب</strong></font></div><input style="width:100%;border:none;border-bottom:1px solid var(--bdr);background:transparent;font-family:Cairo;text-align:center;font-size:.82rem" placeholder="_________ ريال"></div>
+            <div style="text-align:center"><div><font color='var(--gold)'><strong>30% مركز البحوث</strong></font></div><input style="width:100%;border:none;border-bottom:1px solid var(--bdr);background:transparent;font-family:Cairo;text-align:center;font-size:.82rem" placeholder="_________ ريال"></div>
+          </div>
+          <div><strong>ضمان الجودة:</strong> تقييم رضا المشاركين بعد الانتهاء – الحد الأدنى 3.5/5 – يُرسل تقرير للمركز.</div>
+          <div><strong>شهادات المشاركة:</strong> <select style="border:none;border-bottom:1px solid var(--bdr);background:transparent;font-family:Cairo;font-size:.82rem"><option>تُصدر من الجامعة</option><option>تُصدر من الجهة باسم الجامعة</option></select></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;border-top:1px solid var(--bdr);padding-top:16px;margin-top:20px;font-size:.78rem;text-align:center">
+          <div><div style="font-weight:700;color:var(--navy);margin-bottom:8px">مدير مركز البحوث</div><div style="height:50px;border-bottom:1px solid var(--bdr);margin-bottom:6px"></div><div style="color:var(--muted)">التوقيع والتاريخ</div></div>
+          <div><div style="font-weight:700;color:var(--navy);margin-bottom:8px">ممثل الجهة الطالبة</div><div style="height:50px;border-bottom:1px solid var(--bdr);margin-bottom:6px"></div><div style="color:var(--muted)">التوقيع والتاريخ</div></div>
+          <div><div style="font-weight:700;color:var(--navy);margin-bottom:8px">المنسوب المدرّب</div><div style="height:50px;border-bottom:1px solid var(--bdr);margin-bottom:6px"></div><div style="color:var(--muted)">التوقيع والتاريخ</div></div>
+        </div>
+      </div>
+      <!-- Template 3 -->
+      <div id="ct-3" style="display:none;background:var(--surf);border:1px solid var(--bdr);border-radius:var(--rl);padding:28px">
+        <div style="text-align:center;border-bottom:2px solid var(--navy);padding-bottom:16px;margin-bottom:20px">
+          <div style="font-size:.8rem;color:var(--muted)">جامعة الطائف – مركز البحوث والاستشارات</div>
+          <h3 style="color:var(--navy);margin:6px 0;font-size:1.1rem">عقد الاستشارات البحثية والدراسات التطبيقية</h3>
+          <div style="display:flex;justify-content:center;gap:20px;font-size:.8rem;color:var(--muted);margin-top:6px">
+            <span>رقم العقد: <input style="width:100px;border:none;border-bottom:1px solid var(--bdr);background:transparent;font-family:Cairo;font-size:.8rem" placeholder="_______"></span>
+            <span>التاريخ: <input style="width:100px;border:none;border-bottom:1px solid var(--bdr);background:transparent;font-family:Cairo;font-size:.8rem" placeholder="__/__/____"></span>
+          </div>
+        </div>
+        <div style="display:grid;gap:12px;font-size:.82rem">
+          <div><strong>عنوان الدراسة/البحث:</strong> <input style="width:100%;max-width:400px;border:none;border-bottom:1px solid var(--bdr);background:transparent;font-family:Cairo" placeholder="عنوان البحث أو الدراسة"></div>
+          <div style="display:flex;gap:20px;flex-wrap:wrap">
+            <span><strong>نوع البحث:</strong> <select style="border:none;border-bottom:1px solid var(--bdr);background:transparent;font-family:Cairo;font-size:.82rem"><option>دراسة جدوى</option><option>تقييم برنامج</option><option>مسح ميداني</option><option>دراسة حالة</option></select></span>
+            <span><strong>مدة التنفيذ:</strong> <input style="width:80px;border:none;border-bottom:1px solid var(--bdr);background:transparent;font-family:Cairo" placeholder="___"> <select style="border:none;border-bottom:1px solid var(--bdr);background:transparent;font-family:Cairo;font-size:.82rem"><option>أسابيع</option><option>أشهر</option></select></span>
+            <span><strong>لغة التقرير:</strong> <select style="border:none;border-bottom:1px solid var(--bdr);background:transparent;font-family:Cairo;font-size:.82rem"><option>العربية</option><option>الإنجليزية</option><option>كلتاهما</option></select></span>
+          </div>
+          <div><strong>المنهجية المعتمدة:</strong> <input style="width:100%;max-width:400px;border:none;border-bottom:1px solid var(--bdr);background:transparent;font-family:Cairo" placeholder="المنهجية والأدوات المستخدمة"></div>
+          <div style="padding:12px;background:var(--surf2);border-radius:8px">
+            <div style="font-weight:700;margin-bottom:8px">المخرجات النهائية المطلوبة:</div>
+            <div style="display:flex;gap:16px;flex-wrap:wrap;font-size:.8rem">
+              <label><input type="checkbox" checked> تقرير نهائي</label>
+              <label><input type="checkbox" checked> ملخص تنفيذي</label>
+              <label><input type="checkbox" checked> عرض تقديمي</label>
+              <label><input type="checkbox"> بيانات خام</label>
+              <label><input type="checkbox"> توصيات تنفيذية</label>
+            </div>
+          </div>
+          <div style="display:flex;gap:20px;flex-wrap:wrap">
+            <span><strong>ملكية البيانات:</strong> <select style="border:none;border-bottom:1px solid var(--bdr);background:transparent;font-family:Cairo;font-size:.82rem"><option>للجهة الطالبة</option><option>مشتركة</option></select></span>
+            <span><strong>حقوق النشر:</strong> <select style="border:none;border-bottom:1px solid var(--bdr);background:transparent;font-family:Cairo;font-size:.82rem"><option>للجهة حصرياً</option><option>مشتركة</option><option>للمنسوب مع الإشارة</option></select></span>
+          </div>
+          <div><strong>قيمة العقد:</strong> <input style="width:120px;border:none;border-bottom:1px solid var(--bdr);background:transparent;font-family:Cairo" placeholder="_________"> ريال – مدفوعة على <input style="width:40px;border:none;border-bottom:1px solid var(--bdr);background:transparent;font-family:Cairo" placeholder="2"> مراحل.</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;border-top:1px solid var(--bdr);padding-top:16px;margin-top:20px;font-size:.78rem;text-align:center">
+          <div><div style="font-weight:700;color:var(--navy);margin-bottom:8px">مدير مركز البحوث</div><div style="height:50px;border-bottom:1px solid var(--bdr);margin-bottom:6px"></div><div style="color:var(--muted)">التوقيع والتاريخ</div></div>
+          <div><div style="font-weight:700;color:var(--navy);margin-bottom:8px">ممثل الجهة الطالبة</div><div style="height:50px;border-bottom:1px solid var(--bdr);margin-bottom:6px"></div><div style="color:var(--muted)">التوقيع والتاريخ</div></div>
+          <div><div style="font-weight:700;color:var(--navy);margin-bottom:8px">المنسوب الباحث</div><div style="height:50px;border-bottom:1px solid var(--bdr);margin-bottom:6px"></div><div style="color:var(--muted)">التوقيع والتاريخ</div></div>
+        </div>
       </div>
     </div>
 
