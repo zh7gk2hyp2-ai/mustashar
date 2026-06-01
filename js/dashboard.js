@@ -240,19 +240,20 @@ function renderPendingTable() {
       ? regs.slice().reverse().map(r =>
           `<tr>
             <td>
-              <strong>${r.firstName} ${r.lastName}</strong>
-              <div style="font-size:.72rem;color:var(--muted)">${r.email || ''} ${r.empId ? '| ' + r.empId : ''}</div>
+              <strong>${esc(r.firstName)} ${esc(r.lastName)}</strong>
+              <div style="font-size:.72rem;color:var(--muted)">${esc(r.email || '')} ${r.empId ? '| ' + esc(r.empId) : ''}</div>
             </td>
-            <td style="font-size:.78rem;color:var(--muted)">${r.college}</td>
-            <td>${r.type}</td>
+            <td style="font-size:.78rem;color:var(--muted)">${esc(r.college)}</td>
+            <td>${esc(r.type)}</td>
             <td style="font-size:.78rem;color:var(--blue);font-weight:700">${r.rate ? r.rate + ' ر/' + r.rateType : '—'}</td>
             <td>${r.conflict ? '<span class="tag tag-r">⚠️ يراجع</span>' : '<span class="tag tag-g">✓ لا يوجد</span>'}</td>
             <td><span class="tag ${statusClass(r.status)}" id="rs-${r.id}">${r.status}</span></td>
             <td>${r.date}</td>
             <td>
-              <div style="display:flex;gap:5px">
-                <button class="btn btn-g btn-sm" onclick="approveReg('${r.id}')">قبول</button>
-                <button class="btn btn-sm" style="background:rgba(192,57,43,.08);color:var(--red);border-radius:10px;padding:7px 10px;font-size:.78rem;font-weight:700" onclick="rejectReg('${r.id}')">رفض</button>
+              <div style="display:flex;gap:5px;flex-wrap:wrap">
+                ${r.status !== 'معتمد' ? `<button class="btn btn-g btn-sm" onclick="approveReg('${r.id}')">قبول</button>` : ''}
+                ${r.status !== 'مرفوض' && r.status !== 'معتمد' ? `<button class="btn btn-sm" style="background:rgba(192,57,43,.08);color:var(--red);border-radius:10px;padding:7px 10px;font-size:.78rem;font-weight:700" onclick="rejectReg('${r.id}')">رفض</button>` : ''}
+                ${r.status === 'معتمد' && r.empId ? `<button class="btn btn-sm" title="إعادة تعيين كلمة المرور" style="background:rgba(200,148,31,.12);color:#a07000;border-radius:10px;padding:7px 10px;font-size:.78rem;font-weight:700" onclick="adminResetConsPwd('${esc(r.empId)}','${esc(r.email)}','${esc(r.firstName + ' ' + r.lastName)}')">🔑 إعادة تعيين</button>` : ''}
               </div>
             </td>
           </tr>`).join('')
@@ -315,18 +316,29 @@ function statusClass(s) {
 function renderConsTable(data) {
   document.getElementById('dashConsTable').innerHTML =
     `<tr><th>الاسم</th><th>الكلية</th><th>التقييم</th><th>التعاقدات</th><th>الحالة</th><th>إجراء</th></tr>` +
-    data.map(c =>
-      `<tr>
+    data.map(c => {
+      const resetBtn = (c._fromReg && c.empId)
+        ? `<button class="btn btn-sm" title="إعادة تعيين كلمة المرور"
+             style="background:rgba(200,148,31,.12);color:#a07000;border-radius:10px;padding:7px 10px;font-size:.78rem;font-weight:700"
+             onclick="adminResetConsPwd('${esc(c.empId)}','${esc(c.email)}','${esc(c.name)}')">🔑 إعادة تعيين</button>`
+        : '';
+      return `<tr>
         <td>
-          ${c.name}
+          ${esc(c.name)}
           ${c._fromReg ? '<span class="tag tag-b" style="font-size:.65rem;margin-right:6px">جديد</span>' : ''}
         </td>
-        <td style="font-size:.78rem;color:var(--muted)">${c.college}</td>
+        <td style="font-size:.78rem;color:var(--muted)">${esc(c.college)}</td>
         <td class="stars">${c.rating ? c.rating + '★' : '—'}</td>
         <td>${c.contracts || 0}</td>
         <td><span class="tag ${c.verified ? 'tag-g' : 'tag-r'}">${c.verified ? 'معتمد' : 'قيد المراجعة'}</span></td>
-        <td><button class="btn btn-g btn-sm" onclick="go('profile','${c.id}')">عرض</button></td>
-      </tr>`).join('');
+        <td>
+          <div style="display:flex;gap:5px;flex-wrap:wrap">
+            <button class="btn btn-g btn-sm" onclick="go('profile','${c.id}')">عرض</button>
+            ${resetBtn}
+          </div>
+        </td>
+      </tr>`;
+    }).join('');
 }
 
 function filterDash() {
@@ -558,7 +570,12 @@ function renderOrgsList() {
              <button class="btn btn-sm" style="background:rgba(192,57,43,.08);color:var(--red);border-radius:10px;padding:7px 10px;font-size:.78rem;font-weight:700"
                onclick="rejectOrg('${o.id}')">رفض</button>
            </div>`
-        : `<button class="btn btn-g btn-sm" onclick="suspendOrg('${o.id}')">${o.status==='موقوف'?'تفعيل':'وقف'}</button>`;
+        : `<div style="display:flex;gap:5px;flex-wrap:wrap">
+             <button class="btn btn-g btn-sm" onclick="suspendOrg('${o.id}')">${o.status==='موقوف'?'تفعيل':'وقف'}</button>
+             <button class="btn btn-sm" title="إعادة تعيين كلمة المرور"
+               style="background:rgba(200,148,31,.12);color:#a07000;border-radius:10px;padding:7px 10px;font-size:.78rem;font-weight:700"
+               onclick="adminResetOrgPwd('${o.id}','${esc(o.email)}','${esc(o.name)}')">🔑 إعادة تعيين</button>
+           </div>`;
       return `<tr>
         <td><strong>${esc(o.name)}</strong><div style="font-size:.72rem;color:var(--muted)">${esc(o.id)}</div></td>
         <td style="font-size:.8rem">${esc(o.type)}</td>
@@ -606,6 +623,42 @@ function suspendOrg(id) {
   saveOrgs(orgs);
   renderOrgsList();
   toast(`تم ${org.status === 'موقوف' ? 'وقف' : 'تفعيل'} الجهة`, 't-inf');
+}
+
+/* ── إعادة تعيين كلمة المرور (أدمن) ── */
+function _genTempPwd() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789@#$!';
+  const bytes = crypto.getRandomValues(new Uint8Array(12));
+  return Array.from(bytes).map(b => chars[b % chars.length]).join('');
+}
+
+function _showResetModal(name, email, pwd) {
+  document.getElementById('resetPwdName').textContent  = name;
+  document.getElementById('resetPwdEmail').value       = email;
+  document.getElementById('resetPwdVal').value         = pwd;
+  document.getElementById('resetPwdOv').classList.add('open');
+}
+
+function _copyField(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  navigator.clipboard.writeText(el.value).then(() => toast('تم النسخ ✓', 't-ok', 2000));
+}
+
+async function adminResetConsPwd(empId, email, name) {
+  if (!empId) { toast('لا يوجد رقم منسوب لهذا الملف', 't-inf'); return; }
+  if (!confirm(`هل تريد إعادة تعيين كلمة مرور المنسوب:\n${name}؟`)) return;
+  const tmp = _genTempPwd();
+  await saveConsPwdSecure(empId, tmp);
+  _showResetModal(name, email, tmp);
+}
+
+async function adminResetOrgPwd(orgId, email, name) {
+  if (!orgId) return;
+  if (!confirm(`هل تريد إعادة تعيين كلمة مرور الجهة:\n${name}؟`)) return;
+  const tmp = _genTempPwd();
+  await saveOrgPwdSecure(orgId, tmp);
+  _showResetModal(name, email, tmp);
 }
 
 /* ── قوالب العقود ── */
