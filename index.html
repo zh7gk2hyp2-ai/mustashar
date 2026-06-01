@@ -23,8 +23,9 @@
       <a onclick="go('search')"   id="nl-search">البحث عن مستشار</a>
       <a onclick="go('register')" id="nl-register">تسجيل المنسوب</a>
       <a onclick="go('about')"    id="nl-about">عن المنصة</a>
-      <a onclick="go('dashboard')" id="nl-dashboard" style="display:none">لوحة التحكم</a>
-      <a onclick="go('portal')"   id="nl-portal"    style="display:none">بوابة المنسوب</a>
+      <a onclick="go('dashboard')"  id="nl-dashboard"  style="display:none">لوحة التحكم</a>
+      <a onclick="go('portal')"    id="nl-portal"     style="display:none">بوابة المنسوب</a>
+      <a onclick="go('orgportal')" id="nl-orgportal"  style="display:none">بوابة الجهة</a>
     </div>
     <div class="nav-end">
       <button class="btn btn-g btn-sm" id="navLoginBtn" onclick="openLoginModal()">تسجيل الدخول</button>
@@ -37,8 +38,9 @@
     <a onclick="go('search');toggleMob()">البحث</a>
     <a onclick="go('register');toggleMob()">تسجيل</a>
     <a onclick="go('about');toggleMob()">عن المنصة</a>
-    <a onclick="go('dashboard');toggleMob()" id="mob-dashboard" style="display:none">لوحة التحكم</a>
-    <a onclick="go('portal');toggleMob()"    id="mob-portal"    style="display:none">بوابة المنسوب</a>
+    <a onclick="go('dashboard');toggleMob()"  id="mob-dashboard"  style="display:none">لوحة التحكم</a>
+    <a onclick="go('portal');toggleMob()"    id="mob-portal"     style="display:none">بوابة المنسوب</a>
+    <a onclick="go('orgportal');toggleMob()" id="mob-orgportal"  style="display:none">بوابة الجهة</a>
     <a onclick="openLoginModal();toggleMob()" id="mob-login">تسجيل الدخول</a>
   </div>
 </nav>
@@ -172,7 +174,7 @@
         <p>منصة رقمية لحصر وتسويق خبرات منسوبي جامعة الطائف، تحت إشراف مركز البحوث والاستشارات.</p>
       </div>
       <div class="fc"><h4>المنصة</h4><a onclick="go('search')">البحث عن مستشار</a><a onclick="go('register')">تسجيل المنسوب</a><a onclick="go('about')">عن المنصة</a><a href="#">سياسة الخصوصية</a></div>
-      <div class="fc"><h4>للجهات</h4><a onclick="go('search')">استعراض الخبراء</a><a onclick="go('search')">طلب تعاقد</a><a href="#">دليل الاستخدام</a></div>
+      <div class="fc"><h4>للجهات</h4><a onclick="go('search')">استعراض الخبراء</a><a onclick="openLoginModal('org')" style="cursor:pointer">بوابة الجهات</a><a href="docs/entity-guide.html" target="_blank">دليل الاستخدام</a></div>
       <div class="fc"><h4>تواصل معنا</h4><p>مركز البحوث والاستشارات<br>جامعة الطائف – الحوية<br>📞 0127270020<br>📧 turcc@tu.edu.sa</p></div>
     </div>
     <div class="fb"><span>© 2025 جامعة الطائف – جميع الحقوق محفوظة</span><span>🇸🇦 رؤية 2030</span></div>
@@ -930,10 +932,11 @@
       <div class="pu-id" id="portalIdSide"></div>
     </div>
     <div class="psec">
-      <a onclick="showPortalPanel('overview')" id="pnav-overview" class="on">📊 نظرة عامة</a>
-      <a onclick="showPortalPanel('edit')"     id="pnav-edit">✏️ تعديل ملفي</a>
-      <a onclick="showPortalPanel('chpass')"   id="pnav-chpass">🔑 تغيير كلمة المرور</a>
-      <a onclick="go('search')"               id="pnav-search">🔍 استعراض المستشارين</a>
+      <a onclick="showPortalPanel('overview')"  id="pnav-overview" class="on">📊 نظرة عامة</a>
+      <a onclick="showPortalPanel('incoming')"  id="pnav-incoming">📬 الطلبات الواردة<span id="incoming-badge" style="color:var(--gold);font-weight:900"></span></a>
+      <a onclick="showPortalPanel('edit')"      id="pnav-edit">✏️ تعديل ملفي</a>
+      <a onclick="showPortalPanel('chpass')"    id="pnav-chpass">🔑 تغيير كلمة المرور</a>
+      <a onclick="go('search')"                id="pnav-search">🔍 استعراض المستشارين</a>
     </div>
   </div>
   <div>
@@ -951,6 +954,14 @@
         <h3 style="border:none;font-size:1rem;color:var(--navy)">ملفك الاحترافي</h3>
         <p style="font-size:.84rem;color:var(--txt2);margin:10px 0 16px">حدّث بياناتك وسعرك وحالة توفرك لتحصل على مزيد من العقود</p>
         <button class="btn btn-p" onclick="showPortalPanel('edit')">تعديل الملف ←</button>
+      </div>
+    </div>
+    <!-- Incoming Contracts -->
+    <div class="ppanel" id="pp-incoming">
+      <div class="pp-card">
+        <h3>📬 الطلبات الواردة</h3>
+        <p style="font-size:.8rem;color:var(--muted);margin-bottom:16px">الطلبات المُسندة إليك من مركز البحوث — يمكنك القبول أو الرفض مع ذكر السبب.</p>
+        <div id="pp-incoming-list"></div>
       </div>
     </div>
     <!-- Edit Profile -->
@@ -1015,6 +1026,156 @@
 </div></div>
 </div>
 
+<!-- ════════════════════════════════════════
+     PAGE: ORG PORTAL — بوابة الجهات
+════════════════════════════════════════ -->
+<div class="page" id="pg-orgportal">
+<div class="portal-head">
+  <div class="w" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+    <div>
+      <p style="font-size:.8rem;color:rgba(255,255,255,.6);margin-bottom:4px">مرحباً بكم،</p>
+      <h1 id="orgPortalName" style="font-size:1.4rem;margin-bottom:2px">الجهة</h1>
+      <p style="color:rgba(255,255,255,.6);font-size:.82rem">المسؤول: <span id="orgPortalContact"></span></p>
+    </div>
+    <button class="btn btn-g btn-sm" style="color:#fff;border-color:rgba(255,255,255,.3)" onclick="orgLogout()">🚪 خروج</button>
+  </div>
+</div>
+<div class="w"><div class="portal-layout">
+  <!-- Sidebar -->
+  <div class="pside">
+    <div class="puser">
+      <div class="pu-av" style="background:var(--blue)">ج</div>
+      <div class="pu-name" id="orgPortalNameSide">الجهة</div>
+    </div>
+    <div class="opsec psec">
+      <a onclick="showOrgPanel('overview')"  id="opnav-overview" class="on">📋 طلباتي</a>
+      <a onclick="showOrgPanel('newreq')"    id="opnav-newreq">➕ طلب جديد</a>
+      <a onclick="showOrgPanel('rate')"      id="opnav-rate">⭐ تقييم خدمة</a>
+      <a onclick="showOrgPanel('chpass')"    id="opnav-chpass">🔑 تغيير كلمة المرور</a>
+      <a onclick="go('search')">🔍 استعراض المستشارين</a>
+    </div>
+  </div>
+  <!-- Panels -->
+  <div>
+    <!-- Overview -->
+    <div class="ppanel opanel act" id="op-overview">
+      <div class="stats4" id="op-stats"></div>
+      <div class="pp-card">
+        <h3>📋 طلبات التعاقد</h3>
+        <div style="overflow:auto">
+          <table class="tbl" id="op-contracts-tbl"></table>
+        </div>
+        <div style="margin-top:16px;text-align:center">
+          <button class="btn btn-p" onclick="showOrgPanel('newreq')">➕ إرسال طلب جديد ←</button>
+        </div>
+      </div>
+    </div>
+    <!-- New Request -->
+    <div class="ppanel opanel" id="op-newreq">
+      <div class="pp-card">
+        <h3>➕ طلب تعاقد جديد</h3>
+        <p style="font-size:.8rem;color:var(--muted);margin-bottom:16px">اختر المستشار المناسب أو اتركه فارغاً ليقترح المركز الأنسب.</p>
+        <div class="fi">
+          <label>المستشار المطلوب</label>
+          <select id="opreq-consultant"></select>
+        </div>
+        <div class="fi">
+          <label>نوع الخدمة <span class="rq">*</span></label>
+          <select id="opreq-service">
+            <option value="">اختر نوع الخدمة</option>
+            <option>استشارة إدارية</option>
+            <option>برنامج تدريبي</option>
+            <option>بحث وتقييم</option>
+            <option>دراسة جدوى</option>
+            <option>استشارة قانونية</option>
+            <option>استشارة مالية</option>
+            <option>استشارة تقنية</option>
+            <option>خدمة أخرى</option>
+          </select>
+        </div>
+        <div class="fi">
+          <label>وصف المهمة <span class="rq">*</span></label>
+          <textarea id="opreq-desc" rows="4" placeholder="صف احتياجك بالتفصيل: الهدف، المخرجات المطلوبة، الجمهور المستهدف..."></textarea>
+        </div>
+        <div class="two">
+          <div class="fi">
+            <label>مدة التنفيذ</label>
+            <input id="opreq-duration" placeholder="مثال: 3 أشهر">
+          </div>
+          <div class="fi">
+            <label>نمط التنفيذ</label>
+            <select id="opreq-mode">
+              <option value="حضوري">حضوري</option>
+              <option value="عن بُعد">عن بُعد</option>
+              <option value="مختلط">مختلط</option>
+            </select>
+          </div>
+        </div>
+        <div id="opreq-err" style="color:var(--red);font-size:.8rem;margin-bottom:12px;display:none;padding:8px 12px;background:rgba(192,57,43,.07);border-radius:8px"></div>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-p" onclick="submitOrgRequest()">إرسال الطلب ←</button>
+          <button class="btn btn-g" onclick="showOrgPanel('overview')">إلغاء</button>
+        </div>
+      </div>
+    </div>
+    <!-- Rate -->
+    <div class="ppanel opanel" id="op-rate">
+      <div class="pp-card">
+        <h3>⭐ تقييم الخدمة</h3>
+        <p style="font-size:.8rem;color:var(--muted);margin-bottom:16px">يمكنك تقييم الخدمات المكتملة من صفحة طلباتي. اختر الطلب واضغط "قيّم".</p>
+        <div id="op-rate-info" style="font-weight:700;color:var(--navy);margin-bottom:20px;font-size:.9rem"></div>
+        <!-- Star selector -->
+        <div style="text-align:center;margin-bottom:20px">
+          <div style="font-size:.85rem;color:var(--txt2);margin-bottom:12px">اختر عدد النجوم</div>
+          <div style="display:flex;justify-content:center;gap:10px">
+            <span id="orgstar-1" onclick="setStarRating(1)" style="cursor:pointer;font-size:1.8rem;color:var(--muted)">★</span>
+            <span id="orgstar-2" onclick="setStarRating(2)" style="cursor:pointer;font-size:1.8rem;color:var(--muted)">★</span>
+            <span id="orgstar-3" onclick="setStarRating(3)" style="cursor:pointer;font-size:1.8rem;color:var(--muted)">★</span>
+            <span id="orgstar-4" onclick="setStarRating(4)" style="cursor:pointer;font-size:1.8rem;color:var(--muted)">★</span>
+            <span id="orgstar-5" onclick="setStarRating(5)" style="cursor:pointer;font-size:1.8rem;color:var(--muted)">★</span>
+          </div>
+        </div>
+        <div class="fi">
+          <label>تعليق إضافي (اختياري)</label>
+          <textarea id="op-rating-note" rows="3" placeholder="ما الذي أعجبك؟ ما الذي يمكن تحسينه؟"></textarea>
+        </div>
+        <div id="op-rating-err" style="color:var(--red);font-size:.8rem;margin-bottom:12px;display:none;padding:8px 12px;background:rgba(192,57,43,.07);border-radius:8px"></div>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-p" onclick="submitOrgRating()">إرسال التقييم ←</button>
+          <button class="btn btn-g" onclick="showOrgPanel('overview')">إلغاء</button>
+        </div>
+      </div>
+    </div>
+    <!-- Change Password -->
+    <div class="ppanel opanel" id="op-chpass">
+      <div class="pp-card">
+        <h3>🔑 تغيير كلمة المرور</h3>
+        <p style="font-size:.82rem;color:var(--txt2);margin-bottom:18px">أدخل كلمة المرور الحالية ثم الجديدة التي تستوفي متطلبات الأمان.</p>
+        <div class="fi"><label>كلمة المرور الحالية <span class="rq">*</span></label><input id="op-curpass" type="password"></div>
+        <div class="fi"><label>كلمة المرور الجديدة <span class="rq">*</span></label>
+          <input id="op-newpass" type="password" oninput="checkPwdStrength(this.value,'op')">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 14px;font-size:.72rem;padding:10px 14px;background:var(--surf2);border-radius:8px;margin-bottom:14px">
+          <span id="op-len"   style="color:var(--muted)">☐ 8 أحرف على الأقل</span>
+          <span id="op-upper" style="color:var(--muted)">☐ حرف كبير (A-Z)</span>
+          <span id="op-lower" style="color:var(--muted)">☐ حرف صغير (a-z)</span>
+          <span id="op-num"   style="color:var(--muted)">☐ رقم (0-9)</span>
+          <span id="op-sym"   style="color:var(--muted)">☐ رمز خاص (!@#$...)</span>
+        </div>
+        <div class="fi"><label>تأكيد كلمة المرور <span class="rq">*</span></label>
+          <input id="op-confpass" type="password" onkeydown="if(event.key==='Enter')orgPortalChangePassword()">
+        </div>
+        <div id="op-pwd-err" style="color:var(--red);font-size:.8rem;margin-bottom:12px;display:none;padding:8px 12px;background:rgba(192,57,43,.07);border-radius:8px"></div>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-p" onclick="orgPortalChangePassword()">حفظ كلمة المرور ←</button>
+          <button class="btn btn-g" onclick="showOrgPanel('overview')">إلغاء</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div></div>
+</div>
+
 <!-- ════════ LOGIN MODAL ════════ -->
 <div class="ov" id="loginOv" onclick="if(this===event.target)this.classList.remove('open')">
   <div class="modal" style="max-width:440px">
@@ -1027,9 +1188,10 @@
       <button class="m-close" onclick="document.getElementById('loginOv').classList.remove('open')">✕</button>
     </div>
     <!-- Tabs -->
-    <div class="tab-row">
-      <button class="tab-btn on" id="tab-admin" onclick="switchLoginTab('admin')">🏛️ دخول المشرف</button>
-      <button class="tab-btn" id="tab-consultant" onclick="switchLoginTab('consultant')">👤 بوابة المنسوب</button>
+    <div class="tab-row" style="display:grid;grid-template-columns:1fr 1fr 1fr">
+      <button class="tab-btn on" id="tab-admin"      onclick="switchLoginTab('admin')">🏛️ المشرف</button>
+      <button class="tab-btn"    id="tab-consultant"  onclick="switchLoginTab('consultant')">👤 المنسوب</button>
+      <button class="tab-btn"    id="tab-org"         onclick="switchLoginTab('org')">🏢 الجهة</button>
     </div>
     <!-- Admin tab -->
     <div class="tab-pane on" id="tabp-admin">
@@ -1121,6 +1283,97 @@
       </div>
 
     </div>
+
+    <!-- Org tab -->
+    <div class="tab-pane" id="tabp-org">
+
+      <!-- Org step: creds (default) -->
+      <div id="org-step-creds">
+        <div class="fi">
+          <label>البريد الإلكتروني للجهة <span class="rq">*</span></label>
+          <input id="loginOrgEmail" type="email" autocomplete="email"
+            onkeydown="if(event.key==='Enter')document.getElementById('loginOrgPass').focus()">
+        </div>
+        <div class="fi">
+          <label>كلمة المرور <span class="rq">*</span></label>
+          <input id="loginOrgPass" type="password" autocomplete="current-password"
+            onkeydown="if(event.key==='Enter')doOrgLogin()">
+        </div>
+        <div style="font-size:.72rem;color:var(--muted);margin-bottom:12px;padding:8px 12px;background:var(--surf2);border-radius:8px;line-height:1.7">
+          💡 كلمة المرور الافتراضية هي <strong>بريدك الإلكتروني</strong> — ستُطلب منك تغييرها عند أول دخول
+        </div>
+        <div id="loginOrgErr" style="color:var(--red);font-size:.8rem;margin-bottom:12px;display:none;padding:8px 12px;background:rgba(192,57,43,.07);border-radius:8px"></div>
+        <button id="orgLoginBtn" class="btn btn-p" style="width:100%" onclick="doOrgLogin()">دخول ←</button>
+        <div style="text-align:center;margin-top:12px;font-size:.78rem;color:var(--muted)">
+          جهة جديدة؟ <a onclick="showOrgLoginStep('reg')" style="color:var(--blue);cursor:pointer;font-weight:700">سجّل جهتك الآن</a>
+        </div>
+      </div>
+
+      <!-- Org step: registration -->
+      <div id="org-step-reg" style="display:none">
+        <div style="padding:10px 14px;background:rgba(0,102,51,.06);border-radius:10px;margin-bottom:16px;font-size:.82rem;color:var(--navy);line-height:1.7">
+          🏢 تسجيل جهة جديدة — سيُرسل إليك رمز تحقق للدخول
+        </div>
+        <div class="fi"><label>اسم الجهة <span class="rq">*</span></label><input id="oreg-name" placeholder="شركة / وزارة / جهة حكومية"></div>
+        <div class="fi"><label>نوع الجهة <span class="rq">*</span></label>
+          <select id="oreg-type"><option value="">اختر</option><option>حكومية</option><option>خاصة</option><option>أكاديمية</option><option>غير ربحية</option></select>
+        </div>
+        <div class="fi"><label>البريد الإلكتروني <span class="rq">*</span></label><input id="oreg-email" type="email" placeholder="info@org.gov.sa"></div>
+        <div class="fi"><label>رقم الجوال</label><input id="oreg-phone" placeholder="05XXXXXXXX"></div>
+        <div class="fi"><label>اسم المسؤول <span class="rq">*</span></label><input id="oreg-contact" placeholder="الاسم الكامل"></div>
+        <div id="oreg-err" style="color:var(--red);font-size:.8rem;margin-bottom:12px;display:none;padding:8px 12px;background:rgba(192,57,43,.07);border-radius:8px"></div>
+        <button class="btn btn-p" style="width:100%;margin-bottom:10px" onclick="submitOrgReg()">تسجيل الجهة ←</button>
+        <div style="text-align:center;font-size:.78rem">
+          <a onclick="showOrgLoginStep('creds')" style="cursor:pointer;color:var(--blue)">← رجوع للدخول</a>
+        </div>
+      </div>
+
+      <!-- Org step: OTP -->
+      <div id="org-step-otp" style="display:none">
+        <div style="text-align:center;margin-bottom:20px">
+          <div style="font-size:2.2rem;margin-bottom:8px">📧</div>
+          <div style="font-weight:800;color:var(--navy);margin-bottom:6px">تحقق من بريدك</div>
+          <div id="orgOtpHint" style="font-size:.82rem;color:var(--txt2)"></div>
+        </div>
+        <div class="fi">
+          <label style="text-align:center;display:block">رمز التحقق (6 أرقام)</label>
+          <input id="loginOrgOtp" maxlength="6" placeholder="——————"
+            style="text-align:center;font-size:1.5rem;letter-spacing:.4rem;font-weight:700"
+            onkeydown="if(event.key==='Enter')verifyOrgOtp()">
+        </div>
+        <div id="loginOrgOtpErr" style="color:var(--red);font-size:.8rem;margin-bottom:12px;display:none;padding:8px 12px;background:rgba(192,57,43,.07);border-radius:8px"></div>
+        <button class="btn btn-p" style="width:100%;margin-bottom:10px" onclick="verifyOrgOtp()">تأكيد الرمز ←</button>
+        <button class="btn btn-g" style="width:100%;font-size:.82rem" onclick="resendOrgOtp()">🔄 إعادة إرسال الرمز</button>
+        <div style="text-align:center;margin-top:14px;font-size:.75rem">
+          <a onclick="showOrgLoginStep('creds')" style="cursor:pointer;color:var(--blue)">← رجوع</a>
+        </div>
+      </div>
+
+      <!-- Org step: first-time password change -->
+      <div id="org-step-chpass" style="display:none">
+        <div style="padding:12px 14px;background:rgba(240,180,0,.08);border:1px solid rgba(240,180,0,.3);border-radius:10px;margin-bottom:18px;font-size:.82rem;color:var(--navy);line-height:1.7">
+          ⚠️ <strong>أول تسجيل دخول</strong> — يجب تغيير كلمة المرور الافتراضية.
+        </div>
+        <div class="fi">
+          <label>كلمة المرور الجديدة <span class="rq">*</span></label>
+          <input id="loginOrgNewPass" type="password" oninput="checkPwdStrength(this.value,'op-lg')">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:3px 12px;font-size:.7rem;padding:9px 12px;background:var(--surf2);border-radius:8px;margin-bottom:10px">
+          <span id="op-lg-len"   style="color:var(--muted)">☐ 8 أحرف على الأقل</span>
+          <span id="op-lg-upper" style="color:var(--muted)">☐ حرف كبير (A-Z)</span>
+          <span id="op-lg-lower" style="color:var(--muted)">☐ حرف صغير (a-z)</span>
+          <span id="op-lg-num"   style="color:var(--muted)">☐ رقم (0-9)</span>
+          <span id="op-lg-sym"   style="color:var(--muted)">☐ رمز خاص (!@#$...)</span>
+        </div>
+        <div class="fi">
+          <label>تأكيد كلمة المرور <span class="rq">*</span></label>
+          <input id="loginOrgConfPass" type="password" onkeydown="if(event.key==='Enter')changeOrgPassword()">
+        </div>
+        <div id="loginOrgChPassErr" style="color:var(--red);font-size:.8rem;margin-bottom:12px;display:none;padding:8px 12px;background:rgba(192,57,43,.07);border-radius:8px"></div>
+        <button class="btn btn-p" style="width:100%" onclick="changeOrgPassword()">حفظ وتسجيل الدخول ←</button>
+      </div>
+
+    </div>
   </div>
 </div>
 
@@ -1141,12 +1394,29 @@
   </div>
 </div>
 
+<!-- ════════ ASSIGN MODAL ════════ -->
+<div class="ov" id="assignOv" onclick="if(this===event.target)this.classList.remove('open')">
+  <div class="modal" style="max-width:420px">
+    <div class="m-head">
+      <h3>👤 إسناد طلب لمنسوب</h3>
+      <button class="m-close" onclick="document.getElementById('assignOv').classList.remove('open')">✕</button>
+    </div>
+    <p style="font-size:.82rem;color:var(--txt2);margin-bottom:16px">اختر المنسوب المناسب — سيصله إشعار في بوابته لقبول أو رفض الطلب.</p>
+    <div class="fi">
+      <label>المنسوب <span class="rq">*</span></label>
+      <select id="assignConsSelect" style="width:100%"></select>
+    </div>
+    <button class="btn btn-p" style="width:100%;margin-top:8px" onclick="doAssignContract()">إسناد الطلب ←</button>
+  </div>
+</div>
+
 <!-- ════════ Scripts ════════ -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="js/api.js"></script>
 <script src="js/data.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/portal.js"></script>
+<script src="js/org.js"></script>
 <script src="js/ui.js"></script>
 <script src="js/search.js"></script>
 <script src="js/register.js"></script>

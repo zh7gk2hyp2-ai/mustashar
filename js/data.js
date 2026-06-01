@@ -90,6 +90,65 @@ const STATE = {
   isSL(id) { const sid = String(id); return this.shortlist.some(x => String(x) === sid); }
 };
 
+/* ══ Contracts helpers ═══════════════════ */
+function getContracts() {
+  return JSON.parse(localStorage.getItem('mu_ct') || '[]');
+}
+function saveContracts(cts) {
+  localStorage.setItem('mu_ct', JSON.stringify(cts));
+  STATE.contracts = cts;
+}
+function addContract(data) {
+  const cts = getContracts();
+  const id  = 'CT-' + Date.now().toString(36).slice(-5).toUpperCase();
+  const entry = {
+    id,
+    consultantId:       data.consultantId       !== undefined ? data.consultantId : null,
+    consultant:         data.consultant         || '',
+    orgId:              data.orgId              || null,
+    org:                data.org                || '',
+    orgEmail:           data.orgEmail           || '',
+    contact:            data.contact            || '',
+    service:            data.service            || '',
+    desc:               data.desc               || '',
+    mode:               data.mode               || 'حضوري',
+    duration:           data.duration           || '',
+    fee:                data.fee                || 0,
+    status:             'قيد الدراسة',
+    consultantDecision: null,
+    consultantNote:     '',
+    adminDecision:      null,
+    orgRating:          null,
+    orgRatingNote:      '',
+    date: new Date().toLocaleDateString('ar-SA')
+  };
+  cts.push(entry);
+  saveContracts(cts);
+  return entry;
+}
+function updateContract(id, patch) {
+  const cts = getContracts();
+  const i   = cts.findIndex(c => String(c.id) === String(id));
+  if (i > -1) { Object.assign(cts[i], patch); saveContracts(cts); return cts[i]; }
+  return null;
+}
+
+/* ══ Orgs helpers ═════════════════════════ */
+function getOrgs() {
+  return JSON.parse(localStorage.getItem('mu_orgs') || '[]');
+}
+function saveOrgs(orgs) {
+  localStorage.setItem('mu_orgs', JSON.stringify(orgs));
+}
+function _getOrgPwd(orgId) {
+  try { return JSON.parse(localStorage.getItem('mu_org_pwd') || '{}')[orgId] || null; } catch { return null; }
+}
+function _saveOrgPwd(orgId, pass) {
+  const s = JSON.parse(localStorage.getItem('mu_org_pwd') || '{}');
+  s[orgId] = pass;
+  localStorage.setItem('mu_org_pwd', JSON.stringify(s));
+}
+
 /* ══ Registrations helpers ═══════════════ */
 function getRegs() {
   return JSON.parse(localStorage.getItem('mu_regs') || '[]');

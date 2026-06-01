@@ -172,16 +172,18 @@ function renderKPIs() {
 }
 
 function renderDash() {
-  const regs = getRegs();
-  const ct   = STATE.contracts;
+  const regs    = getRegs();
+  const ct      = getContracts();
+  const allCons = getAllConsultants();
 
   /* ── الإحصاءات العلوية ── */
-  const pendingCount = regs.filter(r => r.status === 'قيد المراجعة').length;
+  const pendingCount  = regs.filter(r => r.status === 'قيد المراجعة').length;
+  const approvedCount = allCons.filter(c => c.verified).length;
   document.getElementById('dashStats').innerHTML = `
-    <div class="stat-c"><div class="si">👤</div><div class="sv">${DATA.length + regs.length}</div><div class="sl">إجمالي المسجلين</div></div>
+    <div class="stat-c"><div class="si">👤</div><div class="sv">${allCons.length}</div><div class="sl">إجمالي المسجلين</div></div>
     <div class="stat-c"><div class="si">🕐</div><div class="sv">${pendingCount}</div><div class="sl">طلبات قيد المراجعة</div></div>
     <div class="stat-c"><div class="si">📄</div><div class="sv">${ct.length}</div><div class="sl">طلبات تعاقد</div></div>
-    <div class="stat-c"><div class="si">✅</div><div class="sv">${DATA.length}</div><div class="sl">ملف معتمد</div></div>`;
+    <div class="stat-c"><div class="si">✅</div><div class="sv">${approvedCount}</div><div class="sl">ملف معتمد</div></div>`;
 
   /* ── آخر التسجيلات (نظرة عامة) ── */
   document.getElementById('dashRegs').innerHTML =
@@ -331,30 +333,69 @@ function filterDash() {
 
 /* ── قائمة طلبات التعاقد ── */
 function renderContractsList() {
-  const ct = STATE.contracts;
+  const ct  = getContracts();
+  const all = getAllConsultants();
   document.getElementById('dashContractsList').innerHTML = ct.length
-    ? ct.slice().reverse().map(c =>
-        `<div class="dc-card">
+    ? ct.slice().reverse().map(c => {
+        const statusCls = c.status==='مكتمل'?'tag-g':c.status==='مرفوض'||c.status==='مرفوض من المنسوب'?'tag-r':c.status==='تحت التنفيذ'||c.status==='مقبول من المنسوب'?'tag-b':'tag-gold';
+        const ratingStr = c.orgRating ? ` | تقييم الجهة: ${'★'.repeat(c.orgRating)}${'☆'.repeat(5-c.orgRating)} (${c.orgRating}/5)` : '';
+        return `<div class="dc-card" data-cid="${c.id}">
           <div class="dc-head">
             <div class="dc-title">📄 ${c.service} – ${c.org}</div>
-            <span class="dc-status tag tag-b">${c.status}</span>
+            <span class="dc-status tag ${statusCls}">${c.status}</span>
           </div>
           <div class="dc-info">
-            المستشار: ${c.consultant} | المسؤول: ${c.contact} | النمط: ${c.mode || '—'} | التاريخ: ${c.date}
+            المستشار: <strong>${c.consultant || 'غير محدد'}</strong> | المسؤول: ${c.contact||'—'} | النمط: ${c.mode||'—'} | التاريخ: ${c.date}${ratingStr}
           </div>
-          <div style="display:flex;gap:8px;margin-top:12px">
-            <button class="btn btn-g btn-sm"   onclick="updateContractStatus(this,'مقبول')">قبول</button>
-            <button class="btn btn-sm" style="background:rgba(192,57,43,.08);color:var(--red);border-radius:10px;padding:7px 12px;font-size:.8rem;font-weight:700" onclick="updateContractStatus(this,'مرفوض')">رفض</button>
-            <button class="btn btn-p btn-sm"   onclick="updateContractStatus(this,'تحت التنفيذ')">تحت التنفيذ</button>
-            <button class="btn btn-g btn-sm"   onclick="updateContractStatus(this,'مكتمل')">مكتمل</button>
+          ${c.desc ? `<div style="font-size:.78rem;color:var(--txt2);margin-top:6px;padding:8px 12px;background:var(--surf2);border-radius:8px">${c.desc}</div>` : ''}
+          <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+            <button class="btn btn-g btn-sm"   onclick="updateContractStatus(this,'مقبول')">✅ قبول</button>
+            <button class="btn btn-sm" style="background:rgba(192,57,43,.08);color:var(--red);border-radius:10px;padding:7px 12px;font-size:.8rem;font-weight:700" onclick="updateContractStatus(this,'مرفوض')">❌ رفض</button>
+            <button class="btn btn-p btn-sm"   onclick="updateContractStatus(this,'تحت التنفيذ')">⚙️ تنفيذ</button>
+            <button class="btn btn-g btn-sm"   onclick="updateContractStatus(this,'مكتمل')">🏆 مكتمل</button>
+            <button class="btn btn-sm" style="background:rgba(0,102,51,.08);color:var(--blue);border-radius:10px;padding:7px 12px;font-size:.8rem;font-weight:700"
+              onclick="showAssignModal('${c.id}')">👤 إسناد للمنسوب</button>
           </div>
-        </div>`).join('')
+        </div>`;
+      }).join('')
     : '<div class="nores"><div class="ni">📄</div><h3>لا توجد طلبات</h3><p>ستظهر طلبات التعاقد هنا</p></div>';
 }
 
 function updateContractStatus(btn, status) {
-  btn.closest('.dc-card').querySelector('.dc-status').textContent = status;
+  const card = btn.closest('.dc-card');
+  const id   = card.dataset.cid;
+  card.querySelector('.dc-status').textContent = status;
+  const statusCls = status==='مكتمل'?'tag-g':status==='مرفوض'||status==='مرفوض من المنسوب'?'tag-r':status==='تحت التنفيذ'||status==='مقبول من المنسوب'?'tag-b':'tag-gold';
+  card.querySelector('.dc-status').className = `dc-status tag ${statusCls}`;
+  if (id) updateContract(id, { status, adminDecision: status });
   toast('تم تحديث الحالة إلى: ' + status, 't-ok');
+}
+
+/* ── إسناد طلب لمنسوب ── */
+let _assignCtId = null;
+function showAssignModal(ctId) {
+  _assignCtId = ctId;
+  const all = getAllConsultants().filter(c => c.available !== false);
+  const sel = document.getElementById('assignConsSelect');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">— اختر منسوباً —</option>' +
+    all.map(c => `<option value="${c.id}">${c.name} | ${c.college}</option>`).join('');
+  document.getElementById('assignOv').classList.add('open');
+}
+function doAssignContract() {
+  const sel = document.getElementById('assignConsSelect');
+  const consId = sel?.value;
+  if (!consId) { toast('يرجى اختيار منسوب', 't-err'); return; }
+  const all  = getAllConsultants();
+  const cons = all.find(c => String(c.id) === String(consId));
+  updateContract(_assignCtId, {
+    consultantId: cons?.id || consId,
+    consultant:   cons?.name || '',
+    status:       'مرسل للمنسوب'
+  });
+  document.getElementById('assignOv').classList.remove('open');
+  toast(`✅ تم إسناد الطلب لـ ${cons?.name}`, 't-ok');
+  renderContractsList();
 }
 
 /* ── الرسوم البيانية Chart.js ── */

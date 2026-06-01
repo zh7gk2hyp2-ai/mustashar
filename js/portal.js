@@ -223,6 +223,13 @@ async function renderPortal() {
 
   showPortalPanel('overview');
   await loadPortalOverview();
+  /* update incoming badge count */
+  const pending = getContracts().filter(c =>
+    String(c.consultantId) === String(cons?.id) &&
+    (c.status === 'مرسل للمنسوب' || c.status === 'قيد الدراسة')
+  ).length;
+  const badge = document.getElementById('incoming-badge');
+  if (badge) badge.textContent = pending > 0 ? ` (${pending})` : '';
 }
 
 function showPortalPanel(id) {
@@ -230,6 +237,82 @@ function showPortalPanel(id) {
   document.getElementById('pp-' + id)?.classList.add('act');
   document.querySelectorAll('.psec a').forEach(a => a.classList.remove('on'));
   document.getElementById('pnav-' + id)?.classList.add('on');
+  if (id === 'incoming') loadPortalIncoming();
+}
+
+/* ── Incoming contracts for consultant ── */
+function loadPortalIncoming() {
+  const cons = getConsultantSession();
+  if (!cons) return;
+  const el  = document.getElementById('pp-incoming-list');
+  if (!el) return;
+
+  const pending = getContracts().filter(c =>
+    String(c.consultantId) === String(cons.id) &&
+    (c.status === 'مرسل للمنسوب' || c.status === 'قيد الدراسة')
+  );
+  const history = getContracts().filter(c =>
+    String(c.consultantId) === String(cons.id) &&
+    !['مرسل للمنسوب','قيد الدراسة'].includes(c.status)
+  );
+
+  const pHtml = pending.length
+    ? pending.map(c => `
+      <div class="pp-card" style="margin-bottom:14px;border-right:3px solid var(--gold)">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px">
+          <div>
+            <div style="font-weight:700;color:var(--navy);font-size:.95rem">📄 ${c.service}</div>
+            <div style="font-size:.8rem;color:var(--txt2);margin-top:4px">الجهة: <strong>${c.org}</strong> | التاريخ: ${c.date}</div>
+            ${c.desc ? `<div style="font-size:.82rem;color:var(--txt2);margin-top:6px;line-height:1.6;padding:8px 12px;background:var(--surf2);border-radius:8px">${c.desc}</div>` : ''}
+            <div style="font-size:.78rem;color:var(--muted);margin-top:6px">نمط التنفيذ: ${c.mode} | المدة: ${c.duration || 'غير محدد'}</div>
+          </div>
+          <span class="tag tag-gold">${c.status}</span>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
+          <button class="btn btn-p btn-sm" onclick="acceptIncomingContract('${c.id}')">✅ قبول الطلب</button>
+          <button class="btn btn-sm" style="background:rgba(192,57,43,.08);color:var(--red);border-radius:10px;padding:7px 12px;font-size:.8rem;font-weight:700"
+            onclick="rejectIncomingContract('${c.id}')">❌ رفض الطلب</button>
+        </div>
+      </div>`).join('')
+    : '<div style="text-align:center;padding:20px;color:var(--muted)">لا توجد طلبات واردة حالياً</div>';
+
+  const hHtml = history.length
+    ? `<h4 style="margin:20px 0 12px;color:var(--navy);font-size:.9rem">تاريخ الطلبات</h4>` +
+      history.slice().reverse().map(c => {
+        const cls = c.status==='مكتمل'?'tag-g':c.status==='مرفوض'||c.status==='مرفوض من المنسوب'?'tag-r':c.status==='تحت التنفيذ'?'tag-b':'tag-gold';
+        const earn = c.fee ? `<span style="color:var(--green);font-weight:700">${Math.round(c.fee*0.7).toLocaleString('ar-SA')} ر.س</span>` : '';
+        return `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--surf);border:1px solid var(--bdr);border-radius:10px;margin-bottom:8px;flex-wrap:wrap;gap:6px">
+          <div>
+            <span style="font-weight:600;font-size:.85rem">${c.service} — ${c.org}</span>
+            <div style="font-size:.75rem;color:var(--muted)">${c.date}</div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            ${earn}
+            <span class="tag ${cls}" style="font-size:.65rem">${c.status}</span>
+          </div>
+        </div>`;
+      }).join('')
+    : '';
+
+  el.innerHTML = pHtml + hHtml;
+
+  /* incoming count badge */
+  const badge = document.getElementById('incoming-badge');
+  if (badge) badge.textContent = pending.length > 0 ? ` (${pending.length})` : '';
+}
+
+function acceptIncomingContract(id) {
+  updateContract(id, { consultantDecision: 'مقبول', status: 'مقبول من المنسوب' });
+  toast('✅ تم قبول الطلب — بانتظار موافقة المركز', 't-ok', 4000);
+  loadPortalIncoming();
+  loadPortalOverview();
+}
+
+function rejectIncomingContract(id) {
+  const note = prompt('سبب الرفض (اختياري):') || '';
+  updateContract(id, { consultantDecision: 'مرفوض', consultantNote: note, status: 'مرفوض من المنسوب' });
+  toast('تم رفض الطلب', 't-inf');
+  loadPortalIncoming();
 }
 
 async function loadPortalOverview() {

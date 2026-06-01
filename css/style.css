@@ -540,6 +540,7 @@ input,select,textarea{font-family:inherit}
 .psec a:hover{background:var(--surf2);color:var(--blue)}
 .psec a.on{background:rgba(0,102,51,.1);color:var(--blue);font-weight:700}
 .ppanel{display:none}.ppanel.act{display:block}
+.opanel{display:none}.opanel.act{display:block}
 .pp-card{background:var(--surf);border:1px solid var(--bdr);border-radius:var(--rl);
   padding:24px;margin-bottom:18px}
 .pp-card h3{font-size:.92rem;color:var(--navy);margin-bottom:16px;

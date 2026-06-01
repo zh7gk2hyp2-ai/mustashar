@@ -4,12 +4,15 @@
 
 /* ── Routing ──────────────────────────── */
 function go(pg, extra) {
-  /* auth guards — exclusive roles, check BEFORE showing any page */
+  /* auth guards — exclusive roles */
   if (pg === 'dashboard') {
     if (!isLoggedIn() || isConsultantLoggedIn()) { openLoginModal('admin'); return; }
   }
   if (pg === 'portal') {
     if (!isConsultantLoggedIn() || isLoggedIn()) { openLoginModal('consultant'); return; }
+  }
+  if (pg === 'orgportal') {
+    if (!isOrgLoggedIn()) { openLoginModal('org'); return; }
   }
 
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -22,6 +25,7 @@ function go(pg, extra) {
   if (pg === 'profile' && extra)    renderProfile(extra);
   if (pg === 'dashboard')           renderDash();
   if (pg === 'portal')              renderPortal();
+  if (pg === 'orgportal')           renderOrgPortal();
   if (pg === 'about')               renderAbout();
   if (pg === 'home')                renderHome();
 }
@@ -229,20 +233,27 @@ function submitContract() {
   const o4 = document.getElementById('co4').value;
   const o5 = document.getElementById('co5').value.trim();
   if (!o1 || !o2 || !o3 || !o4 || !o5) { toast('يرجى تعبئة الحقول الإلزامية', 't-err'); return; }
-  STATE.contracts.push({
-    id: Date.now(),
-    consultant: STATE.currentProfile?.name || '—',
-    org: o1, contact: o2, email: o3, service: o4, desc: o5,
-    duration: document.getElementById('co6').value,
-    mode: document.getElementById('co7').value,
-    status: 'قيد الدراسة',
-    date: new Date().toLocaleDateString('ar-SA')
+
+  /* link org session if logged in */
+  const orgSess = isOrgLoggedIn() ? getOrgSession() : null;
+
+  const ct = addContract({
+    consultantId: STATE.currentProfile?.id     || null,
+    consultant:   STATE.currentProfile?.name   || '—',
+    orgId:        orgSess?.id                  || null,
+    org:          orgSess ? orgSess.name : o1,
+    orgEmail:     orgSess ? orgSess.email : o3,
+    contact:      orgSess ? orgSess.contact : o2,
+    service:      o4,
+    desc:         o5,
+    duration:     document.getElementById('co6').value,
+    mode:         document.getElementById('co7').value,
   });
-  STATE.save();
+
   document.getElementById('contractOv').classList.remove('open');
   ['co1','co2','co3','co5','co6'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('co4').selectedIndex = 0;
-  toast('✅ تم إرسال طلبك! سيتواصل معك المركز خلال يومي عمل', 't-ok', 5000);
+  toast(`✅ تم إرسال طلبك! رقم الطلب: ${ct.id} — سيتواصل معك المركز خلال يومي عمل`, 't-ok', 6000);
 }
 
 /* ── ABOUT ────────────────────────────── */

@@ -10,28 +10,25 @@ function isLoggedIn()           { return sessionStorage.getItem('mu_auth') === '
 function updateNav() {
   const adminIn = isLoggedIn();
   const consIn  = isConsultantLoggedIn();
+  const orgIn   = (typeof isOrgLoggedIn === 'function') && isOrgLoggedIn();
 
-  /* show/hide protected links */
-  ['dashboard'].forEach(id => {
-    document.getElementById('nl-' + id).style.display    = adminIn ? '' : 'none';
-    document.getElementById('mob-' + id).style.display   = adminIn ? '' : 'none';
-  });
-  ['portal'].forEach(id => {
-    document.getElementById('nl-' + id).style.display    = consIn  ? '' : 'none';
-    document.getElementById('mob-' + id).style.display   = consIn  ? '' : 'none';
-  });
+  const show = (id, vis) => {
+    document.getElementById('nl-' + id) && (document.getElementById('nl-' + id).style.display  = vis ? '' : 'none');
+    document.getElementById('mob-' + id) && (document.getElementById('mob-' + id).style.display = vis ? '' : 'none');
+  };
+
+  show('dashboard', adminIn);
+  show('portal',    consIn);
+  show('orgportal', orgIn);
 
   /* login / logout button */
-  const btn     = document.getElementById('navLoginBtn');
+  const btn      = document.getElementById('navLoginBtn');
   const mobLogin = document.getElementById('mob-login');
-  if (adminIn) {
+  const logoutFn = adminIn ? logout : consIn ? consultantLogout : orgIn && typeof orgLogout === 'function' ? orgLogout : null;
+  if (logoutFn) {
     btn.textContent = '🚪 خروج';
-    btn.onclick = logout;
-    if (mobLogin) { mobLogin.textContent = '🚪 خروج'; mobLogin.onclick = logout; }
-  } else if (consIn) {
-    btn.textContent = '🚪 خروج';
-    btn.onclick = consultantLogout;
-    if (mobLogin) { mobLogin.textContent = '🚪 خروج'; mobLogin.onclick = consultantLogout; }
+    btn.onclick = logoutFn;
+    if (mobLogin) { mobLogin.textContent = '🚪 خروج'; mobLogin.onclick = logoutFn; }
   } else {
     btn.textContent = 'تسجيل الدخول';
     btn.onclick = () => openLoginModal();
@@ -46,20 +43,26 @@ function openLoginModal(tab) {
   document.getElementById('loginPass').value = '';
   document.getElementById('loginErr').style.display = 'none';
   ['loginConsEmail','loginConsPass','loginConsOtp','loginConsNewPass','loginConsConfPass'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.value = '';
+    const el = document.getElementById(id); if (el) el.value = '';
   });
   ['loginConsErr','loginOtpErr','loginChPassErr'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.style.display = 'none';
+    const el = document.getElementById(id); if (el) el.style.display = 'none';
   });
   showConsStep('creds');
+  /* reset org tab */
+  ['loginOrgEmail','loginOrgPass','loginOrgOtp','loginOrgNewPass','loginOrgConfPass'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+  ['loginOrgErr','loginOrgOtpErr','loginOrgChPassErr','oregErr'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.style.display = 'none';
+  });
+  if (typeof showOrgLoginStep === 'function') showOrgLoginStep('creds');
   document.getElementById('loginOv').classList.add('open');
 }
 
 /* ── Tab switcher ──────────────────────── */
 function switchLoginTab(tab) {
-  ['admin','consultant'].forEach(t => {
+  ['admin','consultant','org'].forEach(t => {
     document.getElementById('tab-' + t)?.classList.toggle('on', t === tab);
     document.getElementById('tabp-' + t)?.classList.toggle('on', t === tab);
   });
