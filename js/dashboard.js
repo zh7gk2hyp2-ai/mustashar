@@ -89,92 +89,84 @@ function applyEmailTemplate(tpl, reg) {
 /* ── مؤشرات الأداء KPIs ── */
 function renderKPIs() {
   const regs      = getRegs();
-  const approved  = regs.filter(r => r.status === 'معتمد').length + DATA.length;
-  const totalRegs = DATA.length + regs.length;
-  const contracts = STATE.contracts.length;
-  const avgRating = DATA.reduce((s, c) => s + c.rating, 0) / DATA.length;
+  const ct        = STATE.contracts;
+  const all       = getAllConsultants();
+
+  const totalRegs    = all.length;
+  const approved     = all.filter(c => c.verified).length;
+  const pending      = regs.filter(r => r.status === 'قيد المراجعة').length;
+  const rejected     = regs.filter(r => r.status === 'مرفوض').length;
+  const available    = all.filter(c => c.available).length;
+  const totalCt      = ct.length;
+  const completedCt  = ct.filter(c => c.status === 'مكتمل').length;
+  const activeCt     = ct.filter(c => c.status === 'تحت التنفيذ').length;
+  const activeOrgs   = [...new Set(ct.map(c => c.org))].length;
+  const avgRating    = DATA.length ? DATA.reduce((s,c) => s + c.rating, 0) / DATA.length : 0;
+  const approvalRate = (approved + rejected) > 0
+    ? Math.round((approved / (approved + rejected)) * 100) : 0;
+  const completionRate = totalCt > 0 ? Math.round((completedCt / totalCt) * 100) : 0;
+
+  /* executive summary row */
+  const summaryHtml = `
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:24px">
+      ${[
+        { v: totalRegs,    l: 'إجمالي المنسوبين',   c: 'var(--blue)',  i: '👤' },
+        { v: approved,     l: 'ملف معتمد',          c: 'var(--green)', i: '✅' },
+        { v: totalCt,      l: 'طلب تعاقد',          c: 'var(--gold)',  i: '📄' },
+        { v: activeOrgs,   l: 'جهة مستفيدة',        c: '#087a45',      i: '🏢' },
+      ].map(x => `
+        <div style="background:var(--surf);border:1px solid var(--bdr);border-radius:var(--rl);padding:18px;text-align:center">
+          <div style="font-size:1.6rem;margin-bottom:4px">${x.i}</div>
+          <div style="font-size:2rem;font-weight:900;color:${x.c};line-height:1">${x.v}</div>
+          <div style="font-size:.74rem;color:var(--muted);margin-top:4px">${x.l}</div>
+        </div>`).join('')}
+    </div>`;
 
   const kpis = [
-    {
-      label:   'المنسوبون المسجلون',
-      icon:    '👤',
-      current: totalRegs,
-      target:  KPI_TARGETS.registeredConsultants,
-      unit:    'منسوب',
-      color:   'var(--blue)',
-    },
-    {
-      label:   'الملفات المعتمدة',
-      icon:    '✅',
-      current: approved,
-      target:  KPI_TARGETS.approvedProfiles,
-      unit:    'ملف',
-      color:   'var(--green)',
-    },
-    {
-      label:   'طلبات التعاقد (الكلي)',
-      icon:    '📄',
-      current: contracts,
-      target:  KPI_TARGETS.monthlyContracts,
-      unit:    'طلب',
-      color:   'var(--gold)',
-    },
-    {
-      label:   'متوسط التقييم',
-      icon:    '⭐',
-      current: +avgRating.toFixed(1),
-      target:  KPI_TARGETS.avgRating,
-      unit:    'من 5',
-      color:   '#f59e0b',
-      decimal: true,
-    },
-    {
-      label:   'هدف الجهات الشريكة',
-      icon:    '🏢',
-      current: Math.min(STATE.contracts.map(c => c.org).filter((v,i,a)=>a.indexOf(v)===i).length, KPI_TARGETS.partnerEntities),
-      target:  KPI_TARGETS.partnerEntities,
-      unit:    'جهة',
-      color:   'var(--teal)',
-    },
-    {
-      label:   'وقت الاستجابة المستهدف',
-      icon:    '⏱️',
-      current: 24,
-      target:  KPI_TARGETS.responseHours,
-      unit:    'ساعة',
-      color:   'var(--mid)',
-      inverse: true,
-    },
+    { label: 'المنسوبون المسجلون',   icon: '👤', current: totalRegs,      target: KPI_TARGETS.registeredConsultants, unit: 'منسوب',  color: 'var(--blue)'  },
+    { label: 'الملفات المعتمدة',     icon: '✅', current: approved,        target: KPI_TARGETS.approvedProfiles,     unit: 'ملف',    color: 'var(--green)' },
+    { label: 'نسبة القبول',          icon: '📈', current: approvalRate,    target: 80,                               unit: '%',      color: '#15803d'      },
+    { label: 'المنسوبون المتاحون',   icon: '🟢', current: available,       target: Math.max(1, Math.round(approved * .75)), unit: 'منسوب', color: '#087a45' },
+    { label: 'إجمالي طلبات التعاقد', icon: '📄', current: totalCt,         target: KPI_TARGETS.monthlyContracts,     unit: 'طلب',    color: 'var(--gold)'  },
+    { label: 'عقود مكتملة',         icon: '🏆', current: completedCt,     target: Math.max(1, Math.round(totalCt * .7)), unit: 'عقد', color: '#c8941f'     },
+    { label: 'عقود تحت التنفيذ',    icon: '⚙️', current: activeCt,        target: Math.max(1, Math.round(totalCt * .3)), unit: 'عقد', color: '#3b82f6'     },
+    { label: 'نسبة إتمام العقود',    icon: '🎯', current: completionRate,  target: 70,                               unit: '%',      color: '#006633'      },
+    { label: 'متوسط التقييم',        icon: '⭐', current: +avgRating.toFixed(1), target: KPI_TARGETS.avgRating,    unit: 'من 5',  color: '#f59e0b',  decimal: true },
+    { label: 'الجهات المستفيدة',     icon: '🏢', current: activeOrgs,      target: KPI_TARGETS.partnerEntities,      unit: 'جهة',    color: 'var(--teal)'  },
+    { label: 'طلبات معلقة',         icon: '⏳', current: pending,          target: 5,                                unit: 'طلب',    color: '#f59e0b', inverse: true },
+    { label: 'وقت الاستجابة',        icon: '⏱️', current: 24,              target: KPI_TARGETS.responseHours,        unit: 'ساعة',   color: 'var(--mid)',  inverse: true },
   ];
 
-  document.getElementById('kpiCards').innerHTML =
-    `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px">` +
+  document.getElementById('kpiCards').innerHTML = summaryHtml +
+    `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px">` +
     kpis.map(k => {
       const pct   = k.inverse
         ? Math.min(100, Math.round((k.target / Math.max(k.current, 1)) * 100))
-        : Math.min(100, Math.round((k.current / k.target) * 100));
+        : Math.min(100, Math.round((k.current / Math.max(k.target, 1)) * 100));
       const val   = k.decimal ? k.current.toFixed(1) : k.current;
       const tgt   = k.decimal ? k.target.toFixed(1)  : k.target;
-      const badge = pct >= 100 ? '<span class="tag tag-g" style="margin-right:8px">✓ تحقق</span>'
-                  : pct >= 60  ? '<span class="tag tag-gold" style="margin-right:8px">جارٍ</span>'
-                  :              '<span class="tag tag-r" style="margin-right:8px">دون الهدف</span>';
+      const status = pct >= 100 ? { cls: 'tag-g',    txt: '✓ تحقق'     }
+                   : pct >= 60  ? { cls: 'tag-gold',  txt: '↗ جارٍ'    }
+                   :              { cls: 'tag-r',      txt: '↓ دون الهدف' };
+      const barColor = pct >= 100 ? '#006633' : pct >= 60 ? '#f59e0b' : '#c0392b';
       return `
-        <div style="background:var(--surf);border:1px solid var(--bdr);border-radius:var(--rl);padding:20px">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div style="background:var(--surf);border:1px solid var(--bdr);border-radius:var(--rl);padding:20px;transition:box-shadow .2s"
+          onmouseover="this.style.boxShadow='var(--shl)'" onmouseout="this.style.boxShadow=''">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px">
             <div style="display:flex;align-items:center;gap:8px">
-              <span style="font-size:1.4rem">${k.icon}</span>
-              <span style="font-size:.82rem;font-weight:700;color:var(--txt2)">${k.label}</span>
+              <span style="font-size:1.5rem">${k.icon}</span>
+              <span style="font-size:.8rem;font-weight:700;color:var(--navy);line-height:1.3">${k.label}</span>
             </div>
-            ${badge}
+            <span class="tag ${status.cls}" style="font-size:.65rem;white-space:nowrap">${status.txt}</span>
           </div>
-          <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:10px">
-            <span style="font-size:1.9rem;font-weight:900;color:${k.color}">${val}</span>
-            <span style="font-size:.78rem;color:var(--muted)">/ ${tgt} ${k.unit}</span>
+          <div style="display:flex;align-items:baseline;gap:5px;margin-bottom:12px">
+            <span style="font-size:2rem;font-weight:900;color:${k.color}">${val}</span>
+            <span style="font-size:.75rem;color:var(--muted)">/ ${tgt} ${k.unit}</span>
           </div>
-          <div style="background:var(--surf2);border-radius:6px;overflow:hidden;height:8px">
-            <div style="width:${pct}%;height:100%;background:${k.color};border-radius:6px;transition:width .6s"></div>
+          <div style="background:var(--surf2);border-radius:6px;overflow:hidden;height:6px;margin-bottom:4px">
+            <div style="width:${pct}%;height:100%;background:${barColor};border-radius:6px;transition:width .8s ease"></div>
           </div>
-          <div style="font-size:.72rem;color:var(--muted);margin-top:5px;text-align:left">${pct}%</div>
+          <div style="font-size:.7rem;color:var(--muted);text-align:left;direction:ltr">${pct}% من الهدف</div>
         </div>`;
     }).join('') + '</div>';
 }
@@ -375,73 +367,121 @@ function destroyChart(id) {
 function renderBarChart() { /* legacy — now handled by renderCharts */ }
 
 function renderCharts() {
-  const regs      = getRegs();
-  const ct        = STATE.contracts;
+  const regs = getRegs();
+  const ct   = STATE.contracts;
+  const all  = getAllConsultants();
+
+  /* ── Dynamic analytics summary stats ── */
+  const avgRating     = DATA.length ? (DATA.reduce((s,c) => s+c.rating,0)/DATA.length).toFixed(1) : '—';
+  const completedCt   = ct.filter(c => c.status === 'مكتمل').length;
+  const completionPct = ct.length ? Math.round(completedCt/ct.length*100) : 0;
+  const totalApproved = all.filter(c => c.verified).length;
+  document.getElementById('analyticsStats').innerHTML = `
+    <div class="stat-c"><div class="sv" style="color:var(--blue)">${all.length}</div><div class="sl">إجمالي المنسوبين المسجلين</div></div>
+    <div class="stat-c"><div class="sv" style="color:var(--green)">${totalApproved}</div><div class="sl">ملف معتمد</div></div>
+    <div class="stat-c"><div class="sv" style="color:#f59e0b">${avgRating}</div><div class="sl">متوسط التقييم</div></div>
+    <div class="stat-c"><div class="sv" style="color:var(--gold)">${completionPct}%</div><div class="sl">نسبة إتمام العقود</div></div>`;
+
+  const FONT = { family: 'Cairo', size: 11 };
+  const GRID = { color: 'rgba(0,0,0,.05)' };
 
   /* 1. توزيع المنسوبين حسب الكلية */
   const colMap = {};
-  DATA.forEach(c => { colMap[c.college] = (colMap[c.college] || 0) + 1; });
-  const colLabels = Object.keys(colMap).slice(0, 8);
-  const colVals   = colLabels.map(l => colMap[l]);
+  all.forEach(c => { if (c.college) colMap[c.college] = (colMap[c.college]||0)+1; });
+  const colEntries = Object.entries(colMap).sort((a,b)=>b[1]-a[1]).slice(0,8);
 
   destroyChart('chartColleges');
   const ctxC = document.getElementById('chartColleges');
-  if (ctxC) {
-    _charts.chartColleges = new Chart(ctxC, {
-      type: 'bar',
-      data: {
-        labels: colLabels,
-        datasets: [{ label: 'عدد المنسوبين', data: colVals,
-          backgroundColor: 'rgba(0,102,51,.75)', borderRadius: 6,
-          borderSkipped: false }]
-      },
-      options: {
-        indexAxis: 'y',
-        plugins: { legend: { display: false } },
-        scales: {
-          x: { grid: { color: 'rgba(0,0,0,.05)' } },
-          y: { ticks: { font: { family: 'Cairo', size: 11 } } }
-        }
-      }
-    });
-  }
+  if (ctxC) _charts.chartColleges = new Chart(ctxC, {
+    type: 'bar',
+    data: { labels: colEntries.map(e=>e[0]), datasets: [{
+      label: 'عدد المنسوبين', data: colEntries.map(e=>e[1]),
+      backgroundColor: 'rgba(0,102,51,.75)', borderRadius:6, borderSkipped:false
+    }]},
+    options: { indexAxis:'y', plugins:{legend:{display:false}},
+      scales:{ x:{grid:GRID}, y:{ticks:{font:FONT}} } }
+  });
 
   /* 2. حالات طلبات التعاقد */
-  const statuses = ['قيد الدراسة','مقبول','تحت التنفيذ','مكتمل','مرفوض'];
-  const stColors = ['#f59e0b','#006633','#087a45','#15803d','#c0392b'];
-  const stCounts = statuses.map(s => ct.filter(c => c.status === s).length);
-
+  const ctStatuses = ['قيد الدراسة','مقبول','تحت التنفيذ','مكتمل','مرفوض'];
+  const ctColors   = ['#f59e0b','#006633','#087a45','#15803d','#c0392b'];
   destroyChart('chartContracts');
   const ctxK = document.getElementById('chartContracts');
-  if (ctxK) {
-    _charts.chartContracts = new Chart(ctxK, {
-      type: 'doughnut',
-      data: { labels: statuses, datasets: [{ data: stCounts, backgroundColor: stColors, borderWidth: 2 }] },
-      options: {
-        plugins: { legend: { position: 'bottom', labels: { font: { family: 'Cairo', size: 11 }, padding: 12 } } },
-        cutout: '62%'
-      }
-    });
-  }
+  if (ctxK) _charts.chartContracts = new Chart(ctxK, {
+    type: 'doughnut',
+    data: { labels: ctStatuses, datasets: [{
+      data: ctStatuses.map(s => ct.filter(c=>c.status===s).length),
+      backgroundColor: ctColors, borderWidth:2
+    }]},
+    options: { plugins:{ legend:{position:'bottom',labels:{font:FONT,padding:10}} }, cutout:'60%' }
+  });
 
-  /* 3. التسجيلات حسب الحالة */
+  /* 3. أكثر المهارات طلباً (top 10) */
+  const skillMap = {};
+  all.forEach(c => (c.skills||[]).forEach(s => { skillMap[s]=(skillMap[s]||0)+1; }));
+  const skillEntries = Object.entries(skillMap).sort((a,b)=>b[1]-a[1]).slice(0,10);
+
+  destroyChart('chartSkills');
+  const ctxSk = document.getElementById('chartSkills');
+  if (ctxSk) _charts.chartSkills = new Chart(ctxSk, {
+    type: 'bar',
+    data: { labels: skillEntries.map(e=>e[0]), datasets: [{
+      label: 'عدد المنسوبين', data: skillEntries.map(e=>e[1]),
+      backgroundColor: skillEntries.map((_,i)=>`hsl(${140+i*12},55%,${42-i*2}%)`),
+      borderRadius:5, borderSkipped:false
+    }]},
+    options: { indexAxis:'y', plugins:{legend:{display:false}},
+      scales:{ x:{grid:GRID,ticks:{stepSize:1}}, y:{ticks:{font:FONT}} } }
+  });
+
+  /* 4. أنواع الخدمات المطلوبة */
+  const svcMap = {};
+  ct.forEach(c => { if (c.service) svcMap[c.service]=(svcMap[c.service]||0)+1; });
+  const svcEntries = Object.entries(svcMap).length
+    ? Object.entries(svcMap)
+    : [['استشارة إدارية',3],['برنامج تدريبي',2],['بحث وتقييم',2],['دراسة جدوى',1]];
+  const svcColors = ['#006633','#087a45','#c8941f','#3b82f6','#8b5cf6'];
+
+  destroyChart('chartServices');
+  const ctxSv = document.getElementById('chartServices');
+  if (ctxSv) _charts.chartServices = new Chart(ctxSv, {
+    type: 'pie',
+    data: { labels: svcEntries.map(e=>e[0]), datasets: [{
+      data: svcEntries.map(e=>e[1]),
+      backgroundColor: svcEntries.map((_,i)=>svcColors[i%svcColors.length]), borderWidth:2
+    }]},
+    options: { plugins:{ legend:{position:'bottom',labels:{font:FONT,padding:10}} } }
+  });
+
+  /* 5. التسجيلات حسب الحالة */
   const rStatuses = ['قيد المراجعة','معتمد','مرفوض'];
   const rColors   = ['#f59e0b','#006633','#c0392b'];
-  const rCounts   = rStatuses.map(s => regs.filter(r => r.status === s).length);
-
   destroyChart('chartRegs');
   const ctxR = document.getElementById('chartRegs');
-  if (ctxR) {
-    _charts.chartRegs = new Chart(ctxR, {
-      type: 'bar',
-      data: {
-        labels: rStatuses,
-        datasets: [{ label: 'الطلبات', data: rCounts, backgroundColor: rColors, borderRadius: 8, borderSkipped: false }]
-      },
-      options: {
-        plugins: { legend: { display: false } },
-        scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
-      }
-    });
-  }
+  if (ctxR) _charts.chartRegs = new Chart(ctxR, {
+    type: 'bar',
+    data: { labels: rStatuses, datasets: [{
+      label: 'الطلبات', data: rStatuses.map(s=>regs.filter(r=>r.status===s).length),
+      backgroundColor: rColors, borderRadius:8, borderSkipped:false
+    }]},
+    options: { plugins:{legend:{display:false}},
+      scales:{ y:{beginAtZero:true,ticks:{stepSize:1,font:FONT},grid:GRID},
+               x:{ticks:{font:FONT}} } }
+  });
+
+  /* 6. توزيع اللغات */
+  const langMap = {};
+  all.forEach(c => (c.lang||[]).forEach(l => { langMap[l]=(langMap[l]||0)+1; }));
+  const langEntries = Object.entries(langMap).sort((a,b)=>b[1]-a[1]);
+  const langColors  = ['#006633','#087a45','#c8941f','#3b82f6'];
+  destroyChart('chartLangs');
+  const ctxL = document.getElementById('chartLangs');
+  if (ctxL) _charts.chartLangs = new Chart(ctxL, {
+    type: 'doughnut',
+    data: { labels: langEntries.map(e=>e[0]), datasets: [{
+      data: langEntries.map(e=>e[1]),
+      backgroundColor: langEntries.map((_,i)=>langColors[i%langColors.length]), borderWidth:2
+    }]},
+    options: { plugins:{ legend:{position:'bottom',labels:{font:FONT,padding:10}} }, cutout:'55%' }
+  });
 }

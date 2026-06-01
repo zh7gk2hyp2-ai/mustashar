@@ -629,12 +629,11 @@
 
     <!-- Analytics -->
     <div class="dpanel" id="pan-analytics">
-      <h3 style="color:var(--navy);margin-bottom:18px">📈 التقارير والتحليلات</h3>
-      <div class="stats4" id="analyticsStats">
-        <div class="stat-c" style="grid-column:span 2"><div class="sv" style="color:var(--blue)">55</div><div class="sl">إجمالي مؤشرات الأداء (KPIs) المُتتبَّعة</div></div>
-        <div class="stat-c"><div class="sv">4.8</div><div class="sl">متوسط تقييم المستشارين</div></div>
-        <div class="stat-c"><div class="sv">92%</div><div class="sl">نسبة التعاقدات المكتملة</div></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px">
+        <h3 style="color:var(--navy)">📈 التقارير والتحليلات</h3>
+        <span class="tag tag-b" style="font-size:.72rem">بيانات حية</span>
       </div>
+      <div class="stats4" id="analyticsStats"></div>
       <div class="charts-grid">
         <div class="chart-box">
           <h4>📊 توزيع المنسوبين حسب الكلية</h4>
@@ -644,10 +643,24 @@
           <h4>📋 حالات طلبات التعاقد</h4>
           <canvas id="chartContracts"></canvas>
         </div>
+        <div class="chart-box">
+          <h4>🏅 أكثر المهارات طلباً</h4>
+          <canvas id="chartSkills"></canvas>
+        </div>
+        <div class="chart-box">
+          <h4>📋 أنواع الخدمات المطلوبة</h4>
+          <canvas id="chartServices"></canvas>
+        </div>
       </div>
-      <div class="chart-box" style="margin-bottom:0">
-        <h4>📅 التسجيلات حسب الحالة</h4>
-        <canvas id="chartRegs" style="max-height:180px"></canvas>
+      <div class="charts-grid" style="margin-top:0">
+        <div class="chart-box">
+          <h4>📅 التسجيلات حسب الحالة</h4>
+          <canvas id="chartRegs" style="max-height:200px"></canvas>
+        </div>
+        <div class="chart-box">
+          <h4>🌐 توزيع اللغات</h4>
+          <canvas id="chartLangs" style="max-height:200px"></canvas>
+        </div>
       </div>
     </div>
   </div>
@@ -770,6 +783,7 @@
     <div class="psec">
       <a onclick="showPortalPanel('overview')" id="pnav-overview" class="on">📊 نظرة عامة</a>
       <a onclick="showPortalPanel('edit')"     id="pnav-edit">✏️ تعديل ملفي</a>
+      <a onclick="showPortalPanel('chpass')"   id="pnav-chpass">🔑 تغيير كلمة المرور</a>
       <a onclick="go('search')"               id="pnav-search">🔍 استعراض المستشارين</a>
     </div>
   </div>
@@ -813,6 +827,37 @@
         </div>
         <div style="display:flex;gap:10px;margin-top:6px">
           <button id="saveProfileBtn" class="btn btn-p" onclick="saveProfile()">حفظ التعديلات ←</button>
+          <button class="btn btn-g" onclick="showPortalPanel('overview')">إلغاء</button>
+        </div>
+      </div>
+    </div>
+    <!-- Change Password -->
+    <div class="ppanel" id="pp-chpass">
+      <div class="pp-card">
+        <h3>🔑 تغيير كلمة المرور</h3>
+        <p style="font-size:.82rem;color:var(--txt2);margin-bottom:18px">استخدم كلمة مرور قوية تستوفي جميع المتطلبات لحماية حسابك.</p>
+        <div class="fi">
+          <label>كلمة المرور الحالية <span class="rq">*</span></label>
+          <input id="pp-curpass" type="password">
+        </div>
+        <div class="fi">
+          <label>كلمة المرور الجديدة <span class="rq">*</span></label>
+          <input id="pp-newpass" type="password" oninput="checkPwdStrength(this.value,'pp')">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 14px;font-size:.72rem;padding:10px 14px;background:var(--surf2);border-radius:8px;margin-bottom:14px">
+          <span id="pp-len"   style="color:var(--muted)">☐ 8 أحرف على الأقل</span>
+          <span id="pp-upper" style="color:var(--muted)">☐ حرف كبير (A-Z)</span>
+          <span id="pp-lower" style="color:var(--muted)">☐ حرف صغير (a-z)</span>
+          <span id="pp-num"   style="color:var(--muted)">☐ رقم (0-9)</span>
+          <span id="pp-sym"   style="color:var(--muted)">☐ رمز خاص (!@#$...)</span>
+        </div>
+        <div class="fi">
+          <label>تأكيد كلمة المرور <span class="rq">*</span></label>
+          <input id="pp-confpass" type="password" onkeydown="if(event.key==='Enter')portalChangePassword()">
+        </div>
+        <div id="pp-pwd-err" style="color:var(--red);font-size:.8rem;margin-bottom:12px;display:none;padding:8px 12px;background:rgba(192,57,43,.07);border-radius:8px"></div>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-p" onclick="portalChangePassword()">حفظ كلمة المرور ←</button>
           <button class="btn btn-g" onclick="showPortalPanel('overview')">إلغاء</button>
         </div>
       </div>
@@ -908,13 +953,20 @@
         </div>
         <div class="fi" style="position:relative">
           <label>كلمة المرور الجديدة <span class="rq">*</span></label>
-          <input id="loginConsNewPass" type="password">
+          <input id="loginConsNewPass" type="password" oninput="checkPwdStrength(this.value,'lp')">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:3px 12px;font-size:.7rem;padding:9px 12px;background:var(--surf2);border-radius:8px;margin-bottom:10px">
+          <span id="lp-len"   style="color:var(--muted)">☐ 8 أحرف على الأقل</span>
+          <span id="lp-upper" style="color:var(--muted)">☐ حرف كبير (A-Z)</span>
+          <span id="lp-lower" style="color:var(--muted)">☐ حرف صغير (a-z)</span>
+          <span id="lp-num"   style="color:var(--muted)">☐ رقم (0-9)</span>
+          <span id="lp-sym"   style="color:var(--muted)">☐ رمز خاص (!@#$...)</span>
         </div>
         <div class="fi">
           <label>تأكيد كلمة المرور <span class="rq">*</span></label>
           <input id="loginConsConfPass" type="password" onkeydown="if(event.key==='Enter')changeConsPassword()">
         </div>
-        <div style="font-size:.72rem;color:var(--muted);margin-bottom:12px">8 أحرف على الأقل · لا تساوي رقم المنسوب</div>
+        <div style="font-size:.72rem;color:var(--muted);margin-bottom:12px">لا تساوي رقم المنسوب</div>
         <div id="loginChPassErr" style="color:var(--red);font-size:.8rem;margin-bottom:12px;display:none;padding:8px 12px;background:rgba(192,57,43,.07);border-radius:8px"></div>
         <button class="btn btn-p" style="width:100%" onclick="changeConsPassword()">حفظ وتسجيل الدخول ←</button>
       </div>

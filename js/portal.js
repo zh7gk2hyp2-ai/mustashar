@@ -20,6 +20,29 @@ function _saveConsPwd(empId, pass) {
   store[empId] = pass;
   localStorage.setItem('mu_cons_pwd', JSON.stringify(store));
 }
+function _isStrongPwd(p) {
+  return p.length >= 8 &&
+    /[A-Z]/.test(p) &&
+    /[a-z]/.test(p) &&
+    /[0-9]/.test(p) &&
+    /[^A-Za-z0-9]/.test(p);
+}
+/* live strength checker — pfx matches element IDs like pp-len, lp-len */
+function checkPwdStrength(val, pfx) {
+  const rules = [
+    ['len',   val.length >= 8,          '8 أحرف على الأقل'],
+    ['upper', /[A-Z]/.test(val),        'حرف كبير (A-Z)'],
+    ['lower', /[a-z]/.test(val),        'حرف صغير (a-z)'],
+    ['num',   /[0-9]/.test(val),        'رقم (0-9)'],
+    ['sym',   /[^A-Za-z0-9]/.test(val), 'رمز خاص (!@#$...)'],
+  ];
+  rules.forEach(([k, ok, label]) => {
+    const el = document.getElementById(`${pfx}-${k}`);
+    if (!el) return;
+    el.style.color   = ok ? 'var(--green)' : 'var(--muted)';
+    el.textContent   = (ok ? '✓ ' : '☐ ') + label;
+  });
+}
 
 /* temp state during login flow */
 let _consOtp  = null;
@@ -87,7 +110,7 @@ async function doConsultantLogin() {
     _consOtp = String(Math.floor(100000 + Math.random() * 900000));
 
     /* simulate sending email: show code in a toast (demo mode) */
-    toast(`📧 رمز التحقق المرسل إلى ${email} هو: ${_consOtp}`, 't-inf', 20000);
+    toast(`📧 رمز التحقق المرسل إلى ${email} هو: ${_consOtp}`, 't-inf', 5000);
 
     err.style.display = 'none';
     document.getElementById('otpEmailHint').textContent =
@@ -130,7 +153,7 @@ function verifyConsOtp() {
 function resendConsOtp() {
   if (!_consReg) return;
   _consOtp = String(Math.floor(100000 + Math.random() * 900000));
-  toast(`📧 رمز جديد أُرسل إلى ${_consReg.email}: ${_consOtp}`, 't-inf', 20000);
+  toast(`📧 رمز جديد أُرسل إلى ${_consReg.email}: ${_consOtp}`, 't-inf', 5000);
   document.getElementById('loginConsOtp').value = '';
   document.getElementById('loginOtpErr').style.display = 'none';
 }
@@ -141,8 +164,8 @@ function changeConsPassword() {
   const confPass = document.getElementById('loginConsConfPass')?.value || '';
   const err      = document.getElementById('loginChPassErr');
 
-  if (newPass.length < 8) {
-    err.textContent = '⚠️ كلمة المرور يجب أن تكون 8 أحرف على الأقل';
+  if (!_isStrongPwd(newPass)) {
+    err.textContent = '⚠️ كلمة المرور لا تستوفي متطلبات الأمان (8 أحرف + كبير + صغير + رقم + رمز)';
     err.style.display = 'block'; return;
   }
   if (newPass !== confPass) {
@@ -284,4 +307,38 @@ async function saveProfile() {
   } finally {
     btn.disabled = false;
   }
+}
+
+/* ── Portal: change password (after login) ── */
+function portalChangePassword() {
+  const cons    = getConsultantSession();
+  if (!cons) return;
+  const curPass  = document.getElementById('pp-curpass')?.value  || '';
+  const newPass  = document.getElementById('pp-newpass')?.value  || '';
+  const confPass = document.getElementById('pp-confpass')?.value || '';
+  const err      = document.getElementById('pp-pwd-err');
+
+  const storedPwd   = _getConsPwd(cons.emp_id);
+  const expectedPwd = storedPwd || cons.emp_id;
+  if (curPass !== expectedPwd) {
+    err.textContent = '⚠️ كلمة المرور الحالية غير صحيحة'; err.style.display = 'block'; return;
+  }
+  if (!_isStrongPwd(newPass)) {
+    err.textContent = '⚠️ كلمة المرور لا تستوفي متطلبات الأمان (8 أحرف + كبير + صغير + رقم + رمز)';
+    err.style.display = 'block'; return;
+  }
+  if (newPass !== confPass) {
+    err.textContent = '⚠️ كلمتا المرور غير متطابقتين'; err.style.display = 'block'; return;
+  }
+  if (newPass === cons.emp_id) {
+    err.textContent = '⚠️ لا يمكن استخدام رقم المنسوب ككلمة مرور'; err.style.display = 'block'; return;
+  }
+  _saveConsPwd(cons.emp_id, newPass);
+  err.style.display = 'none';
+  ['pp-curpass','pp-newpass','pp-confpass'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+  checkPwdStrength('', 'pp');
+  toast('✅ تم تغيير كلمة المرور بنجاح', 't-ok');
+  showPortalPanel('overview');
 }
